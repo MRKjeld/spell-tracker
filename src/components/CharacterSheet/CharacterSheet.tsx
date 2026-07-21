@@ -14,7 +14,8 @@ export function CharacterSheet() {
   const addExtraPool = useCharacterStore((s) => s.addExtraPool);
   const removeExtraPool = useCharacterStore((s) => s.removeExtraPool);
   const fillSlot = useCharacterStore((s) => s.fillSlot);
-  const clearSlot = useCharacterStore((s) => s.clearSlot);
+  const setSlotUsed = useCharacterStore((s) => s.setSlotUsed);
+  const restCharacter = useCharacterStore((s) => s.restCharacter);
 
   const [showAddPool, setShowAddPool] = useState(false);
   const [pickerTarget, setPickerTarget] = useState<{
@@ -38,18 +39,37 @@ export function CharacterSheet() {
   }
 
   function handleSlotClick(spellLevel: number | null, slotInstanceId: string, poolName?: string) {
-    if (character!.slotFills[slotInstanceId]) {
-      if (confirm('Clear this slot?')) clearSlot(character!.id, slotInstanceId);
+    const fill = character!.slotFills[slotInstanceId];
+    if (fill) {
+      if (fill.used) {
+        if (confirm('Are you sure you want to unuse this spell?')) {
+          setSlotUsed(character!.id, slotInstanceId, false);
+        }
+      } else {
+        setSlotUsed(character!.id, slotInstanceId, true);
+      }
     } else {
       setPickerTarget({ spellLevel, poolName, slotInstanceId });
     }
   }
 
-  function handlePick(spellId: string, spellName: string, sourceClassId: ClassId | null) {
+  function handlePick(spellId: string, spellName: string, sourceClassId: ClassId | null, persistAfterRest: boolean) {
     if (pickerTarget) {
-      fillSlot(character!.id, pickerTarget.slotInstanceId, { spellId, spellName, sourceClassId });
+      fillSlot(character!.id, pickerTarget.slotInstanceId, {
+        spellId,
+        spellName,
+        sourceClassId,
+        used: false,
+        persistAfterRest,
+      });
     }
     setPickerTarget(null);
+  }
+
+  function handleRest() {
+    if (confirm('Rest and clear all spells not marked "Persist after rest"?')) {
+      restCharacter(character!.id);
+    }
   }
 
   return (
@@ -62,6 +82,9 @@ export function CharacterSheet() {
           </p>
         </div>
         <div className="character-sheet-header-actions">
+          <button type="button" onClick={handleRest} className="button-secondary">
+            Rest
+          </button>
           <Link to={`/${character.id}/edit`}>Edit Character</Link>
           <Link to="/">All Characters</Link>
         </div>

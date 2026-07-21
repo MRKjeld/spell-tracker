@@ -75,3 +75,9 @@ button:hover {
 .button-primary:hover {
   background: var(--accent-hover);
 }
+
+.button-secondary {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 10px 20px;
+}

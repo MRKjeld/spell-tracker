@@ -9,9 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "unpack-spells": "node scripts/unpack-spells.mjs",
-    "distill-spells": "node scripts/distill-spells.mjs",
-    "gen-spells": "npm run unpack-spells && npm run distill-spells"
+    "gen-spells": "node scripts/scrape-aon-spells.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",
@@ -20,7 +18,6 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@foundryvtt/foundryvtt-cli": "^3.0.4",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

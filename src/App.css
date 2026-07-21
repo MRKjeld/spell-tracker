@@ -166,15 +166,32 @@
   border-color: var(--accent);
 }
 
+.slot-chip-used {
+  background: var(--border);
+  color: var(--text-muted);
+  border-color: var(--border);
+  opacity: 0.6;
+}
+
 .slot-chip-spell {
   font-weight: 600;
   font-size: 13px;
 }
 
 .slot-chip-source,
-.slot-chip-empty-label {
+.slot-chip-empty-label,
+.slot-chip-used-label {
   font-size: 11px;
   opacity: 0.8;
+}
+
+.slot-chip-used-label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.slot-chip-persist {
+  font-size: 11px;
 }
 
 /* Modal */

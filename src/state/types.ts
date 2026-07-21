@@ -11,6 +11,8 @@ export interface SlotFill {
   spellId: string;
   spellName: string;
   sourceClassId: ClassId | null; // which class's list the spell was picked from; null if picked from All Classes
+  used: boolean; // greyed out once cast; toggled back off via an "unuse" confirmation
+  persistAfterRest: boolean; // if true, Rest does not clear this fill
 }
 
 export interface Character {

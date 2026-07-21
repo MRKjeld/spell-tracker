@@ -13,6 +13,8 @@ interface CharacterStoreState {
   removeExtraPool(charId: string, poolId: string): void;
   fillSlot(charId: string, slotInstanceId: string, fill: SlotFill): void;
   clearSlot(charId: string, slotInstanceId: string): void;
+  setSlotUsed(charId: string, slotInstanceId: string, used: boolean): void;
+  restCharacter(charId: string): void;
   replaceAllCharacters(chars: Character[]): void;
   addCharacters(chars: Character[]): void;
 }
@@ -105,6 +107,34 @@ export const useCharacterStore = create<CharacterStoreState>()(
           if (!existing) return state;
           const { [slotInstanceId]: _removed, ...restFills } = existing.slotFills;
           const updated = touch({ ...existing, slotFills: restFills });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      setSlotUsed(charId, slotInstanceId, used) {
+        set((state) => {
+          const existing = state.characters[charId];
+          const fill = existing?.slotFills[slotInstanceId];
+          if (!existing || !fill) return state;
+          const updated = touch({
+            ...existing,
+            slotFills: { ...existing.slotFills, [slotInstanceId]: { ...fill, used } },
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      restCharacter(charId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const restedFills: Record<string, SlotFill> = {};
+          for (const [slotInstanceId, fill] of Object.entries(existing.slotFills)) {
+            if (fill.persistAfterRest) {
+              restedFills[slotInstanceId] = { ...fill, used: false };
+            }
+          }
+          const updated = touch({ ...existing, slotFills: restedFills });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

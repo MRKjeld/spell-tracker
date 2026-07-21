@@ -9,7 +9,7 @@ interface SpellPickerModalProps {
   defaultClassId: ClassId;
   spellLevel: number | null;
   poolName?: string;
-  onPick: (spellId: string, spellName: string, sourceClassId: ClassId | null) => void;
+  onPick: (spellId: string, spellName: string, sourceClassId: ClassId | null, persistAfterRest: boolean) => void;
   onClose: () => void;
 }
 
@@ -75,6 +75,7 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
   const [searchDescriptions, setSearchDescriptions] = useState(false);
   const [showAllDescriptions, setShowAllDescriptions] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [persistAfterRest, setPersistAfterRest] = useState(false);
 
   const spells = useMemo(() => {
     if (activeTab === 'all') {
@@ -125,6 +126,14 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
         >
           {showAllDescriptions ? 'Hide descriptions' : 'Show descriptions'}
         </button>
+        <label className="spell-picker-description-toggle">
+          <input
+            type="checkbox"
+            checked={persistAfterRest}
+            onChange={(e) => setPersistAfterRest(e.target.checked)}
+          />
+          Persist after rest
+        </label>
       </div>
 
       <div className="spell-picker-tabs">
@@ -159,7 +168,7 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
                   className="spell-picker-pick"
                   onClick={() => {
                     const sourceClassId = activeTab === 'all' ? null : activeTab;
-                    onPick(spell.id, spell.name, sourceClassId);
+                    onPick(spell.id, spell.name, sourceClassId, persistAfterRest);
                   }}
                 >
                   {spell.name}

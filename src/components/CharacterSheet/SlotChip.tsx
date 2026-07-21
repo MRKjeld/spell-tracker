@@ -18,20 +18,23 @@ export function SlotChip({ instance, fill, characterClassId, onClick }: SlotChip
       : null;
 
   const filledSourceParts = [originLabel, fromOtherClass ? `from ${fromOtherClass}` : null].filter(Boolean);
+  const stateClass = fill ? (fill.used ? 'slot-chip-used' : 'slot-chip-filled') : 'slot-chip-empty';
 
   return (
     <button
       type="button"
-      className={`slot-chip slot-chip-${instance.origin} ${fill ? 'slot-chip-filled' : 'slot-chip-empty'}`}
+      className={`slot-chip slot-chip-${instance.origin} ${stateClass}`}
       onClick={onClick}
       title={originLabel ?? undefined}
     >
       {fill ? (
         <>
           <span className="slot-chip-spell">{fill.spellName}</span>
+          {fill.persistAfterRest && <span className="slot-chip-persist" title="Persists after rest">★</span>}
           {filledSourceParts.length > 0 && (
             <span className="slot-chip-source">{filledSourceParts.join(' · ')}</span>
           )}
+          {fill.used && <span className="slot-chip-used-label">Used</span>}
         </>
       ) : (
         <span className="slot-chip-empty-label">{originLabel ?? 'Empty'}</span>
