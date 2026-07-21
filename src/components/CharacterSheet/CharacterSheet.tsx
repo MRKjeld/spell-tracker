@@ -45,7 +45,7 @@ export function CharacterSheet() {
     }
   }
 
-  function handlePick(spellId: string, spellName: string, sourceClassId: ClassId) {
+  function handlePick(spellId: string, spellName: string, sourceClassId: ClassId | null) {
     if (pickerTarget) {
       fillSlot(character!.id, pickerTarget.slotInstanceId, { spellId, spellName, sourceClassId });
     }

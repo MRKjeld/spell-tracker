@@ -9,7 +9,7 @@ interface SpellPickerModalProps {
   defaultClassId: ClassId;
   spellLevel: number | null;
   poolName?: string;
-  onPick: (spellId: string, spellName: string, sourceClassId: ClassId) => void;
+  onPick: (spellId: string, spellName: string, sourceClassId: ClassId | null) => void;
   onClose: () => void;
 }
 
@@ -158,12 +158,7 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
                   type="button"
                   className="spell-picker-pick"
                   onClick={() => {
-                    const sourceClassId =
-                      activeTab === 'all'
-                        ? spell.levels[defaultClassId] !== undefined
-                          ? defaultClassId
-                          : (Object.keys(spell.levels)[0] as ClassId)
-                        : activeTab;
+                    const sourceClassId = activeTab === 'all' ? null : activeTab;
                     onPick(spell.id, spell.name, sourceClassId);
                   }}
                 >

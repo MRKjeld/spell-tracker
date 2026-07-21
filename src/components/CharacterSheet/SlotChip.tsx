@@ -12,7 +12,10 @@ interface SlotChipProps {
 
 export function SlotChip({ instance, fill, characterClassId, onClick }: SlotChipProps) {
   const originLabel = instance.origin === 'pool' ? instance.poolName : instance.origin === 'bonus' ? 'Bonus' : null;
-  const fromOtherClass = fill && fill.sourceClassId !== characterClassId ? CLASS_LABELS[fill.sourceClassId] : null;
+  const fromOtherClass =
+    fill && fill.sourceClassId !== null && fill.sourceClassId !== characterClassId
+      ? CLASS_LABELS[fill.sourceClassId]
+      : null;
 
   const filledSourceParts = [originLabel, fromOtherClass ? `from ${fromOtherClass}` : null].filter(Boolean);
 

@@ -10,7 +10,7 @@ export interface ExtraSlotPool {
 export interface SlotFill {
   spellId: string;
   spellName: string;
-  sourceClassId: ClassId; // which class's list the spell was picked from
+  sourceClassId: ClassId | null; // which class's list the spell was picked from; null if picked from All Classes
 }
 
 export interface Character {
