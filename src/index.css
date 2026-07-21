@@ -68,6 +68,8 @@ button:hover {
   border-color: var(--accent);
   text-decoration: none;
   display: inline-block;
+  border-radius: 8px;
+  padding: 10px 20px;
 }
 
 .button-primary:hover {
