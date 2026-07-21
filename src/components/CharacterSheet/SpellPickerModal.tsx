@@ -70,7 +70,7 @@ function levelLabelFor(spell: SpellEntry, activeTab: ClassId | 'all', defaultCla
 }
 
 export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick, onClose }: SpellPickerModalProps) {
-  const [activeTab, setActiveTab] = useState<ClassId | 'all'>(defaultClassId);
+  const [activeTab, setActiveTab] = useState<ClassId | 'all'>(spellLevel === null ? 'all' : defaultClassId);
   const [query, setQuery] = useState('');
   const [searchDescriptions, setSearchDescriptions] = useState(false);
   const [showAllDescriptions, setShowAllDescriptions] = useState(false);
