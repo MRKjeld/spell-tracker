@@ -1,0 +1,110 @@
+import { describe, expect, it } from 'vitest';
+import { getBaseSlots, getBonusSlots, computeSlots, pruneOrphanedFills } from './slotMath';
+import { CLASS_IDS, MAX_SPELL_LEVEL, START_LEVEL } from '../data/classes';
+
+const NEUTRAL_SCORES = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+
+describe('getBaseSlots', () => {
+  it('matches the SRD wizard level 1 row', () => {
+    expect(getBaseSlots('wizard', 1)).toEqual([3, 1, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('matches the SRD wizard level 20 row (all 4s)', () => {
+    expect(getBaseSlots('wizard', 20)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+  });
+
+  it('is all-zero before a late-start class\'s start level', () => {
+    expect(getBaseSlots('paladin', 1)).toEqual(new Array(10).fill(0));
+    expect(getBaseSlots('paladin', 2)).toEqual(new Array(10).fill(0));
+    expect(getBaseSlots('paladin', 3)).toEqual(new Array(10).fill(0));
+  });
+
+  it('bard level 1 has no 0-level column (at-will, represented as 0)', () => {
+    expect(getBaseSlots('bard', 1)[0]).toBe(0);
+    expect(getBaseSlots('bard', 1)[1]).toBe(1);
+  });
+});
+
+describe('bonus spells', () => {
+  it('are suppressed at a spell level with zero base slots', () => {
+    // Level 1 wizard has 0 base 2nd-level slots even with a huge Int score.
+    const bonus = getBonusSlots('wizard', 1, { ...NEUTRAL_SCORES, int: 20 });
+    expect(bonus[2]).toBe(0);
+  });
+
+  it('18 Int grants +1 bonus at spell levels 1-4 for a high enough level wizard', () => {
+    const bonus = getBonusSlots('wizard', 20, { ...NEUTRAL_SCORES, int: 18 });
+    expect(bonus[1]).toBe(1);
+    expect(bonus[2]).toBe(1);
+    expect(bonus[3]).toBe(1);
+    expect(bonus[4]).toBe(1);
+    expect(bonus[5]).toBe(0);
+  });
+
+  it('20 Int grants +1 bonus at spell levels 1-5', () => {
+    const bonus = getBonusSlots('wizard', 20, { ...NEUTRAL_SCORES, int: 20 });
+    expect(bonus[5]).toBe(1);
+    expect(bonus[6]).toBe(0);
+  });
+
+  it('never grants a bonus 0-level spell', () => {
+    const bonus = getBonusSlots('wizard', 20, { ...NEUTRAL_SCORES, int: 30 });
+    expect(bonus[0]).toBe(0);
+  });
+});
+
+describe('computeSlots', () => {
+  it('totals base + bonus + pool counts, and instances match totalCount', () => {
+    const pools = [{ id: 'p1', name: 'Domain', spellLevel: 1, count: 1 }];
+    const result = computeSlots('wizard', 5, { ...NEUTRAL_SCORES, int: 18 }, pools);
+    for (const levelSlots of result) {
+      expect(levelSlots.instances.length).toBe(levelSlots.totalCount);
+      expect(levelSlots.totalCount).toBe(
+        levelSlots.baseCount + levelSlots.bonusCount + levelSlots.poolCounts.reduce((s, p) => s + p.count, 0),
+      );
+    }
+    const level1 = result.find((r) => r.spellLevel === 1)!;
+    expect(level1.poolCounts).toEqual([{ poolId: 'p1', poolName: 'Domain', count: 1 }]);
+  });
+
+  it('a pool at a spell level beyond the class max still renders', () => {
+    const pools = [{ id: 'p1', name: 'Weird Boon', spellLevel: 6, count: 2 }];
+    const result = computeSlots('paladin', 4, NEUTRAL_SCORES, pools);
+    const level6 = result.find((r) => r.spellLevel === 6)!;
+    expect(level6.totalCount).toBe(2);
+  });
+
+  it('invariant sweep: base counts are monotonic non-decreasing per spell level as character level increases, and respect MAX_SPELL_LEVEL / START_LEVEL', () => {
+    for (const classId of CLASS_IDS) {
+      let prevRow = new Array(10).fill(0);
+      for (let level = 1; level <= 20; level++) {
+        const row = getBaseSlots(classId, level);
+        expect(row.length).toBe(10);
+
+        for (let spellLevel = 0; spellLevel < 10; spellLevel++) {
+          expect(row[spellLevel]).toBeGreaterThanOrEqual(prevRow[spellLevel]);
+
+          if (spellLevel > MAX_SPELL_LEVEL[classId]) {
+            expect(row[spellLevel]).toBe(0);
+          }
+          if (level < START_LEVEL[classId]) {
+            expect(row[spellLevel]).toBe(0);
+          }
+        }
+        prevRow = row;
+      }
+    }
+  });
+});
+
+describe('pruneOrphanedFills', () => {
+  it('drops fills whose slot instance no longer exists', () => {
+    const levelSlots = computeSlots('wizard', 1, NEUTRAL_SCORES, []);
+    const fills = {
+      'base-0-0': { spellId: 'a', spellName: 'A', sourceClassId: 'wizard' },
+      'base-9-0': { spellId: 'b', spellName: 'B', sourceClassId: 'wizard' }, // no 9th-level slots at level 1
+    };
+    const pruned = pruneOrphanedFills(fills, levelSlots);
+    expect(Object.keys(pruned)).toEqual(['base-0-0']);
+  });
+});
