@@ -82,9 +82,6 @@ export function CharacterSheet() {
           </p>
         </div>
         <div className="character-sheet-header-actions">
-          <button type="button" onClick={handleRest} className="button-secondary">
-            Rest
-          </button>
           <Link to={`/${character.id}/edit`}>Edit Character</Link>
           <Link to="/">All Characters</Link>
         </div>
@@ -107,6 +104,12 @@ export function CharacterSheet() {
         onSlotClick={handleSlotClick}
         onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
       />
+
+      <div className="character-sheet-rest">
+        <button type="button" onClick={handleRest} className="button-secondary">
+          Rest
+        </button>
+      </div>
 
       {showAddPool && (
         <AddSlotPoolModal

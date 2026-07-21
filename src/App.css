@@ -88,6 +88,12 @@
   gap: 12px;
 }
 
+.character-sheet-rest {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
 .cantrips-at-will-note {
   color: var(--text-muted);
   font-size: 13px;
