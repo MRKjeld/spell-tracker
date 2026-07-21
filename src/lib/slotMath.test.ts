@@ -56,22 +56,42 @@ describe('bonus spells', () => {
 describe('computeSlots', () => {
   it('totals base + bonus + pool counts, and instances match totalCount', () => {
     const pools = [{ id: 'p1', name: 'Domain', spellLevel: 1, count: 1 }];
-    const result = computeSlots('wizard', 5, { ...NEUTRAL_SCORES, int: 18 }, pools);
-    for (const levelSlots of result) {
-      expect(levelSlots.instances.length).toBe(levelSlots.totalCount);
-      expect(levelSlots.totalCount).toBe(
-        levelSlots.baseCount + levelSlots.bonusCount + levelSlots.poolCounts.reduce((s, p) => s + p.count, 0),
+    const { levelSlots } = computeSlots('wizard', 5, { ...NEUTRAL_SCORES, int: 18 }, pools);
+    for (const ls of levelSlots) {
+      expect(ls.instances.length).toBe(ls.totalCount);
+      expect(ls.totalCount).toBe(
+        ls.baseCount + ls.bonusCount + ls.poolCounts.reduce((s, p) => s + p.count, 0),
       );
     }
-    const level1 = result.find((r) => r.spellLevel === 1)!;
+    const level1 = levelSlots.find((r) => r.spellLevel === 1)!;
     expect(level1.poolCounts).toEqual([{ poolId: 'p1', poolName: 'Domain', count: 1 }]);
   });
 
   it('a pool at a spell level beyond the class max still renders', () => {
     const pools = [{ id: 'p1', name: 'Weird Boon', spellLevel: 6, count: 2 }];
-    const result = computeSlots('paladin', 4, NEUTRAL_SCORES, pools);
-    const level6 = result.find((r) => r.spellLevel === 6)!;
+    const { levelSlots } = computeSlots('paladin', 4, NEUTRAL_SCORES, pools);
+    const level6 = levelSlots.find((r) => r.spellLevel === 6)!;
     expect(level6.totalCount).toBe(2);
+  });
+
+  it('a level-less pool forms its own segment and is absent from levelSlots', () => {
+    const pools = [{ id: 'p1', name: 'Drow Innate', spellLevel: null, count: 3 }];
+    const { levelSlots, levellessPools } = computeSlots('wizard', 5, NEUTRAL_SCORES, pools);
+    for (const ls of levelSlots) {
+      expect(ls.poolCounts).toEqual([]);
+    }
+    expect(levellessPools).toEqual([
+      {
+        poolId: 'p1',
+        poolName: 'Drow Innate',
+        count: 3,
+        instances: [
+          { id: 'pool-p1-0', origin: 'pool', poolId: 'p1', poolName: 'Drow Innate' },
+          { id: 'pool-p1-1', origin: 'pool', poolId: 'p1', poolName: 'Drow Innate' },
+          { id: 'pool-p1-2', origin: 'pool', poolId: 'p1', poolName: 'Drow Innate' },
+        ],
+      },
+    ]);
   });
 
   it('invariant sweep: base counts are monotonic non-decreasing per spell level as character level increases, and respect MAX_SPELL_LEVEL / START_LEVEL', () => {
@@ -99,12 +119,22 @@ describe('computeSlots', () => {
 
 describe('pruneOrphanedFills', () => {
   it('drops fills whose slot instance no longer exists', () => {
-    const levelSlots = computeSlots('wizard', 1, NEUTRAL_SCORES, []);
+    const computed = computeSlots('wizard', 1, NEUTRAL_SCORES, []);
     const fills = {
       'base-0-0': { spellId: 'a', spellName: 'A', sourceClassId: 'wizard' },
       'base-9-0': { spellId: 'b', spellName: 'B', sourceClassId: 'wizard' }, // no 9th-level slots at level 1
     };
-    const pruned = pruneOrphanedFills(fills, levelSlots);
+    const pruned = pruneOrphanedFills(fills, computed);
     expect(Object.keys(pruned)).toEqual(['base-0-0']);
+  });
+
+  it('keeps fills belonging to a level-less pool', () => {
+    const pools = [{ id: 'p1', name: 'Drow Innate', spellLevel: null, count: 1 }];
+    const computed = computeSlots('wizard', 1, NEUTRAL_SCORES, pools);
+    const fills = {
+      'pool-p1-0': { spellId: 'a', spellName: 'A', sourceClassId: 'wizard' },
+    };
+    const pruned = pruneOrphanedFills(fills, computed);
+    expect(Object.keys(pruned)).toEqual(['pool-p1-0']);
   });
 });

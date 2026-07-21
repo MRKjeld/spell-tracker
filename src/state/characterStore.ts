@@ -18,10 +18,10 @@ interface CharacterStoreState {
 }
 
 function touch(character: Character): Character {
-  const levelSlots = computeSlots(character.classId, character.level, character.abilityScores, character.extraSlotPools);
+  const computed = computeSlots(character.classId, character.level, character.abilityScores, character.extraSlotPools);
   return {
     ...character,
-    slotFills: pruneOrphanedFills(character.slotFills, levelSlots) as Record<string, SlotFill>,
+    slotFills: pruneOrphanedFills(character.slotFills, computed) as Record<string, SlotFill>,
     updatedAt: new Date().toISOString(),
   };
 }

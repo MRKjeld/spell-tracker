@@ -3,7 +3,7 @@ import type { AbilityId, ClassId } from '../data/classes';
 export interface ExtraSlotPool {
   id: string;
   name: string; // e.g. "Domain: Fire", "Drow Innate"
-  spellLevel: number; // 0-9
+  spellLevel: number | null; // 0-9, or null for a level-less pool that forms its own segment
   count: number;
 }
 

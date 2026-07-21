@@ -232,6 +232,16 @@
   border-radius: 6px;
 }
 
+.add-slot-pool-form .add-slot-pool-checkbox {
+  flex-direction: row;
+  align-items: center;
+}
+
+.add-slot-pool-form .add-slot-pool-checkbox input {
+  padding: 0;
+  width: auto;
+}
+
 /* Spell picker */
 .spell-picker-search {
   width: 100%;

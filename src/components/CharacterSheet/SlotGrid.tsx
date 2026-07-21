@@ -1,18 +1,19 @@
-import type { SpellLevelSlots } from '../../lib/slotMath';
+import type { LevellessPoolSlots, SpellLevelSlots } from '../../lib/slotMath';
 import type { Character } from '../../state/types';
 import { SlotChip } from './SlotChip';
 
 interface SlotGridProps {
   character: Character;
   levelSlots: SpellLevelSlots[];
-  onSlotClick: (spellLevel: number, slotInstanceId: string) => void;
+  levellessPools: LevellessPoolSlots[];
+  onSlotClick: (spellLevel: number | null, slotInstanceId: string, poolName?: string) => void;
   onRemovePool: (poolId: string) => void;
 }
 
-export function SlotGrid({ character, levelSlots, onSlotClick, onRemovePool }: SlotGridProps) {
+export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, onRemovePool }: SlotGridProps) {
   const visibleLevels = levelSlots.filter((ls) => ls.totalCount > 0);
 
-  if (visibleLevels.length === 0) {
+  if (visibleLevels.length === 0 && levellessPools.length === 0) {
     return <p>This character has no spell slots yet at their current level.</p>;
   }
 
@@ -43,6 +44,34 @@ export function SlotGrid({ character, levelSlots, onSlotClick, onRemovePool }: S
                 fill={character.slotFills[instance.id]}
                 characterClassId={character.classId}
                 onClick={() => onSlotClick(ls.spellLevel, instance.id)}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {levellessPools.map((pool) => (
+        <div key={pool.poolId} className="slot-grid-row">
+          <div className="slot-grid-row-header">
+            <h3>{pool.poolName}</h3>
+            <span className="slot-grid-row-summary">
+              {pool.count} slot{pool.count === 1 ? '' : 's'}
+            </span>
+            <span className="slot-grid-pool-tag">
+              No level
+              <button type="button" onClick={() => onRemovePool(pool.poolId)} title={`Remove ${pool.poolName}`}>
+                ×
+              </button>
+            </span>
+          </div>
+          <div className="slot-grid-chips">
+            {pool.instances.map((instance) => (
+              <SlotChip
+                key={instance.id}
+                instance={instance}
+                fill={character.slotFills[instance.id]}
+                characterClassId={character.classId}
+                onClick={() => onSlotClick(null, instance.id, pool.poolName)}
               />
             ))}
           </div>

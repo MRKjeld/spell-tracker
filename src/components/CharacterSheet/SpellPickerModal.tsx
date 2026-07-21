@@ -2,12 +2,13 @@ import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
-import { getSpellsFor, humanizeTag, searchSpells, spellMatchesQuery, SCHOOL_LABELS } from '../../data/spells';
+import { getAllSpellsFor, getSpellsFor, humanizeTag, searchSpells, spellMatchesQuery, SCHOOL_LABELS } from '../../data/spells';
 import type { SpellEntry } from '../../data/spells';
 
 interface SpellPickerModalProps {
   defaultClassId: ClassId;
-  spellLevel: number;
+  spellLevel: number | null;
+  poolName?: string;
   onPick: (spellId: string, spellName: string, sourceClassId: ClassId) => void;
   onClose: () => void;
 }
@@ -62,7 +63,13 @@ function SpellDetails({ spell }: { spell: SpellEntry }) {
   );
 }
 
-export function SpellPickerModal({ defaultClassId, spellLevel, onPick, onClose }: SpellPickerModalProps) {
+function levelLabelFor(spell: SpellEntry, activeTab: ClassId | 'all', defaultClassId: ClassId): string {
+  const classId = activeTab === 'all' ? (spell.levels[defaultClassId] !== undefined ? defaultClassId : (Object.keys(spell.levels)[0] as ClassId)) : activeTab;
+  const level = spell.levels[classId];
+  return level !== undefined ? `Lvl ${level}` : '';
+}
+
+export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick, onClose }: SpellPickerModalProps) {
   const [activeTab, setActiveTab] = useState<ClassId | 'all'>(defaultClassId);
   const [query, setQuery] = useState('');
   const [searchDescriptions, setSearchDescriptions] = useState(false);
@@ -71,13 +78,15 @@ export function SpellPickerModal({ defaultClassId, spellLevel, onPick, onClose }
 
   const spells = useMemo(() => {
     if (activeTab === 'all') {
-      return searchSpells(query, spellLevel, searchDescriptions);
+      return searchSpells(query, spellLevel ?? undefined, searchDescriptions);
     }
-    const list = getSpellsFor(activeTab, spellLevel);
+    const list = spellLevel === null ? getAllSpellsFor(activeTab) : getSpellsFor(activeTab, spellLevel);
     if (!query.trim()) return list;
     const normalized = query.trim().toLowerCase();
     return list.filter((s) => spellMatchesQuery(s, normalized, searchDescriptions));
   }, [activeTab, query, spellLevel, searchDescriptions]);
+
+  const title = spellLevel !== null ? `Fill Slot — Level ${spellLevel}` : `Fill Slot — ${poolName ?? 'No Level'}`;
 
   function toggleExpanded(spellId: string) {
     setExpandedIds((prev) => {
@@ -89,7 +98,7 @@ export function SpellPickerModal({ defaultClassId, spellLevel, onPick, onClose }
   }
 
   return (
-    <Modal title={`Fill Slot — Level ${spellLevel}`} onClose={onClose}>
+    <Modal title={title} onClose={onClose}>
       <input
         type="search"
         placeholder="Search spells..."
@@ -159,7 +168,11 @@ export function SpellPickerModal({ defaultClassId, spellLevel, onPick, onClose }
                   }}
                 >
                   {spell.name}
-                  <span className="spell-picker-school"> — {spell.school}</span>
+                  <span className="spell-picker-school">
+                    {' '}
+                    — {spell.school}
+                    {spellLevel === null && ` · ${levelLabelFor(spell, activeTab, defaultClassId)}`}
+                  </span>
                 </button>
                 <button
                   type="button"

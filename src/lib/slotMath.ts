@@ -47,16 +47,28 @@ export interface SpellLevelSlots {
   instances: SlotInstance[];
 }
 
+export interface LevellessPoolSlots {
+  poolId: string;
+  poolName: string;
+  count: number;
+  instances: SlotInstance[];
+}
+
+export interface ComputedSlots {
+  levelSlots: SpellLevelSlots[];
+  levellessPools: LevellessPoolSlots[];
+}
+
 export function computeSlots(
   classId: ClassId,
   level: number,
   abilityScores: Record<AbilityId, number>,
   extraPools: ExtraSlotPool[],
-): SpellLevelSlots[] {
+): ComputedSlots {
   const base = getBaseSlots(classId, level);
   const bonus = getBonusSlots(classId, level, abilityScores);
 
-  const result: SpellLevelSlots[] = [];
+  const levelSlots: SpellLevelSlots[] = [];
 
   for (let spellLevel = 0; spellLevel < SPELL_LEVEL_COUNT; spellLevel++) {
     const instances: SlotInstance[] = [];
@@ -84,7 +96,7 @@ export function computeSlots(
 
     const poolTotal = poolCounts.reduce((sum, p) => sum + p.count, 0);
 
-    result.push({
+    levelSlots.push({
       spellLevel,
       baseCount: base[spellLevel],
       bonusCount: bonus[spellLevel],
@@ -94,7 +106,21 @@ export function computeSlots(
     });
   }
 
-  return result;
+  const levellessPools: LevellessPoolSlots[] = extraPools
+    .filter((pool) => pool.spellLevel === null)
+    .map((pool) => ({
+      poolId: pool.id,
+      poolName: pool.name,
+      count: pool.count,
+      instances: Array.from({ length: pool.count }, (_, i) => ({
+        id: `pool-${pool.id}-${i}`,
+        origin: 'pool' as const,
+        poolId: pool.id,
+        poolName: pool.name,
+      })),
+    }));
+
+  return { levelSlots, levellessPools };
 }
 
 /**
@@ -104,9 +130,12 @@ export function computeSlots(
  */
 export function pruneOrphanedFills(
   slotFills: Record<string, unknown>,
-  levelSlots: SpellLevelSlots[],
+  computed: ComputedSlots,
 ): Record<string, unknown> {
-  const validIds = new Set(levelSlots.flatMap((ls) => ls.instances.map((i) => i.id)));
+  const validIds = new Set([
+    ...computed.levelSlots.flatMap((ls) => ls.instances.map((i) => i.id)),
+    ...computed.levellessPools.flatMap((p) => p.instances.map((i) => i.id)),
+  ]);
   const pruned: Record<string, unknown> = {};
   for (const [id, fill] of Object.entries(slotFills)) {
     if (validIds.has(id)) pruned[id] = fill;

@@ -2,19 +2,20 @@ import { useState } from 'react';
 import { Modal } from '../common/Modal';
 
 interface AddSlotPoolModalProps {
-  onAdd: (name: string, spellLevel: number, count: number) => void;
+  onAdd: (name: string, spellLevel: number | null, count: number) => void;
   onClose: () => void;
 }
 
 export function AddSlotPoolModal({ onAdd, onClose }: AddSlotPoolModalProps) {
   const [name, setName] = useState('');
+  const [noLevel, setNoLevel] = useState(false);
   const [spellLevel, setSpellLevel] = useState(1);
   const [count, setCount] = useState(1);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd(name.trim(), spellLevel, count);
+    onAdd(name.trim(), noLevel ? null : spellLevel, count);
     onClose();
   }
 
@@ -31,16 +32,22 @@ export function AddSlotPoolModal({ onAdd, onClose }: AddSlotPoolModalProps) {
             required
           />
         </label>
-        <label>
-          Spell Level
-          <input
-            type="number"
-            min={0}
-            max={9}
-            value={spellLevel}
-            onChange={(e) => setSpellLevel(Number(e.target.value))}
-          />
+        <label className="add-slot-pool-checkbox">
+          <input type="checkbox" checked={noLevel} onChange={(e) => setNoLevel(e.target.checked)} />
+          No specific spell level — these spells form their own segment
         </label>
+        {!noLevel && (
+          <label>
+            Spell Level
+            <input
+              type="number"
+              min={0}
+              max={9}
+              value={spellLevel}
+              onChange={(e) => setSpellLevel(Number(e.target.value))}
+            />
+          </label>
+        )}
         <label>
           Count
           <input

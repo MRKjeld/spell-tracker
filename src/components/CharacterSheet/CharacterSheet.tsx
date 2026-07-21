@@ -17,10 +17,14 @@ export function CharacterSheet() {
   const clearSlot = useCharacterStore((s) => s.clearSlot);
 
   const [showAddPool, setShowAddPool] = useState(false);
-  const [pickerTarget, setPickerTarget] = useState<{ spellLevel: number; slotInstanceId: string } | null>(null);
+  const [pickerTarget, setPickerTarget] = useState<{
+    spellLevel: number | null;
+    poolName?: string;
+    slotInstanceId: string;
+  } | null>(null);
 
-  const levelSlots = useMemo(() => {
-    if (!character) return [];
+  const computed = useMemo(() => {
+    if (!character) return { levelSlots: [], levellessPools: [] };
     return computeSlots(character.classId, character.level, character.abilityScores, character.extraSlotPools);
   }, [character]);
 
@@ -33,11 +37,11 @@ export function CharacterSheet() {
     );
   }
 
-  function handleSlotClick(spellLevel: number, slotInstanceId: string) {
+  function handleSlotClick(spellLevel: number | null, slotInstanceId: string, poolName?: string) {
     if (character!.slotFills[slotInstanceId]) {
       if (confirm('Clear this slot?')) clearSlot(character!.id, slotInstanceId);
     } else {
-      setPickerTarget({ spellLevel, slotInstanceId });
+      setPickerTarget({ spellLevel, poolName, slotInstanceId });
     }
   }
 
@@ -75,7 +79,8 @@ export function CharacterSheet() {
 
       <SlotGrid
         character={character}
-        levelSlots={levelSlots}
+        levelSlots={computed.levelSlots}
+        levellessPools={computed.levellessPools}
         onSlotClick={handleSlotClick}
         onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
       />
@@ -91,6 +96,7 @@ export function CharacterSheet() {
         <SpellPickerModal
           defaultClassId={character.classId}
           spellLevel={pickerTarget.spellLevel}
+          poolName={pickerTarget.poolName}
           onPick={handlePick}
           onClose={() => setPickerTarget(null)}
         />

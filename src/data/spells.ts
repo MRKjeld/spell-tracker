@@ -39,6 +39,7 @@ const SPELLS = rawSpells as SpellEntry[];
 
 const byId = new Map<string, SpellEntry>();
 const byClassLevel = new Map<string, SpellEntry[]>();
+const byClass = new Map<ClassId, SpellEntry[]>();
 
 function classLevelKey(classId: ClassId, spellLevel: number): string {
   return `${classId}:${spellLevel}`;
@@ -51,6 +52,10 @@ for (const spell of SPELLS) {
     const list = byClassLevel.get(key);
     if (list) list.push(spell);
     else byClassLevel.set(key, [spell]);
+
+    const classList = byClass.get(classId as ClassId);
+    if (classList) classList.push(spell);
+    else byClass.set(classId as ClassId, [spell]);
   }
 }
 
@@ -60,6 +65,11 @@ export function getSpellById(id: string): SpellEntry | undefined {
 
 export function getSpellsFor(classId: ClassId, spellLevel: number): SpellEntry[] {
   return byClassLevel.get(classLevelKey(classId, spellLevel)) ?? [];
+}
+
+// All spells on a class's list, across every spell level -- for pickers with no level constraint.
+export function getAllSpellsFor(classId: ClassId): SpellEntry[] {
+  return byClass.get(classId) ?? [];
 }
 
 export function spellMatchesQuery(spell: SpellEntry, normalizedQuery: string, includeDescription: boolean): boolean {
