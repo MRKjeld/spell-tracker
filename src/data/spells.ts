@@ -8,6 +8,31 @@ export interface SpellEntry {
   subschool: string[];
   descriptors: string[];
   levels: Partial<Record<ClassId, number>>;
+  description: string;
+  castingTime: string;
+  components: string;
+  range: string;
+  effect: string;
+  duration: string;
+  savingThrow: string;
+  spellResistance: string;
+}
+
+export const SCHOOL_LABELS: Record<string, string> = {
+  abj: 'Abjuration',
+  con: 'Conjuration',
+  div: 'Divination',
+  enc: 'Enchantment',
+  evo: 'Evocation',
+  ill: 'Illusion',
+  nec: 'Necromancy',
+  trs: 'Transmutation',
+  uni: 'Universal',
+};
+
+export function humanizeTag(tag: string): string {
+  const spaced = tag.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
 const SPELLS = rawSpells as SpellEntry[];
@@ -37,10 +62,16 @@ export function getSpellsFor(classId: ClassId, spellLevel: number): SpellEntry[]
   return byClassLevel.get(classLevelKey(classId, spellLevel)) ?? [];
 }
 
-export function searchSpells(query: string, spellLevel?: number): SpellEntry[] {
+export function spellMatchesQuery(spell: SpellEntry, normalizedQuery: string, includeDescription: boolean): boolean {
+  if (!normalizedQuery) return true;
+  if (spell.name.toLowerCase().includes(normalizedQuery)) return true;
+  return includeDescription && spell.description.toLowerCase().includes(normalizedQuery);
+}
+
+export function searchSpells(query: string, spellLevel?: number, includeDescription = false): SpellEntry[] {
   const normalized = query.trim().toLowerCase();
   return SPELLS.filter((spell) => {
-    if (normalized && !spell.name.toLowerCase().includes(normalized)) return false;
+    if (!spellMatchesQuery(spell, normalized, includeDescription)) return false;
     if (spellLevel !== undefined && !Object.values(spell.levels).includes(spellLevel)) return false;
     return true;
   });
