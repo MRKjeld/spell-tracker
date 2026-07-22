@@ -9,7 +9,7 @@ function formatLevels(spell: SpellEntry): string {
     .join(', ');
 }
 
-export function SpellDetails({ spell }: { spell: SpellEntry }) {
+export function SpellDetails({ spell, saveDC }: { spell: SpellEntry; saveDC?: number }) {
   const schoolLine = [
     SCHOOL_LABELS[spell.school] ?? spell.school,
     ...spell.subschool.map(humanizeTag),
@@ -45,6 +45,11 @@ export function SpellDetails({ spell }: { spell: SpellEntry }) {
       <p>
         <strong>Saving Throw:</strong> {spell.savingThrow || 'No'}
       </p>
+      {saveDC !== undefined && (
+        <p>
+          <strong>Spell Save DC:</strong> {saveDC}
+        </p>
+      )}
       <p>
         <strong>Spell Resistance:</strong> {spell.spellResistance || 'No'}
       </p>

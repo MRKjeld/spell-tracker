@@ -27,7 +27,11 @@ export function CharacterSheet() {
     poolName?: string;
     slotInstanceId: string;
   } | null>(null);
-  const [viewTarget, setViewTarget] = useState<{ slotInstanceId: string; fill: SlotFill } | null>(null);
+  const [viewTarget, setViewTarget] = useState<{
+    slotInstanceId: string;
+    fill: SlotFill;
+    spellLevel: number | null;
+  } | null>(null);
   const [showCasterStats, setShowCasterStats] = useState(false);
 
   const computed = useMemo(() => {
@@ -55,7 +59,7 @@ export function CharacterSheet() {
   function handleSlotClick(spellLevel: number | null, slotInstanceId: string, poolName?: string) {
     const fill = character!.slotFills[slotInstanceId];
     if (fill) {
-      setViewTarget({ slotInstanceId, fill });
+      setViewTarget({ slotInstanceId, fill, spellLevel });
     } else {
       setPickerTarget({ spellLevel, poolName, slotInstanceId });
     }
@@ -165,6 +169,9 @@ export function CharacterSheet() {
           spellId={viewTarget.fill.spellId}
           spellName={viewTarget.fill.spellName}
           used={viewTarget.fill.used}
+          character={character}
+          sourceClassId={viewTarget.fill.sourceClassId}
+          slotSpellLevel={viewTarget.spellLevel}
           onToggleUsed={handleToggleUsed}
           onClear={handleClear}
           onClose={() => setViewTarget(null)}

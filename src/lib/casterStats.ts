@@ -49,3 +49,21 @@ export function computeCasterStats(
 export function formatModifier(value: number): string {
   return value >= 0 ? `+${value}` : `${value}`;
 }
+
+// The scraped savingThrow text is free-form ('', 'No', 'None', 'See text',
+// 'Reflex negates', 'None or Will negates; see text', ...) so "not one of
+// the no-save phrasings" isn't reliable -- instead check for an actual named
+// save type, which is present whenever a DC is meaningful (including
+// mixed cases like "None or Will negates; see text").
+export function hasSavingThrow(savingThrow: string): boolean {
+  return /\b(will|fortitude|reflex)\b/i.test(savingThrow);
+}
+
+export function computeSpellSaveDC(
+  spellLevel: number,
+  castingAbilityModifier: number,
+  hasSpellFocus: boolean,
+  hasGreaterSpellFocus: boolean,
+): number {
+  return 10 + spellLevel + castingAbilityModifier + (hasSpellFocus ? 1 : 0) + (hasGreaterSpellFocus ? 1 : 0);
+}
