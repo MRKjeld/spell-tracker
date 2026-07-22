@@ -25,6 +25,22 @@ export interface SpellSelection {
   sourceClassId: ClassId | null;
 }
 
+// How an item's uses/charges recover. 'rest' and 'day' both recover whenever
+// the character rests (this tracker only has one rest action); 'week' and
+// 'month' recover automatically once real-world time has elapsed, or can be
+// force-recharged from the item's view.
+export type ItemUsePeriod = 'unlimited' | 'rest' | 'day' | 'week' | 'month';
+
+export interface Item {
+  id: string;
+  name: string;
+  activation: string; // free text describing what activating the item does
+  usePeriod: ItemUsePeriod;
+  maxUses: number; // ignored when usePeriod is 'unlimited'
+  usesRemaining: number; // ignored when usePeriod is 'unlimited'
+  lastReset: string; // ISO timestamp of the last time uses were recovered
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -37,6 +53,7 @@ export interface Character {
   greaterSpellFocusSchools: string[]; // subset of spellFocusSchools, each at most once
   extraSlotPools: ExtraSlotPool[];
   slotFills: Record<string, SlotFill>; // keyed by deterministic slot-instance id
+  items: Item[]; // Equipment segment; persists through rest (see restCharacter)
   createdAt: string;
   updatedAt: string;
 }

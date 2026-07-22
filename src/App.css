@@ -295,6 +295,89 @@
   letter-spacing: 0.05em;
 }
 
+/* Equipment / items */
+.equipment-section {
+  margin-top: 4px;
+}
+
+.equipment-add-button {
+  margin-left: auto;
+  font-size: 13px;
+  padding: 4px 10px;
+}
+
+.equipment-empty {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.item-chip {
+  min-width: 96px;
+  min-height: 48px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  text-align: center;
+  background: var(--accent);
+  color: white;
+  border: 1px solid var(--accent);
+}
+
+.item-chip-depleted {
+  background: var(--border);
+  color: var(--text-muted);
+  border-color: var(--border);
+  opacity: 0.6;
+}
+
+.item-chip-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.item-chip-uses {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.item-view-activation {
+  white-space: pre-line;
+  color: var(--text-muted);
+}
+
+.item-view-uses {
+  font-weight: 600;
+}
+
+/* Add item form */
+.add-item-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.add-item-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.add-item-form input,
+.add-item-form select,
+.add-item-form textarea {
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font: inherit;
+  color: inherit;
+}
+
 /* Update toast */
 .update-toast {
   position: fixed;

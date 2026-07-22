@@ -4,12 +4,15 @@ import { useCharacterStore } from '../../state/characterStore';
 import { CANTRIPS_AT_WILL, CASTING_ABILITY, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { computeSlots } from '../../lib/slotMath';
-import type { SlotFill } from '../../state/types';
+import type { Item, SlotFill } from '../../state/types';
 import { SlotGrid } from './SlotGrid';
 import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
 import { SpellViewModal } from './SpellViewModal';
 import { CasterStatsModal } from './CasterStatsModal';
+import { EquipmentSection } from './EquipmentSection';
+import { AddItemModal } from './AddItemModal';
+import { ItemViewModal } from './ItemViewModal';
 
 export function CharacterSheet() {
   const { id } = useParams();
@@ -20,8 +23,14 @@ export function CharacterSheet() {
   const clearSlot = useCharacterStore((s) => s.clearSlot);
   const setSlotUsed = useCharacterStore((s) => s.setSlotUsed);
   const restCharacter = useCharacterStore((s) => s.restCharacter);
+  const addItem = useCharacterStore((s) => s.addItem);
+  const removeItem = useCharacterStore((s) => s.removeItem);
+  const consumeItemCharge = useCharacterStore((s) => s.consumeItemCharge);
+  const rechargeItem = useCharacterStore((s) => s.rechargeItem);
 
   const [showAddPool, setShowAddPool] = useState(false);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
   const [pickerTarget, setPickerTarget] = useState<{
     spellLevel: number | null;
     poolName?: string;
@@ -104,6 +113,26 @@ export function CharacterSheet() {
     }
   }
 
+  function handleUseItemCharge() {
+    if (!itemViewTarget) return;
+    consumeItemCharge(character!.id, itemViewTarget.id);
+    setItemViewTarget(null);
+  }
+
+  function handleRechargeItem() {
+    if (!itemViewTarget) return;
+    rechargeItem(character!.id, itemViewTarget.id);
+    setItemViewTarget(null);
+  }
+
+  function handleRemoveItem() {
+    if (!itemViewTarget) return;
+    if (confirm(`Remove ${itemViewTarget.name}?`)) {
+      removeItem(character!.id, itemViewTarget.id);
+      setItemViewTarget(null);
+    }
+  }
+
   return (
     <div className="page page-has-footer">
       <div className="character-sheet-header">
@@ -135,6 +164,12 @@ export function CharacterSheet() {
         levellessPools={computed.levellessPools}
         onSlotClick={handleSlotClick}
         onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
+      />
+
+      <EquipmentSection
+        items={character.items ?? []}
+        onAddItem={() => setShowAddItem(true)}
+        onItemClick={(item) => setItemViewTarget(item)}
       />
 
       <div className="character-sheet-footer">
@@ -186,6 +221,20 @@ export function CharacterSheet() {
           castingAbility={character.castingAbility ?? CASTING_ABILITY[character.classId]}
           spellcraft={character.spellcraft}
           onClose={() => setShowCasterStats(false)}
+        />
+      )}
+
+      {showAddItem && (
+        <AddItemModal onAdd={(item) => addItem(character.id, item)} onClose={() => setShowAddItem(false)} />
+      )}
+
+      {itemViewTarget && (
+        <ItemViewModal
+          item={itemViewTarget}
+          onUseCharge={handleUseItemCharge}
+          onRecharge={handleRechargeItem}
+          onRemove={handleRemoveItem}
+          onClose={() => setItemViewTarget(null)}
         />
       )}
     </div>

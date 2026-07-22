@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createId } from '../lib/id';
 import { computeSlots, pruneOrphanedFills } from '../lib/slotMath';
+import { defaultUsesRemaining, recoverItemsOnRest } from '../lib/itemRecovery';
 import { CASTING_ABILITY } from '../data/classes';
-import type { Character, ExtraSlotPool, NewCharacterInput, SlotFill, SpellSelection } from './types';
+import type { Character, ExtraSlotPool, Item, ItemUsePeriod, NewCharacterInput, SlotFill, SpellSelection } from './types';
 
 interface CharacterStoreState {
   characters: Record<string, Character>;
@@ -16,6 +17,10 @@ interface CharacterStoreState {
   clearSlot(charId: string, slotInstanceId: string): void;
   setSlotUsed(charId: string, slotInstanceId: string, used: boolean): void;
   restCharacter(charId: string): void;
+  addItem(charId: string, item: { name: string; activation: string; usePeriod: ItemUsePeriod; maxUses: number }): void;
+  removeItem(charId: string, itemId: string): void;
+  consumeItemCharge(charId: string, itemId: string): void;
+  rechargeItem(charId: string, itemId: string): void;
   replaceAllCharacters(chars: Character[]): void;
   addCharacters(chars: Character[]): void;
 }
@@ -27,6 +32,7 @@ function touch(character: Character): Character {
   const spellcraft = character.spellcraft ?? 0;
   const spellFocusSchools = character.spellFocusSchools ?? [];
   const greaterSpellFocusSchools = character.greaterSpellFocusSchools ?? [];
+  const items = character.items ?? [];
   const computed = computeSlots(
     character.classId,
     character.level,
@@ -40,6 +46,7 @@ function touch(character: Character): Character {
     spellcraft,
     spellFocusSchools,
     greaterSpellFocusSchools,
+    items,
     slotFills: pruneOrphanedFills(character.slotFills, computed) as Record<string, SlotFill>,
     updatedAt: new Date().toISOString(),
   };
@@ -65,6 +72,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           greaterSpellFocusSchools: input.greaterSpellFocusSchools,
           extraSlotPools: [],
           slotFills: {},
+          items: [],
           createdAt: now,
           updatedAt: now,
         };
@@ -172,7 +180,67 @@ export const useCharacterStore = create<CharacterStoreState>()(
               restedFills[slotInstanceId] = { ...fill, used: false };
             }
           }
-          const updated = touch({ ...existing, slotFills: restedFills });
+          // Items live in their own Equipment segment and are unaffected by
+          // clearing slotFills above — only their own uses/charges recover,
+          // and only for periods that have actually elapsed.
+          const restedItems = recoverItemsOnRest(existing.items ?? [], new Date());
+          const updated = touch({ ...existing, slotFills: restedFills, items: restedItems });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addItem(charId, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newItem: Item = {
+            id: createId(),
+            name: item.name,
+            activation: item.activation,
+            usePeriod: item.usePeriod,
+            maxUses: item.maxUses,
+            usesRemaining: defaultUsesRemaining(item.usePeriod, item.maxUses),
+            lastReset: new Date().toISOString(),
+          };
+          const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      removeItem(charId, itemId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const updated = touch({
+            ...existing,
+            items: (existing.items ?? []).filter((i) => i.id !== itemId),
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      consumeItemCharge(charId, itemId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const items = (existing.items ?? []).map((i) =>
+            i.id === itemId && i.usePeriod !== 'unlimited' && i.usesRemaining > 0
+              ? { ...i, usesRemaining: i.usesRemaining - 1 }
+              : i,
+          );
+          const updated = touch({ ...existing, items });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      rechargeItem(charId, itemId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const items = (existing.items ?? []).map((i) =>
+            i.id === itemId ? { ...i, usesRemaining: i.maxUses, lastReset: new Date().toISOString() } : i,
+          );
+          const updated = touch({ ...existing, items });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },
