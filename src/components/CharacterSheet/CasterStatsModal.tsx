@@ -29,7 +29,7 @@ export function CasterStatsModal({
   spellcraft,
   onClose,
 }: CasterStatsModalProps) {
-  const stats = computeCasterStats(classId, level, abilityScores, castingAbility, spellcraft);
+  const stats = computeCasterStats(level, abilityScores, castingAbility, spellcraft);
 
   return (
     <Modal title={`${CLASS_LABELS[classId]} ${level} — Caster Stats`} onClose={onClose}>
@@ -48,23 +48,9 @@ export function CasterStatsModal({
           <strong>Spellcraft Check:</strong> {formatModifier(stats.spellcraftCheck)}
         </p>
 
-        <h3>Spell Save DCs</h3>
-        <table className="caster-stats-table">
-          <thead>
-            <tr>
-              <th>Spell Level</th>
-              <th>DC</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stats.spellDCsByLevel.map(({ spellLevel, dc }) => (
-              <tr key={spellLevel}>
-                <td>{spellLevel}</td>
-                <td>{dc}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <p>
+          <strong>Spell Save DC:</strong> {stats.baseSpellDC} + Spell Level
+        </p>
 
         <h3>Spell Range</h3>
         <table className="caster-stats-table">

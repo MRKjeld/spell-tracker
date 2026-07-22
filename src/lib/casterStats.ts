@@ -1,5 +1,4 @@
-import type { AbilityId, ClassId } from '../data/classes';
-import { MAX_SPELL_LEVEL } from '../data/classes';
+import type { AbilityId } from '../data/classes';
 import { abilityModifier } from '../data/bonusSpells';
 
 export interface CasterStats {
@@ -7,7 +6,7 @@ export interface CasterStats {
   castingAbilityModifier: number;
   concentrationCheck: number;
   spellcraftCheck: number;
-  spellDCsByLevel: { spellLevel: number; dc: number }[];
+  baseSpellDC: number;
   rangeCloseFt: number;
   rangeMediumFt: number;
   rangeLongFt: number;
@@ -19,7 +18,6 @@ export interface CasterStats {
  * `level` doubles as caster level for range/concentration/DC purposes.
  */
 export function computeCasterStats(
-  classId: ClassId,
   level: number,
   abilityScores: Record<AbilityId, number>,
   castingAbility: AbilityId,
@@ -27,19 +25,13 @@ export function computeCasterStats(
 ): CasterStats {
   const casterLevel = level;
   const castingAbilityModifier = abilityModifier(abilityScores[castingAbility]);
-  const maxSpellLevel = MAX_SPELL_LEVEL[classId];
-
-  const spellDCsByLevel = [];
-  for (let spellLevel = 0; spellLevel <= maxSpellLevel; spellLevel++) {
-    spellDCsByLevel.push({ spellLevel, dc: 10 + castingAbilityModifier + spellLevel });
-  }
 
   return {
     casterLevel,
     castingAbilityModifier,
     concentrationCheck: casterLevel + castingAbilityModifier,
     spellcraftCheck: spellcraft,
-    spellDCsByLevel,
+    baseSpellDC: 10 + castingAbilityModifier,
     rangeCloseFt: 25 + 5 * Math.floor(casterLevel / 2),
     rangeMediumFt: 100 + 10 * casterLevel,
     rangeLongFt: 400 + 40 * casterLevel,
