@@ -4,6 +4,10 @@
   padding: 24px 16px 64px;
 }
 
+.page-has-footer {
+  padding-bottom: 96px;
+}
+
 /* Character list */
 .character-list {
   list-style: none;
@@ -88,10 +92,19 @@
   gap: 12px;
 }
 
-.character-sheet-rest {
+.character-sheet-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
-  margin-top: 32px;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  z-index: 100;
 }
 
 .cantrips-at-will-note {

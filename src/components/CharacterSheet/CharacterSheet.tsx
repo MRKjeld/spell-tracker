@@ -16,6 +16,7 @@ export function CharacterSheet() {
   const fillSlot = useCharacterStore((s) => s.fillSlot);
   const setSlotUsed = useCharacterStore((s) => s.setSlotUsed);
   const restCharacter = useCharacterStore((s) => s.restCharacter);
+  const clearAllSlots = useCharacterStore((s) => s.clearAllSlots);
 
   const [showAddPool, setShowAddPool] = useState(false);
   const [pickerTarget, setPickerTarget] = useState<{
@@ -72,8 +73,14 @@ export function CharacterSheet() {
     }
   }
 
+  function handleClearAll() {
+    if (confirm('Clear ALL spells, including those marked "Persist after rest"?')) {
+      clearAllSlots(character!.id);
+    }
+  }
+
   return (
-    <div className="page">
+    <div className="page page-has-footer">
       <div className="character-sheet-header">
         <div>
           <h1>{character.name}</h1>
@@ -105,9 +112,12 @@ export function CharacterSheet() {
         onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
       />
 
-      <div className="character-sheet-rest">
+      <div className="character-sheet-footer">
         <button type="button" onClick={handleRest} className="button-secondary">
           Rest
+        </button>
+        <button type="button" onClick={handleClearAll} className="button-danger">
+          Clear All
         </button>
       </div>
 

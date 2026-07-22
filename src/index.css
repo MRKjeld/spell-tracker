@@ -81,3 +81,16 @@ button:hover {
   border-radius: 8px;
   padding: 10px 20px;
 }
+
+.button-danger {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.button-danger:hover {
+  background: var(--danger);
+  color: white;
+}
