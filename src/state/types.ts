@@ -32,6 +32,9 @@ export interface Character {
   level: number; // 1-20
   abilityScores: Record<AbilityId, number>;
   castingAbility: AbilityId; // defaults to the class's usual ability, but overridable
+  spellcraft: number;
+  spellFocusSchools: string[]; // spell school keys (see SCHOOL_LABELS), each at most once
+  greaterSpellFocusSchools: string[]; // subset of spellFocusSchools, each at most once
   extraSlotPools: ExtraSlotPool[];
   slotFills: Record<string, SlotFill>; // keyed by deterministic slot-instance id
   createdAt: string;
@@ -40,5 +43,12 @@ export interface Character {
 
 export type NewCharacterInput = Pick<
   Character,
-  'name' | 'classId' | 'level' | 'abilityScores' | 'castingAbility'
+  | 'name'
+  | 'classId'
+  | 'level'
+  | 'abilityScores'
+  | 'castingAbility'
+  | 'spellcraft'
+  | 'spellFocusSchools'
+  | 'greaterSpellFocusSchools'
 >;

@@ -23,6 +23,10 @@ interface CharacterStoreState {
 function touch(character: Character): Character {
   // Older persisted characters predate this field, so fall back to the class default.
   const castingAbility = character.castingAbility ?? CASTING_ABILITY[character.classId];
+  // Older persisted characters predate these fields too.
+  const spellcraft = character.spellcraft ?? 0;
+  const spellFocusSchools = character.spellFocusSchools ?? [];
+  const greaterSpellFocusSchools = character.greaterSpellFocusSchools ?? [];
   const computed = computeSlots(
     character.classId,
     character.level,
@@ -33,6 +37,9 @@ function touch(character: Character): Character {
   return {
     ...character,
     castingAbility,
+    spellcraft,
+    spellFocusSchools,
+    greaterSpellFocusSchools,
     slotFills: pruneOrphanedFills(character.slotFills, computed) as Record<string, SlotFill>,
     updatedAt: new Date().toISOString(),
   };
@@ -53,6 +60,9 @@ export const useCharacterStore = create<CharacterStoreState>()(
           level: input.level,
           abilityScores: input.abilityScores,
           castingAbility: input.castingAbility ?? CASTING_ABILITY[input.classId],
+          spellcraft: input.spellcraft,
+          spellFocusSchools: input.spellFocusSchools,
+          greaterSpellFocusSchools: input.greaterSpellFocusSchools,
           extraSlotPools: [],
           slotFills: {},
           createdAt: now,
