@@ -325,22 +325,22 @@
   border-color: var(--accent);
 }
 
-.spell-picker-tabs {
+.spell-picker-class-filter {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
   margin-bottom: 12px;
 }
 
-.spell-picker-tab {
+.spell-picker-class-filter select {
   font-size: 13px;
-  padding: 4px 10px;
-}
-
-.spell-picker-tab.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--bg);
 }
 
 .spell-picker-list {

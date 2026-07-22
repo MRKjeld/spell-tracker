@@ -136,25 +136,20 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
         </label>
       </div>
 
-      <div className="spell-picker-tabs">
-        {CLASS_IDS.map((id) => (
-          <button
-            key={id}
-            type="button"
-            className={`spell-picker-tab ${activeTab === id ? 'active' : ''}`}
-            onClick={() => setActiveTab(id)}
-          >
-            {CLASS_LABELS[id]}
-          </button>
-        ))}
-        <button
-          type="button"
-          className={`spell-picker-tab ${activeTab === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveTab('all')}
+      <label className="spell-picker-class-filter">
+        Class
+        <select
+          value={activeTab}
+          onChange={(e) => setActiveTab(e.target.value as ClassId | 'all')}
         >
-          All Classes
-        </button>
-      </div>
+          <option value="all">All Classes</option>
+          {CLASS_IDS.map((id) => (
+            <option key={id} value={id}>
+              {CLASS_LABELS[id]}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <ul className="spell-picker-list">
         {spells.length === 0 && <li className="spell-picker-empty">No spells found.</li>}
