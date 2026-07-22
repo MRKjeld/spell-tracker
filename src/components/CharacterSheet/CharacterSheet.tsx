@@ -9,6 +9,7 @@ import { SlotGrid } from './SlotGrid';
 import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
 import { SpellViewModal } from './SpellViewModal';
+import { CasterStatsModal } from './CasterStatsModal';
 
 export function CharacterSheet() {
   const { id } = useParams();
@@ -27,6 +28,7 @@ export function CharacterSheet() {
     slotInstanceId: string;
   } | null>(null);
   const [viewTarget, setViewTarget] = useState<{ slotInstanceId: string; fill: SlotFill } | null>(null);
+  const [showCasterStats, setShowCasterStats] = useState(false);
 
   const computed = useMemo(() => {
     if (!character) return { levelSlots: [], levellessPools: [] };
@@ -103,9 +105,9 @@ export function CharacterSheet() {
       <div className="character-sheet-header">
         <div>
           <h1>{character.name}</h1>
-          <p>
+          <button type="button" className="class-level-trigger" onClick={() => setShowCasterStats(true)}>
             {CLASS_LABELS[character.classId]} {character.level}
-          </p>
+          </button>
         </div>
         <div className="character-sheet-header-actions">
           <Link to={`/${character.id}/edit`}>Edit Character</Link>
@@ -166,6 +168,17 @@ export function CharacterSheet() {
           onToggleUsed={handleToggleUsed}
           onClear={handleClear}
           onClose={() => setViewTarget(null)}
+        />
+      )}
+
+      {showCasterStats && (
+        <CasterStatsModal
+          classId={character.classId}
+          level={character.level}
+          abilityScores={character.abilityScores}
+          castingAbility={character.castingAbility ?? CASTING_ABILITY[character.classId]}
+          spellcraft={character.spellcraft}
+          onClose={() => setShowCasterStats(false)}
         />
       )}
     </div>

@@ -172,6 +172,34 @@
   margin: 12px 0;
 }
 
+.class-level-trigger {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.caster-stats h3 {
+  margin: 16px 0 8px;
+}
+
+.caster-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.caster-stats-table th,
+.caster-stats-table td {
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
 /* Slot grid */
 .slot-grid {
   margin-top: 24px;
