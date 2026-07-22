@@ -16,6 +16,7 @@ export function CharacterSheet() {
   const addExtraPool = useCharacterStore((s) => s.addExtraPool);
   const removeExtraPool = useCharacterStore((s) => s.removeExtraPool);
   const fillSlot = useCharacterStore((s) => s.fillSlot);
+  const clearSlot = useCharacterStore((s) => s.clearSlot);
   const setSlotUsed = useCharacterStore((s) => s.setSlotUsed);
   const restCharacter = useCharacterStore((s) => s.restCharacter);
   const clearAllSlots = useCharacterStore((s) => s.clearAllSlots);
@@ -63,6 +64,12 @@ export function CharacterSheet() {
       setSlotUsed(character!.id, slotInstanceId, true);
       setViewTarget(null);
     }
+  }
+
+  function handleClear() {
+    if (!viewTarget) return;
+    clearSlot(character!.id, viewTarget.slotInstanceId);
+    setViewTarget(null);
   }
 
   function handlePick(spellId: string, spellName: string, sourceClassId: ClassId | null, persistAfterRest: boolean) {
@@ -158,6 +165,7 @@ export function CharacterSheet() {
           spellName={viewTarget.fill.spellName}
           used={viewTarget.fill.used}
           onToggleUsed={handleToggleUsed}
+          onClear={handleClear}
           onClose={() => setViewTarget(null)}
         />
       )}

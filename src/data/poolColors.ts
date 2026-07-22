@@ -13,3 +13,14 @@ export const POOL_COLOR_PRESETS: { id: PoolColorId; label: string; value: string
 export const POOL_COLOR_HEX: Record<PoolColorId, string> = Object.fromEntries(
   POOL_COLOR_PRESETS.map((p) => [p.id, p.value]),
 ) as Record<PoolColorId, string>;
+
+// Readable text colour to pair with each preset used as a solid background.
+export const POOL_COLOR_TEXT: Record<PoolColorId, string> = {
+  green: '#ffffff',
+  red: '#ffffff',
+  blue: '#ffffff',
+  yellow: '#18181b',
+  purple: '#ffffff',
+  black: '#ffffff',
+  white: '#18181b',
+};

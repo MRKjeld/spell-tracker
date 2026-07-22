@@ -1,6 +1,7 @@
 import type { LevellessPoolSlots, SpellLevelSlots } from '../../lib/slotMath';
 import type { Character } from '../../state/types';
-import { POOL_COLOR_HEX } from '../../data/poolColors';
+import type { PoolColorId } from '../../data/poolColors';
+import { POOL_COLOR_HEX, POOL_COLOR_TEXT } from '../../data/poolColors';
 import { SlotChip } from './SlotChip';
 
 interface SlotGridProps {
@@ -9,6 +10,11 @@ interface SlotGridProps {
   levellessPools: LevellessPoolSlots[];
   onSlotClick: (spellLevel: number | null, slotInstanceId: string, poolName?: string) => void;
   onRemovePool: (poolId: string) => void;
+}
+
+function poolTagStyle(color: PoolColorId | undefined) {
+  if (!color) return undefined;
+  return { backgroundColor: POOL_COLOR_HEX[color], color: POOL_COLOR_TEXT[color] };
 }
 
 export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, onRemovePool }: SlotGridProps) {
@@ -29,11 +35,7 @@ export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, o
               {ls.bonusCount > 0 && ` (${ls.baseCount} base + ${ls.bonusCount} bonus)`}
             </span>
             {ls.poolCounts.map((p) => (
-              <span
-                key={p.poolId}
-                className="slot-grid-pool-tag"
-                style={p.color ? { borderLeft: `4px solid ${POOL_COLOR_HEX[p.color]}` } : undefined}
-              >
+              <span key={p.poolId} className="slot-grid-pool-tag" style={poolTagStyle(p.color)}>
                 {p.poolName} +{p.count}
                 <button type="button" onClick={() => onRemovePool(p.poolId)} title={`Remove ${p.poolName}`}>
                   ×
@@ -62,10 +64,7 @@ export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, o
             <span className="slot-grid-row-summary">
               {pool.count} slot{pool.count === 1 ? '' : 's'}
             </span>
-            <span
-              className="slot-grid-pool-tag"
-              style={pool.color ? { borderLeft: `4px solid ${POOL_COLOR_HEX[pool.color]}` } : undefined}
-            >
+            <span className="slot-grid-pool-tag" style={poolTagStyle(pool.color)}>
               No level
               <button
                 type="button"

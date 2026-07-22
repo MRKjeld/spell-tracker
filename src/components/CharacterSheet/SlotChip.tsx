@@ -2,7 +2,7 @@ import type { ClassId } from '../../data/classes';
 import { CLASS_LABELS } from '../../data/classes';
 import type { SlotInstance } from '../../lib/slotMath';
 import type { SlotFill } from '../../state/types';
-import { POOL_COLOR_HEX } from '../../data/poolColors';
+import { POOL_COLOR_HEX, POOL_COLOR_TEXT } from '../../data/poolColors';
 
 interface SlotChipProps {
   instance: SlotInstance;
@@ -21,6 +21,7 @@ export function SlotChip({ instance, fill, characterClassId, onClick }: SlotChip
   const filledSourceParts = [originLabel, fromOtherClass ? `from ${fromOtherClass}` : null].filter(Boolean);
   const stateClass = fill ? (fill.used ? 'slot-chip-used' : 'slot-chip-filled') : 'slot-chip-empty';
   const poolColor = instance.poolColor ? POOL_COLOR_HEX[instance.poolColor] : undefined;
+  const poolTextColor = instance.poolColor ? POOL_COLOR_TEXT[instance.poolColor] : undefined;
 
   return (
     <button
@@ -28,7 +29,9 @@ export function SlotChip({ instance, fill, characterClassId, onClick }: SlotChip
       className={`slot-chip slot-chip-${instance.origin} ${stateClass}`}
       onClick={onClick}
       title={originLabel ?? undefined}
-      style={poolColor ? { borderLeft: `4px solid ${poolColor}` } : undefined}
+      style={
+        poolColor ? { backgroundColor: poolColor, borderColor: poolColor, color: poolTextColor } : undefined
+      }
     >
       {fill ? (
         <>
