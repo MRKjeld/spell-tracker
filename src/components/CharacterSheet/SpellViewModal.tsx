@@ -5,6 +5,7 @@ import type { AbilityId, ClassId } from '../../data/classes';
 import { CASTING_ABILITY } from '../../data/classes';
 import { abilityModifier } from '../../data/bonusSpells';
 import { computeSpellSaveDC, hasSavingThrow } from '../../lib/casterStats';
+import { schoolThemeColor } from '../../data/schoolThemes';
 import type { Character } from '../../state/types';
 
 interface SpellViewModalProps {
@@ -44,7 +45,7 @@ export function SpellViewModal({
   }
 
   return (
-    <Modal title={spellName} onClose={onClose}>
+    <Modal title={spellName} onClose={onClose} accentColor={spell ? schoolThemeColor(spell.school) : undefined}>
       {spell ? (
         <SpellDetails spell={spell} saveDC={saveDC} casterLevel={character.level} themed />
       ) : (

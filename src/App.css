@@ -338,6 +338,11 @@
   padding: 20px;
 }
 
+.modal-themed {
+  background: color-mix(in srgb, var(--modal-accent) 14%, var(--surface));
+  border-top: 4px solid var(--modal-accent);
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
