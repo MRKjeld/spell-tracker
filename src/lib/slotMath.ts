@@ -3,6 +3,7 @@ import { CASTING_ABILITY, START_LEVEL } from '../data/classes';
 import { SPELLS_PER_DAY } from '../data/spellsPerDay';
 import { abilityModifier, bonusSpellsForLevel } from '../data/bonusSpells';
 import type { ExtraSlotPool } from '../state/types';
+import type { PoolColorId } from '../data/poolColors';
 
 const SPELL_LEVEL_COUNT = 10; // spell levels 0-9
 
@@ -36,13 +37,14 @@ export interface SlotInstance {
   origin: SlotOrigin;
   poolId?: string;
   poolName?: string;
+  poolColor?: PoolColorId;
 }
 
 export interface SpellLevelSlots {
   spellLevel: number;
   baseCount: number;
   bonusCount: number;
-  poolCounts: { poolId: string; poolName: string; count: number }[];
+  poolCounts: { poolId: string; poolName: string; count: number; color?: PoolColorId }[];
   totalCount: number;
   instances: SlotInstance[];
 }
@@ -52,6 +54,7 @@ export interface LevellessPoolSlots {
   poolIds: string[]; // every pool record contributing to this named segment
   count: number;
   instances: SlotInstance[];
+  color?: PoolColorId;
 }
 
 export interface ComputedSlots {
@@ -89,9 +92,10 @@ export function computeSlots(
           origin: 'pool',
           poolId: pool.id,
           poolName: pool.name,
+          poolColor: pool.color,
         });
       }
-      poolCounts.push({ poolId: pool.id, poolName: pool.name, count: pool.count });
+      poolCounts.push({ poolId: pool.id, poolName: pool.name, count: pool.count, color: pool.color });
     }
 
     const poolTotal = poolCounts.reduce((sum, p) => sum + p.count, 0);
@@ -109,7 +113,10 @@ export function computeSlots(
   // Level-less pools group into one segment per distinct name, so e.g. two
   // separate "Drow" additions merge together while "Drow" and "Drow Innate"
   // stay in their own segments.
-  const levellessGroups = new Map<string, { poolIds: string[]; instances: SlotInstance[] }>();
+  const levellessGroups = new Map<
+    string,
+    { poolIds: string[]; instances: SlotInstance[]; color?: PoolColorId }
+  >();
   for (const pool of extraPools) {
     if (pool.spellLevel !== null) continue;
     const group = levellessGroups.get(pool.name) ?? { poolIds: [], instances: [] };
@@ -120,8 +127,10 @@ export function computeSlots(
         origin: 'pool',
         poolId: pool.id,
         poolName: pool.name,
+        poolColor: pool.color,
       });
     }
+    if (pool.color) group.color = pool.color;
     levellessGroups.set(pool.name, group);
   }
   const levellessPools: LevellessPoolSlots[] = Array.from(levellessGroups.entries()).map(
@@ -130,6 +139,7 @@ export function computeSlots(
       poolIds: group.poolIds,
       count: group.instances.length,
       instances: group.instances,
+      color: group.color,
     }),
   );
 

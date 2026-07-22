@@ -209,10 +209,6 @@
   letter-spacing: 0.05em;
 }
 
-.slot-chip-persist {
-  font-size: 11px;
-}
-
 /* Update toast */
 .update-toast {
   position: fixed;
@@ -308,6 +304,31 @@
 .add-slot-pool-form .add-slot-pool-checkbox input {
   padding: 0;
   width: auto;
+}
+
+.add-slot-pool-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.add-slot-pool-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  padding: 0;
+  cursor: pointer;
+}
+
+.add-slot-pool-color-swatch.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.add-slot-pool-color-none {
+  background: var(--surface);
+  background-image: linear-gradient(to top right, transparent 47%, var(--border) 49%, var(--border) 51%, transparent 53%);
 }
 
 .add-slot-pool-spells {

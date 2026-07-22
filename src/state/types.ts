@@ -1,10 +1,12 @@
 import type { AbilityId, ClassId } from '../data/classes';
+import type { PoolColorId } from '../data/poolColors';
 
 export interface ExtraSlotPool {
   id: string;
   name: string; // e.g. "Domain: Fire", "Drow Innate"
   spellLevel: number | null; // 0-9, or null for a level-less pool that forms its own segment
   count: number;
+  color?: PoolColorId;
 }
 
 export interface SlotFill {

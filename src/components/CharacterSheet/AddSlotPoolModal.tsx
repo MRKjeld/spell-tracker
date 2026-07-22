@@ -2,35 +2,28 @@ import { useState } from 'react';
 import { Modal } from '../common/Modal';
 import type { ClassId } from '../../data/classes';
 import type { SpellSelection } from '../../state/types';
+import { POOL_COLOR_PRESETS } from '../../data/poolColors';
+import type { PoolColorId } from '../../data/poolColors';
 import { SpellPickerModal } from './SpellPickerModal';
 
 interface AddSlotPoolModalProps {
   defaultClassId: ClassId;
-  onAdd: (name: string, spellLevel: number | null, count: number, spells: SpellSelection[]) => void;
+  onAdd: (name: string, spellLevel: number | null, spells: SpellSelection[], color?: PoolColorId) => void;
   onClose: () => void;
 }
 
 export function AddSlotPoolModal({ defaultClassId, onAdd, onClose }: AddSlotPoolModalProps) {
   const [name, setName] = useState('');
-  const [noLevel, setNoLevel] = useState(false);
+  const [specifyLevel, setSpecifyLevel] = useState(false);
   const [spellLevel, setSpellLevel] = useState(1);
-  const [count, setCount] = useState(1);
-  const [spells, setSpells] = useState<SpellSelection[]>([]);
+  const [spell, setSpell] = useState<SpellSelection | null>(null);
+  const [color, setColor] = useState<PoolColorId | undefined>(undefined);
   const [showSpellPicker, setShowSpellPicker] = useState(false);
-
-  function handleCountChange(next: number) {
-    setCount(next);
-    setSpells((prev) => prev.slice(0, next));
-  }
-
-  function handleRemoveSpell(index: number) {
-    setSpells((prev) => prev.filter((_, i) => i !== index));
-  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd(name.trim(), noLevel ? null : spellLevel, count, spells);
+    onAdd(name.trim(), specifyLevel ? spellLevel : null, spell ? [spell] : [], color);
     onClose();
   }
 
@@ -48,10 +41,10 @@ export function AddSlotPoolModal({ defaultClassId, onAdd, onClose }: AddSlotPool
           />
         </label>
         <label className="add-slot-pool-checkbox">
-          <input type="checkbox" checked={noLevel} onChange={(e) => setNoLevel(e.target.checked)} />
-          No specific spell level — these spells form their own segment
+          <input type="checkbox" checked={specifyLevel} onChange={(e) => setSpecifyLevel(e.target.checked)} />
+          Specify a spell level
         </label>
-        {!noLevel && (
+        {specifyLevel && (
           <label>
             Spell Level
             <input
@@ -63,36 +56,48 @@ export function AddSlotPoolModal({ defaultClassId, onAdd, onClose }: AddSlotPool
             />
           </label>
         )}
-        <label>
-          Count
-          <input
-            type="number"
-            min={1}
-            max={20}
-            value={count}
-            onChange={(e) => handleCountChange(Number(e.target.value))}
-          />
+
+        <label className="add-slot-pool-color">
+          Colour
+          <div className="add-slot-pool-color-swatches">
+            <button
+              type="button"
+              className={`add-slot-pool-color-swatch add-slot-pool-color-none${color === undefined ? ' selected' : ''}`}
+              onClick={() => setColor(undefined)}
+              title="No colour"
+              aria-label="No colour"
+            />
+            {POOL_COLOR_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                className={`add-slot-pool-color-swatch${color === preset.id ? ' selected' : ''}`}
+                style={{ backgroundColor: preset.value }}
+                onClick={() => setColor(preset.id)}
+                title={preset.label}
+                aria-label={preset.label}
+              />
+            ))}
+          </div>
         </label>
 
         <div className="add-slot-pool-spells">
           <div className="add-slot-pool-spells-header">
-            <span>Spells (optional — added as persisted fills)</span>
-            {spells.length < count && (
+            <span>Spell (optional — added as a persisted fill)</span>
+            {!spell && (
               <button type="button" onClick={() => setShowSpellPicker(true)}>
                 + Specify Spell
               </button>
             )}
           </div>
-          {spells.length > 0 && (
+          {spell && (
             <ul className="add-slot-pool-spells-list">
-              {spells.map((spell, i) => (
-                <li key={`${spell.spellId}-${i}`} className="slot-grid-pool-tag">
-                  {spell.spellName}
-                  <button type="button" onClick={() => handleRemoveSpell(i)} title={`Remove ${spell.spellName}`}>
-                    ×
-                  </button>
-                </li>
-              ))}
+              <li className="slot-grid-pool-tag">
+                {spell.spellName}
+                <button type="button" onClick={() => setSpell(null)} title={`Remove ${spell.spellName}`}>
+                  ×
+                </button>
+              </li>
             </ul>
           )}
         </div>
@@ -110,10 +115,10 @@ export function AddSlotPoolModal({ defaultClassId, onAdd, onClose }: AddSlotPool
       {showSpellPicker && (
         <SpellPickerModal
           defaultClassId={defaultClassId}
-          spellLevel={noLevel ? null : spellLevel}
+          spellLevel={specifyLevel ? spellLevel : null}
           poolName={name.trim() || undefined}
           onPick={(spellId, spellName, sourceClassId) => {
-            setSpells((prev) => [...prev, { spellId, spellName, sourceClassId }]);
+            setSpell({ spellId, spellName, sourceClassId });
             setShowSpellPicker(false);
           }}
           onClose={() => setShowSpellPicker(false)}

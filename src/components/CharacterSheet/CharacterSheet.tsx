@@ -135,8 +135,8 @@ export function CharacterSheet() {
       {showAddPool && (
         <AddSlotPoolModal
           defaultClassId={character.classId}
-          onAdd={(name, spellLevel, count, spells) =>
-            addExtraPool(character.id, { name, spellLevel, count }, spells)
+          onAdd={(name, spellLevel, spells, color) =>
+            addExtraPool(character.id, { name, spellLevel, count: 1, color }, spells)
           }
           onClose={() => setShowAddPool(false)}
         />
