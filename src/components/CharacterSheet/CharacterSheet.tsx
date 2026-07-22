@@ -19,7 +19,6 @@ export function CharacterSheet() {
   const clearSlot = useCharacterStore((s) => s.clearSlot);
   const setSlotUsed = useCharacterStore((s) => s.setSlotUsed);
   const restCharacter = useCharacterStore((s) => s.restCharacter);
-  const clearAllSlots = useCharacterStore((s) => s.clearAllSlots);
 
   const [showAddPool, setShowAddPool] = useState(false);
   const [pickerTarget, setPickerTarget] = useState<{
@@ -72,14 +71,14 @@ export function CharacterSheet() {
     setViewTarget(null);
   }
 
-  function handlePick(spellId: string, spellName: string, sourceClassId: ClassId | null, persistAfterRest: boolean) {
+  function handlePick(spellId: string, spellName: string, sourceClassId: ClassId | null) {
     if (pickerTarget) {
       fillSlot(character!.id, pickerTarget.slotInstanceId, {
         spellId,
         spellName,
         sourceClassId,
         used: false,
-        persistAfterRest,
+        persistAfterRest: false,
       });
     }
     setPickerTarget(null);
@@ -88,12 +87,6 @@ export function CharacterSheet() {
   function handleRest() {
     if (confirm('Rest and clear all spells not marked "Persist after rest"?')) {
       restCharacter(character!.id);
-    }
-  }
-
-  function handleClearAll() {
-    if (confirm('Clear ALL spells, including those marked "Persist after rest"?')) {
-      clearAllSlots(character!.id);
     }
   }
 
@@ -133,9 +126,6 @@ export function CharacterSheet() {
       <div className="character-sheet-footer">
         <button type="button" onClick={handleRest} className="button-secondary">
           Rest
-        </button>
-        <button type="button" onClick={handleClearAll} className="button-danger">
-          Clear All
         </button>
       </div>
 

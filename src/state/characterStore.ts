@@ -15,7 +15,6 @@ interface CharacterStoreState {
   clearSlot(charId: string, slotInstanceId: string): void;
   setSlotUsed(charId: string, slotInstanceId: string, used: boolean): void;
   restCharacter(charId: string): void;
-  clearAllSlots(charId: string): void;
   replaceAllCharacters(chars: Character[]): void;
   addCharacters(chars: Character[]): void;
 }
@@ -153,15 +152,6 @@ export const useCharacterStore = create<CharacterStoreState>()(
             }
           }
           const updated = touch({ ...existing, slotFills: restedFills });
-          return { characters: { ...state.characters, [charId]: updated } };
-        });
-      },
-
-      clearAllSlots(charId) {
-        set((state) => {
-          const existing = state.characters[charId];
-          if (!existing) return state;
-          const updated = touch({ ...existing, slotFills: {} });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },
