@@ -28,7 +28,7 @@ export function AddSlotPoolModal({ defaultClassId, onAdd, onClose }: AddSlotPool
   }
 
   return (
-    <Modal title="Add Spell Slots" onClose={onClose}>
+    <Modal title="Add Spell" onClose={onClose}>
       <form onSubmit={handleSubmit} className="add-slot-pool-form">
         <label>
           Name

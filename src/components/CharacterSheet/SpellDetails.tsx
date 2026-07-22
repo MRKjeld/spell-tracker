@@ -43,10 +43,10 @@ export function SpellDetails({ spell }: { spell: SpellEntry }) {
         <strong>Duration:</strong> {spell.duration}
       </p>
       <p>
-        <strong>Saving Throw:</strong> {spell.savingThrow}
+        <strong>Saving Throw:</strong> {spell.savingThrow || 'No'}
       </p>
       <p>
-        <strong>Spell Resistance:</strong> {spell.spellResistance}
+        <strong>Spell Resistance:</strong> {spell.spellResistance || 'No'}
       </p>
       <p className="spell-picker-description">{spell.description || 'No description available.'}</p>
     </div>

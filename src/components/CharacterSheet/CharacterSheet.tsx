@@ -112,7 +112,7 @@ export function CharacterSheet() {
       )}
 
       <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
-        + Add Spell Slots
+        + Add Spell
       </button>
 
       <SlotGrid

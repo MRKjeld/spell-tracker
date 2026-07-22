@@ -7,7 +7,7 @@ import type { ClassId } from './classes';
 // per-level tables live inside a minified bundle not worth reverse
 // engineering). Cleric's "+1 domain spell" slot is intentionally excluded
 // here -- it isn't a class-table slot count, it's modeled by the player
-// adding a named "Domain" extra slot pool via the app's own Add Spell Slots
+// adding a named "Domain" extra slot pool via the app's own Add Spell
 // feature, same as any other bonus-slot source (e.g. Drow innate casting).
 export const SPELLS_PER_DAY: Record<ClassId, number[][]> = {
   wizard: [
