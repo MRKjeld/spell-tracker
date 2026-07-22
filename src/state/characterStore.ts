@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createId } from '../lib/id';
 import { computeSlots, pruneOrphanedFills } from '../lib/slotMath';
+import { CASTING_ABILITY } from '../data/classes';
 import type { Character, ExtraSlotPool, NewCharacterInput, SlotFill, SpellSelection } from './types';
 
 interface CharacterStoreState {
@@ -20,9 +21,18 @@ interface CharacterStoreState {
 }
 
 function touch(character: Character): Character {
-  const computed = computeSlots(character.classId, character.level, character.abilityScores, character.extraSlotPools);
+  // Older persisted characters predate this field, so fall back to the class default.
+  const castingAbility = character.castingAbility ?? CASTING_ABILITY[character.classId];
+  const computed = computeSlots(
+    character.classId,
+    character.level,
+    character.abilityScores,
+    character.extraSlotPools,
+    castingAbility,
+  );
   return {
     ...character,
+    castingAbility,
     slotFills: pruneOrphanedFills(character.slotFills, computed) as Record<string, SlotFill>,
     updatedAt: new Date().toISOString(),
   };
@@ -42,6 +52,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           classId: input.classId,
           level: input.level,
           abilityScores: input.abilityScores,
+          castingAbility: input.castingAbility ?? CASTING_ABILITY[input.classId],
           extraSlotPools: [],
           slotFills: {},
           createdAt: now,

@@ -58,6 +58,15 @@
   color: var(--text-muted);
 }
 
+.character-form .form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.character-form .form-row label {
+  flex: 1;
+}
+
 .character-form input,
 .character-form select {
   padding: 8px;

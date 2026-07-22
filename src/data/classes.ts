@@ -89,6 +89,8 @@ export const CLASS_LABELS: Record<ClassId, string> = {
   warpriest: 'Warpriest',
 };
 
+// Default casting ability per class. A character's actual casting ability
+// (Character.castingAbility) defaults to this but can be overridden.
 export const CASTING_ABILITY: Record<ClassId, AbilityId> = {
   wizard: 'int',
   cleric: 'wis',

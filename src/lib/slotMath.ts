@@ -1,5 +1,5 @@
 import type { AbilityId, ClassId } from '../data/classes';
-import { CASTING_ABILITY, START_LEVEL } from '../data/classes';
+import { START_LEVEL } from '../data/classes';
 import { SPELLS_PER_DAY } from '../data/spellsPerDay';
 import { abilityModifier, bonusSpellsForLevel } from '../data/bonusSpells';
 import type { ExtraSlotPool } from '../state/types';
@@ -23,10 +23,10 @@ export function getBonusSlots(
   classId: ClassId,
   level: number,
   abilityScores: Record<AbilityId, number>,
+  castingAbility: AbilityId,
 ): number[] {
   const base = getBaseSlots(classId, level);
-  const ability = CASTING_ABILITY[classId];
-  const modifier = abilityModifier(abilityScores[ability]);
+  const modifier = abilityModifier(abilityScores[castingAbility]);
   return base.map((baseCount, spellLevel) => (baseCount > 0 ? bonusSpellsForLevel(modifier, spellLevel) : 0));
 }
 
@@ -67,9 +67,10 @@ export function computeSlots(
   level: number,
   abilityScores: Record<AbilityId, number>,
   extraPools: ExtraSlotPool[],
+  castingAbility: AbilityId,
 ): ComputedSlots {
   const base = getBaseSlots(classId, level);
-  const bonus = getBonusSlots(classId, level, abilityScores);
+  const bonus = getBonusSlots(classId, level, abilityScores, castingAbility);
 
   const levelSlots: SpellLevelSlots[] = [];
 

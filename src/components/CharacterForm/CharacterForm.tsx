@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
-import { CLASS_IDS, CLASS_LABELS } from '../../data/classes';
+import { CASTING_ABILITY, CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { AbilityId, ClassId } from '../../data/classes';
 
 const ABILITIES: { id: AbilityId; label: string }[] = [
   { id: 'str', label: 'Strength' },
   { id: 'dex', label: 'Dexterity' },
   { id: 'con', label: 'Constitution' },
+  { id: 'int', label: 'Intelligence' },
+  { id: 'wis', label: 'Wisdom' },
+  { id: 'cha', label: 'Charisma' },
+];
+
+const CASTING_ABILITIES: { id: AbilityId; label: string }[] = [
   { id: 'int', label: 'Intelligence' },
   { id: 'wis', label: 'Wisdom' },
   { id: 'cha', label: 'Charisma' },
@@ -28,18 +34,26 @@ export function CharacterForm({ mode }: CharacterFormProps) {
 
   const [name, setName] = useState(existing?.name ?? '');
   const [classId, setClassId] = useState<ClassId>(existing?.classId ?? 'wizard');
+  const [castingAbility, setCastingAbility] = useState<AbilityId>(
+    existing?.castingAbility ?? CASTING_ABILITY[existing?.classId ?? 'wizard'],
+  );
   const [level, setLevel] = useState(existing?.level ?? 1);
   const [abilityScores, setAbilityScores] = useState<Record<AbilityId, number>>(
     existing?.abilityScores ?? { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
   );
 
+  function handleClassChange(newClassId: ClassId) {
+    setClassId(newClassId);
+    setCastingAbility(CASTING_ABILITY[newClassId]);
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (mode === 'create') {
-      const newId = createCharacter({ name, classId, level, abilityScores });
+      const newId = createCharacter({ name, classId, level, abilityScores, castingAbility });
       navigate(`/${newId}`);
     } else if (existing) {
-      updateCharacter(existing.id, { name, classId, level, abilityScores });
+      updateCharacter(existing.id, { name, classId, level, abilityScores, castingAbility });
       navigate(`/${existing.id}`);
     }
   }
@@ -53,16 +67,29 @@ export function CharacterForm({ mode }: CharacterFormProps) {
           <input value={name} onChange={(e) => setName(e.target.value)} required />
         </label>
 
-        <label>
-          Spell Casting Class
-          <select value={classId} onChange={(e) => setClassId(e.target.value as ClassId)}>
-            {CLASS_IDS.map((id) => (
-              <option key={id} value={id}>
-                {CLASS_LABELS[id]}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="form-row">
+          <label>
+            Spell Casting Class
+            <select value={classId} onChange={(e) => handleClassChange(e.target.value as ClassId)}>
+              {CLASS_IDS.map((id) => (
+                <option key={id} value={id}>
+                  {CLASS_LABELS[id]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Caster Modifier
+            <select value={castingAbility} onChange={(e) => setCastingAbility(e.target.value as AbilityId)}>
+              {CASTING_ABILITIES.map(({ id, label }) => (
+                <option key={id} value={id}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <label>
           Level

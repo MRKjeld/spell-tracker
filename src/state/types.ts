@@ -31,10 +31,14 @@ export interface Character {
   classId: ClassId;
   level: number; // 1-20
   abilityScores: Record<AbilityId, number>;
+  castingAbility: AbilityId; // defaults to the class's usual ability, but overridable
   extraSlotPools: ExtraSlotPool[];
   slotFills: Record<string, SlotFill>; // keyed by deterministic slot-instance id
   createdAt: string;
   updatedAt: string;
 }
 
-export type NewCharacterInput = Pick<Character, 'name' | 'classId' | 'level' | 'abilityScores'>;
+export type NewCharacterInput = Pick<
+  Character,
+  'name' | 'classId' | 'level' | 'abilityScores' | 'castingAbility'
+>;

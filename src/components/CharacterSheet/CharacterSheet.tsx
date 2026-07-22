@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
-import { CANTRIPS_AT_WILL, CLASS_LABELS } from '../../data/classes';
+import { CANTRIPS_AT_WILL, CASTING_ABILITY, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { computeSlots } from '../../lib/slotMath';
 import type { SlotFill } from '../../state/types';
@@ -30,7 +30,15 @@ export function CharacterSheet() {
 
   const computed = useMemo(() => {
     if (!character) return { levelSlots: [], levellessPools: [] };
-    return computeSlots(character.classId, character.level, character.abilityScores, character.extraSlotPools);
+    // Older persisted characters predate this field, so fall back to the class default.
+    const castingAbility = character.castingAbility ?? CASTING_ABILITY[character.classId];
+    return computeSlots(
+      character.classId,
+      character.level,
+      character.abilityScores,
+      character.extraSlotPools,
+      castingAbility,
+    );
   }, [character]);
 
   if (!character) {
