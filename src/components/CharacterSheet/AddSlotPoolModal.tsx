@@ -1,24 +1,47 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
 import type { ClassId } from '../../data/classes';
-import type { SpellSelection } from '../../state/types';
+import type { ExtraSlotPool, SpellSelection } from '../../state/types';
 import { POOL_COLOR_PRESETS } from '../../data/poolColors';
 import type { PoolColorId } from '../../data/poolColors';
 import { SpellPickerModal } from './SpellPickerModal';
 
 interface AddSlotPoolModalProps {
   defaultClassId: ClassId;
+  existingPools: ExtraSlotPool[];
   onAdd: (name: string, spellLevel: number | null, spells: SpellSelection[], color?: PoolColorId) => void;
   onClose: () => void;
 }
 
-export function AddSlotPoolModal({ defaultClassId, onAdd, onClose }: AddSlotPoolModalProps) {
+export function AddSlotPoolModal({ defaultClassId, existingPools, onAdd, onClose }: AddSlotPoolModalProps) {
   const [name, setName] = useState('');
   const [specifyLevel, setSpecifyLevel] = useState(false);
   const [spellLevel, setSpellLevel] = useState(1);
   const [spell, setSpell] = useState<SpellSelection | null>(null);
   const [color, setColor] = useState<PoolColorId | undefined>(undefined);
   const [showSpellPicker, setShowSpellPicker] = useState(false);
+
+  const existingNames = useMemo(
+    () => Array.from(new Set(existingPools.map((p) => p.name))).sort((a, b) => a.localeCompare(b)),
+    [existingPools],
+  );
+
+  const nameSuggestions = useMemo(() => {
+    const query = name.trim().toLowerCase();
+    return existingNames.filter((n) => n.toLowerCase() !== query && (!query || n.toLowerCase().includes(query)));
+  }, [existingNames, name]);
+
+  function handleSelectSuggestion(suggestedName: string) {
+    setName(suggestedName);
+    // Match the existing pool's level/colour so this addition actually
+    // merges into that named segment instead of forming a separate one.
+    const match = existingPools.find((p) => p.name === suggestedName);
+    if (match) {
+      setSpecifyLevel(match.spellLevel !== null);
+      if (match.spellLevel !== null) setSpellLevel(match.spellLevel);
+      setColor(match.color);
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,6 +63,17 @@ export function AddSlotPoolModal({ defaultClassId, onAdd, onClose }: AddSlotPool
             required
           />
         </label>
+        {nameSuggestions.length > 0 && (
+          <ul className="add-slot-pool-name-suggestions">
+            {nameSuggestions.map((suggestion) => (
+              <li key={suggestion}>
+                <button type="button" onClick={() => handleSelectSuggestion(suggestion)}>
+                  {suggestion}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         <label className="add-slot-pool-checkbox">
           <input type="checkbox" checked={specifyLevel} onChange={(e) => setSpecifyLevel(e.target.checked)} />
           Specify a spell level

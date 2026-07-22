@@ -331,6 +331,29 @@
   background-image: linear-gradient(to top right, transparent 47%, var(--border) 49%, var(--border) 51%, transparent 53%);
 }
 
+.add-slot-pool-name-suggestions {
+  list-style: none;
+  padding: 0;
+  margin: -8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.add-slot-pool-name-suggestions button {
+  background: var(--border);
+  border: none;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.add-slot-pool-name-suggestions button:hover {
+  background: var(--accent);
+  color: white;
+}
+
 .add-slot-pool-spells {
   display: flex;
   flex-direction: column;
