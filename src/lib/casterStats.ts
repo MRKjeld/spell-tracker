@@ -12,6 +12,18 @@ export interface CasterStats {
   rangeLongFt: number;
 }
 
+export function closeRangeFt(casterLevel: number): number {
+  return 25 + 5 * Math.floor(casterLevel / 2);
+}
+
+export function mediumRangeFt(casterLevel: number): number {
+  return 100 + 10 * casterLevel;
+}
+
+export function longRangeFt(casterLevel: number): number {
+  return 400 + 40 * casterLevel;
+}
+
 /**
  * PF1E caster level equals character level for every class this tracker
  * supports (no multiclass/prestige-class caster-level stacking here), so
@@ -32,9 +44,9 @@ export function computeCasterStats(
     concentrationCheck: casterLevel + castingAbilityModifier,
     spellcraftCheck: spellcraft,
     baseSpellDC: 10 + castingAbilityModifier,
-    rangeCloseFt: 25 + 5 * Math.floor(casterLevel / 2),
-    rangeMediumFt: 100 + 10 * casterLevel,
-    rangeLongFt: 400 + 40 * casterLevel,
+    rangeCloseFt: closeRangeFt(casterLevel),
+    rangeMediumFt: mediumRangeFt(casterLevel),
+    rangeLongFt: longRangeFt(casterLevel),
   };
 }
 

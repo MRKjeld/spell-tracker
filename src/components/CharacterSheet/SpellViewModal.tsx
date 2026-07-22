@@ -45,7 +45,11 @@ export function SpellViewModal({
 
   return (
     <Modal title={spellName} onClose={onClose}>
-      {spell ? <SpellDetails spell={spell} saveDC={saveDC} /> : <p>Spell details not found.</p>}
+      {spell ? (
+        <SpellDetails spell={spell} saveDC={saveDC} casterLevel={character.level} themed />
+      ) : (
+        <p>Spell details not found.</p>
+      )}
       <div className="spell-view-actions">
         <button type="button" className="button-danger" onClick={onClear}>
           Clear

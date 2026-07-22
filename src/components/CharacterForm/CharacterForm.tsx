@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
 import { CASTING_ABILITY, CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { AbilityId, ClassId } from '../../data/classes';
 import { SCHOOL_LABELS } from '../../data/spells';
+import { schoolThemeColor, schoolThemeTextColor } from '../../data/schoolThemes';
 
 // Universal has no school proper, so it isn't a valid Spell Focus target.
 const FOCUSABLE_SCHOOLS = Object.keys(SCHOOL_LABELS).filter((school) => school !== 'uni');
@@ -187,7 +189,11 @@ export function CharacterForm({ mode }: CharacterFormProps) {
             <ul className="school-focus-options">
               {FOCUSABLE_SCHOOLS.filter((s) => !spellFocusSchools.includes(s)).map((s) => (
                 <li key={s}>
-                  <button type="button" onClick={() => addSpellFocusSchool(s)}>
+                  <button
+                    type="button"
+                    onClick={() => addSpellFocusSchool(s)}
+                    style={{ '--school-color': schoolThemeColor(s) } as CSSProperties}
+                  >
                     {SCHOOL_LABELS[s]}
                   </button>
                 </li>
@@ -203,6 +209,7 @@ export function CharacterForm({ mode }: CharacterFormProps) {
                     className="school-focus-tag"
                     onClick={() => removeSpellFocusSchool(s)}
                     title={`Remove ${SCHOOL_LABELS[s]}`}
+                    style={{ backgroundColor: schoolThemeColor(s), color: schoolThemeTextColor(s) }}
                   >
                     {SCHOOL_LABELS[s]} ×
                   </button>
@@ -225,7 +232,11 @@ export function CharacterForm({ mode }: CharacterFormProps) {
             <ul className="school-focus-options">
               {FOCUSABLE_SCHOOLS.filter((s) => !greaterSpellFocusSchools.includes(s)).map((s) => (
                 <li key={s}>
-                  <button type="button" onClick={() => addGreaterSpellFocusSchool(s)}>
+                  <button
+                    type="button"
+                    onClick={() => addGreaterSpellFocusSchool(s)}
+                    style={{ '--school-color': schoolThemeColor(s) } as CSSProperties}
+                  >
                     {SCHOOL_LABELS[s]}
                   </button>
                 </li>
@@ -241,6 +252,7 @@ export function CharacterForm({ mode }: CharacterFormProps) {
                     className="school-focus-tag"
                     onClick={() => removeGreaterSpellFocusSchool(s)}
                     title={`Remove ${SCHOOL_LABELS[s]}`}
+                    style={{ backgroundColor: schoolThemeColor(s), color: schoolThemeTextColor(s) }}
                   >
                     {SCHOOL_LABELS[s]} ×
                   </button>
