@@ -82,8 +82,8 @@ describe('computeSlots', () => {
     }
     expect(levellessPools).toEqual([
       {
-        poolId: 'p1',
         poolName: 'Drow Innate',
+        poolIds: ['p1'],
         count: 3,
         instances: [
           { id: 'pool-p1-0', origin: 'pool', poolId: 'p1', poolName: 'Drow Innate' },
@@ -92,6 +92,25 @@ describe('computeSlots', () => {
         ],
       },
     ]);
+  });
+
+  it('level-less pools with matching names merge into one segment; different names stay separate', () => {
+    const pools = [
+      { id: 'p1', name: 'Drow', spellLevel: null, count: 1 },
+      { id: 'p2', name: 'Drow Innate', spellLevel: null, count: 1 },
+      { id: 'p3', name: 'Drow', spellLevel: null, count: 2 },
+    ];
+    const { levellessPools } = computeSlots('wizard', 5, NEUTRAL_SCORES, pools);
+    expect(levellessPools).toHaveLength(2);
+
+    const drow = levellessPools.find((p) => p.poolName === 'Drow')!;
+    expect(drow.poolIds).toEqual(['p1', 'p3']);
+    expect(drow.count).toBe(3);
+    expect(drow.instances.map((i) => i.id)).toEqual(['pool-p1-0', 'pool-p3-0', 'pool-p3-1']);
+
+    const drowInnate = levellessPools.find((p) => p.poolName === 'Drow Innate')!;
+    expect(drowInnate.poolIds).toEqual(['p2']);
+    expect(drowInnate.count).toBe(1);
   });
 
   it('invariant sweep: base counts are monotonic non-decreasing per spell level as character level increases, and respect MAX_SPELL_LEVEL / START_LEVEL', () => {

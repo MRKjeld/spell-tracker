@@ -15,6 +15,14 @@ export interface SlotFill {
   persistAfterRest: boolean; // if true, Rest does not clear this fill
 }
 
+// A spell chosen up front while creating a slot pool (see AddSlotPoolModal).
+// Pools created this way pre-fill their slots with these spells as persisted fills.
+export interface SpellSelection {
+  spellId: string;
+  spellName: string;
+  sourceClassId: ClassId | null;
+}
+
 export interface Character {
   id: string;
   name: string;

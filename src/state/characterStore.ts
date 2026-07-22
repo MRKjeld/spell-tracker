@@ -2,14 +2,14 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createId } from '../lib/id';
 import { computeSlots, pruneOrphanedFills } from '../lib/slotMath';
-import type { Character, ExtraSlotPool, NewCharacterInput, SlotFill } from './types';
+import type { Character, ExtraSlotPool, NewCharacterInput, SlotFill, SpellSelection } from './types';
 
 interface CharacterStoreState {
   characters: Record<string, Character>;
   createCharacter(input: NewCharacterInput): string;
   updateCharacter(id: string, patch: Partial<Omit<Character, 'id' | 'createdAt'>>): void;
   deleteCharacter(id: string): void;
-  addExtraPool(charId: string, pool: Omit<ExtraSlotPool, 'id'>): void;
+  addExtraPool(charId: string, pool: Omit<ExtraSlotPool, 'id'>, spells?: SpellSelection[]): void;
   removeExtraPool(charId: string, poolId: string): void;
   fillSlot(charId: string, slotInstanceId: string, fill: SlotFill): void;
   clearSlot(charId: string, slotInstanceId: string): void;
@@ -68,12 +68,29 @@ export const useCharacterStore = create<CharacterStoreState>()(
         });
       },
 
-      addExtraPool(charId, pool) {
+      addExtraPool(charId, pool, spells = []) {
         set((state) => {
           const existing = state.characters[charId];
           if (!existing) return state;
           const newPool: ExtraSlotPool = { ...pool, id: createId() };
-          const updated = touch({ ...existing, extraSlotPools: [...existing.extraSlotPools, newPool] });
+          // Spells specified up front fill this pool's slots immediately, as
+          // persisted fills (they represent innate/fixed spells, not picks
+          // that get cleared on the next Rest).
+          const newFills: Record<string, SlotFill> = {};
+          spells.slice(0, newPool.count).forEach((spell, i) => {
+            newFills[`pool-${newPool.id}-${i}`] = {
+              spellId: spell.spellId,
+              spellName: spell.spellName,
+              sourceClassId: spell.sourceClassId,
+              used: false,
+              persistAfterRest: true,
+            };
+          });
+          const updated = touch({
+            ...existing,
+            extraSlotPools: [...existing.extraSlotPools, newPool],
+            slotFills: { ...existing.slotFills, ...newFills },
+          });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

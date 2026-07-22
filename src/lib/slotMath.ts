@@ -48,8 +48,8 @@ export interface SpellLevelSlots {
 }
 
 export interface LevellessPoolSlots {
-  poolId: string;
   poolName: string;
+  poolIds: string[]; // every pool record contributing to this named segment
   count: number;
   instances: SlotInstance[];
 }
@@ -106,19 +106,32 @@ export function computeSlots(
     });
   }
 
-  const levellessPools: LevellessPoolSlots[] = extraPools
-    .filter((pool) => pool.spellLevel === null)
-    .map((pool) => ({
-      poolId: pool.id,
-      poolName: pool.name,
-      count: pool.count,
-      instances: Array.from({ length: pool.count }, (_, i) => ({
+  // Level-less pools group into one segment per distinct name, so e.g. two
+  // separate "Drow" additions merge together while "Drow" and "Drow Innate"
+  // stay in their own segments.
+  const levellessGroups = new Map<string, { poolIds: string[]; instances: SlotInstance[] }>();
+  for (const pool of extraPools) {
+    if (pool.spellLevel !== null) continue;
+    const group = levellessGroups.get(pool.name) ?? { poolIds: [], instances: [] };
+    group.poolIds.push(pool.id);
+    for (let i = 0; i < pool.count; i++) {
+      group.instances.push({
         id: `pool-${pool.id}-${i}`,
-        origin: 'pool' as const,
+        origin: 'pool',
         poolId: pool.id,
         poolName: pool.name,
-      })),
-    }));
+      });
+    }
+    levellessGroups.set(pool.name, group);
+  }
+  const levellessPools: LevellessPoolSlots[] = Array.from(levellessGroups.entries()).map(
+    ([poolName, group]) => ({
+      poolName,
+      poolIds: group.poolIds,
+      count: group.instances.length,
+      instances: group.instances,
+    }),
+  );
 
   return { levelSlots, levellessPools };
 }

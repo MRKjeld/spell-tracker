@@ -310,6 +310,29 @@
   width: auto;
 }
 
+.add-slot-pool-spells {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-slot-pool-spells-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.add-slot-pool-spells-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 /* Spell picker */
 .spell-picker-search {
   width: 100%;

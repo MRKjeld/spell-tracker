@@ -51,7 +51,7 @@ export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, o
       ))}
 
       {levellessPools.map((pool) => (
-        <div key={pool.poolId} className="slot-grid-row">
+        <div key={pool.poolName} className="slot-grid-row">
           <div className="slot-grid-row-header">
             <h3>{pool.poolName}</h3>
             <span className="slot-grid-row-summary">
@@ -59,7 +59,11 @@ export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, o
             </span>
             <span className="slot-grid-pool-tag">
               No level
-              <button type="button" onClick={() => onRemovePool(pool.poolId)} title={`Remove ${pool.poolName}`}>
+              <button
+                type="button"
+                onClick={() => pool.poolIds.forEach(onRemovePool)}
+                title={`Remove ${pool.poolName}`}
+              >
                 ×
               </button>
             </span>
