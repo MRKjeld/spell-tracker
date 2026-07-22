@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
-import { getAllSpellsFor, getSpellsFor, humanizeTag, searchSpells, spellMatchesQuery, SCHOOL_LABELS } from '../../data/spells';
+import { getAllSpellsFor, getSpellsFor, searchSpells, spellMatchesQuery } from '../../data/spells';
 import type { SpellEntry } from '../../data/spells';
+import { SpellDetails } from './SpellDetails';
 
 interface SpellPickerModalProps {
   defaultClassId: ClassId;
@@ -11,56 +12,6 @@ interface SpellPickerModalProps {
   poolName?: string;
   onPick: (spellId: string, spellName: string, sourceClassId: ClassId | null, persistAfterRest: boolean) => void;
   onClose: () => void;
-}
-
-function formatLevels(spell: SpellEntry): string {
-  return Object.entries(spell.levels)
-    .map(([classId, level]) => `${CLASS_LABELS[classId as ClassId]} ${level}`)
-    .join(', ');
-}
-
-function SpellDetails({ spell }: { spell: SpellEntry }) {
-  const schoolLine = [
-    SCHOOL_LABELS[spell.school] ?? spell.school,
-    ...spell.subschool.map(humanizeTag),
-  ].join(', ');
-  const descriptorLine = spell.descriptors.map(humanizeTag).join(', ');
-
-  return (
-    <div className="spell-picker-details">
-      <p>
-        <strong>School:</strong> {schoolLine}
-        {descriptorLine && ` (${descriptorLine})`}
-      </p>
-      <p>
-        <strong>Level:</strong> {formatLevels(spell)}
-      </p>
-      <p>
-        <strong>Casting Time:</strong> {spell.castingTime}
-      </p>
-      <p>
-        <strong>Components:</strong> {spell.components}
-      </p>
-      <p>
-        <strong>Range:</strong> {spell.range}
-      </p>
-      {spell.effect && (
-        <p>
-          <strong>Effect:</strong> {spell.effect}
-        </p>
-      )}
-      <p>
-        <strong>Duration:</strong> {spell.duration}
-      </p>
-      <p>
-        <strong>Saving Throw:</strong> {spell.savingThrow}
-      </p>
-      <p>
-        <strong>Spell Resistance:</strong> {spell.spellResistance}
-      </p>
-      <p className="spell-picker-description">{spell.description || 'No description available.'}</p>
-    </div>
-  );
 }
 
 function levelLabelFor(spell: SpellEntry, activeTab: ClassId | 'all', defaultClassId: ClassId): string {

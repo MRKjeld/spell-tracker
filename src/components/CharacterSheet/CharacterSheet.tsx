@@ -4,9 +4,11 @@ import { useCharacterStore } from '../../state/characterStore';
 import { CANTRIPS_AT_WILL, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { computeSlots } from '../../lib/slotMath';
+import type { SlotFill } from '../../state/types';
 import { SlotGrid } from './SlotGrid';
 import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
+import { SpellViewModal } from './SpellViewModal';
 
 export function CharacterSheet() {
   const { id } = useParams();
@@ -24,6 +26,7 @@ export function CharacterSheet() {
     poolName?: string;
     slotInstanceId: string;
   } | null>(null);
+  const [viewTarget, setViewTarget] = useState<{ slotInstanceId: string; fill: SlotFill } | null>(null);
 
   const computed = useMemo(() => {
     if (!character) return { levelSlots: [], levellessPools: [] };
@@ -42,15 +45,23 @@ export function CharacterSheet() {
   function handleSlotClick(spellLevel: number | null, slotInstanceId: string, poolName?: string) {
     const fill = character!.slotFills[slotInstanceId];
     if (fill) {
-      if (fill.used) {
-        if (confirm('Are you sure you want to unuse this spell?')) {
-          setSlotUsed(character!.id, slotInstanceId, false);
-        }
-      } else {
-        setSlotUsed(character!.id, slotInstanceId, true);
-      }
+      setViewTarget({ slotInstanceId, fill });
     } else {
       setPickerTarget({ spellLevel, poolName, slotInstanceId });
+    }
+  }
+
+  function handleToggleUsed() {
+    if (!viewTarget) return;
+    const { slotInstanceId, fill } = viewTarget;
+    if (fill.used) {
+      if (confirm('Are you sure you want to unuse this spell?')) {
+        setSlotUsed(character!.id, slotInstanceId, false);
+        setViewTarget(null);
+      }
+    } else {
+      setSlotUsed(character!.id, slotInstanceId, true);
+      setViewTarget(null);
     }
   }
 
@@ -135,6 +146,16 @@ export function CharacterSheet() {
           poolName={pickerTarget.poolName}
           onPick={handlePick}
           onClose={() => setPickerTarget(null)}
+        />
+      )}
+
+      {viewTarget && (
+        <SpellViewModal
+          spellId={viewTarget.fill.spellId}
+          spellName={viewTarget.fill.spellName}
+          used={viewTarget.fill.used}
+          onToggleUsed={handleToggleUsed}
+          onClose={() => setViewTarget(null)}
         />
       )}
     </div>
