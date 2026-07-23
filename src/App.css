@@ -563,11 +563,26 @@
 
 .spell-view-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 16px;
+  }
+
+  .spell-view-actions {
+    flex-direction: column;
+  }
+
+  .spell-view-actions button {
+    width: 100%;
+  }
 }
 
 /* Add slot pool form */
