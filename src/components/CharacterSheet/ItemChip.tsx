@@ -19,11 +19,12 @@ export function ItemChip({ item, onClick }: ItemChipProps) {
   const depleted = item.usePeriod !== 'unlimited' && item.usesRemaining <= 0;
   const usesLabel =
     item.usePeriod === 'unlimited' ? 'Unlimited' : `${item.usesRemaining}/${item.maxUses} ${USE_PERIOD_SHORT_LABELS[item.usePeriod]}`;
+  const wornClass = item.equippedSlot ? 'item-chip-worn' : 'item-chip-unworn';
 
   return (
     <button
       type="button"
-      className={`item-chip${depleted ? ' item-chip-depleted' : ''}`}
+      className={`item-chip ${wornClass}${depleted ? ' item-chip-depleted' : ''}`}
       onClick={onClick}
     >
       <span className="item-chip-name">{item.name}</span>

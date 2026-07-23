@@ -411,9 +411,17 @@
   justify-content: center;
   padding: 6px 10px;
   text-align: center;
-  background: var(--accent);
   color: white;
-  border: 1px solid var(--accent);
+}
+
+.item-chip-worn {
+  background: var(--item-chip-worn);
+  border: 1px solid var(--item-chip-worn);
+}
+
+.item-chip-unworn {
+  background: var(--item-chip-unworn);
+  border: 1px solid var(--item-chip-unworn);
 }
 
 .item-chip-depleted {
