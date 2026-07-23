@@ -37,31 +37,36 @@ interface CharacterStoreState {
   addCharacters(chars: Character[]): void;
 }
 
-function touch(character: Character): Character {
-  // Older persisted characters predate this field, so fall back to the class default.
-  const castingAbility = character.castingAbility ?? CASTING_ABILITY[character.classId];
-  // Older persisted characters predate these fields too.
-  const spellcraft = character.spellcraft ?? 0;
-  const spellFocusSchools = character.spellFocusSchools ?? [];
-  const greaterSpellFocusSchools = character.greaterSpellFocusSchools ?? [];
-  const items = character.items ?? [];
-  const equipmentSlots = character.equipmentSlots ?? {};
-  const computed = computeSlots(
-    character.classId,
-    character.level,
-    character.abilityScores,
-    character.extraSlotPools,
-    castingAbility,
-  );
+// Fills in fields added to the Character shape after some characters were
+// already persisted, so components never see them as undefined. Applied both
+// on every store mutation (touch) and once at load time (see the `merge`
+// option below) — the latter matters because opening a tab is a pure
+// render/state change that never calls a mutator, so a character that predates
+// a newly-added field would otherwise stay undefined until first edited.
+function backfillDefaults(character: Character): Character {
   return {
     ...character,
-    castingAbility,
-    spellcraft,
-    spellFocusSchools,
-    greaterSpellFocusSchools,
-    items,
-    equipmentSlots,
-    slotFills: pruneOrphanedFills(character.slotFills, computed) as Record<string, SlotFill>,
+    castingAbility: character.castingAbility ?? CASTING_ABILITY[character.classId],
+    spellcraft: character.spellcraft ?? 0,
+    spellFocusSchools: character.spellFocusSchools ?? [],
+    greaterSpellFocusSchools: character.greaterSpellFocusSchools ?? [],
+    items: character.items ?? [],
+    equipmentSlots: character.equipmentSlots ?? {},
+  };
+}
+
+function touch(character: Character): Character {
+  const filled = backfillDefaults(character);
+  const computed = computeSlots(
+    filled.classId,
+    filled.level,
+    filled.abilityScores,
+    filled.extraSlotPools,
+    filled.castingAbility,
+  );
+  return {
+    ...filled,
+    slotFills: pruneOrphanedFills(filled.slotFills, computed) as Record<string, SlotFill>,
     updatedAt: new Date().toISOString(),
   };
 }
@@ -295,6 +300,17 @@ export const useCharacterStore = create<CharacterStoreState>()(
     {
       name: 'pf1e-spell-tracker',
       version: 1,
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<CharacterStoreState> | undefined;
+        if (!persisted?.characters) return currentState;
+        return {
+          ...currentState,
+          ...persisted,
+          characters: Object.fromEntries(
+            Object.entries(persisted.characters).map(([id, character]) => [id, backfillDefaults(character)]),
+          ),
+        };
+      },
     },
   ),
 );

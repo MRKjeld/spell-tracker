@@ -143,7 +143,7 @@ export function CharacterSheet() {
   }
 
   function handleEquipmentSlotClick(slot: BodySlotId) {
-    if (character!.equipmentSlots[slot]) {
+    if (character!.equipmentSlots?.[slot]) {
       setEquippedSlotViewTarget(slot);
     } else {
       setSlotPickerTarget(slot);
@@ -223,7 +223,7 @@ export function CharacterSheet() {
 
       {activeTab === 'items' && (
         <>
-          <EquipmentSlotsGrid equipmentSlots={character.equipmentSlots} onSlotClick={handleEquipmentSlotClick} />
+          <EquipmentSlotsGrid equipmentSlots={character.equipmentSlots ?? {}} onSlotClick={handleEquipmentSlotClick} />
 
           <button type="button" onClick={() => setShowAddItem(true)} className="button-primary">
             + Add Item
@@ -307,7 +307,7 @@ export function CharacterSheet() {
         />
       )}
 
-      {equippedSlotViewTarget && character.equipmentSlots[equippedSlotViewTarget] && (
+      {equippedSlotViewTarget && character.equipmentSlots?.[equippedSlotViewTarget] && (
         <EquippedSlotItemModal
           slot={equippedSlotViewTarget}
           itemId={character.equipmentSlots[equippedSlotViewTarget]!.itemId}
