@@ -30,9 +30,8 @@ export function ItemChip({ item, onClick }: ItemChipProps) {
       <span className="item-chip-name">{item.name}</span>
       {item.equippedSlot ? (
         <span className="item-chip-equipped">Worn — {BODY_SLOT_LABELS[item.equippedSlot]}</span>
-      ) : (
-        <span className="item-chip-uses">{usesLabel}</span>
-      )}
+      ) : null}
+      <span className="item-chip-uses">{usesLabel}</span>
     </button>
   );
 }
