@@ -272,75 +272,27 @@
   gap: 8px;
 }
 
-/* Paperdoll: item slots arranged to echo where they sit on a body.
-   Center spine runs head -> feet; hands/wrists form a side column
-   at torso height, with hands above wrists. */
+/* Paperdoll: a fixed 3-column x 9-row grid of Worn Items slots, in the
+   exact left-to-right/top-to-bottom order rendered by EquipmentSlotsGrid.
+   Cells with no slot (rendered as .slot-chip-placeholder) still occupy a
+   grid cell but are invisible, so the surrounding slots keep their
+   body-relative positions. */
 .slot-paperdoll {
   display: grid;
   grid-template-columns: minmax(90px, 1fr) minmax(90px, 1fr) minmax(90px, 1fr);
-  grid-template-areas:
-    '.      head      headband'
-    '.      eyes      .'
-    '.      neck      .'
-    '.      shoulders .'
-    'hands  chest     .'
-    'wrists body      .'
-    '.      belt      .'
-    '.      feet      .';
   gap: 8px;
   justify-items: stretch;
   flex-wrap: unset;
 }
 
-.slot-paperdoll [data-slot='head'] {
-  grid-area: head;
-}
-.slot-paperdoll [data-slot='headband'] {
-  grid-area: headband;
-}
-.slot-paperdoll [data-slot='eyes'] {
-  grid-area: eyes;
-}
-.slot-paperdoll [data-slot='neck'] {
-  grid-area: neck;
-}
-.slot-paperdoll [data-slot='shoulders'] {
-  grid-area: shoulders;
-}
-.slot-paperdoll [data-slot='hands'] {
-  grid-area: hands;
-}
-.slot-paperdoll [data-slot='wrists'] {
-  grid-area: wrists;
-}
-.slot-paperdoll [data-slot='chest'] {
-  grid-area: chest;
-}
-.slot-paperdoll [data-slot='body'] {
-  grid-area: body;
-}
-.slot-paperdoll [data-slot='belt'] {
-  grid-area: belt;
-}
-.slot-paperdoll [data-slot='feet'] {
-  grid-area: feet;
+.slot-chip-placeholder {
+  visibility: hidden;
 }
 
 @media (max-width: 480px) {
   .slot-paperdoll {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'head'
-      'headband'
-      'eyes'
-      'neck'
-      'shoulders'
-      'hands'
-      'wrists'
-      'chest'
-      'body'
-      'belt'
-      'feet';
+    grid-template-columns: repeat(3, minmax(60px, 1fr));
+    gap: 6px;
   }
 }
 
