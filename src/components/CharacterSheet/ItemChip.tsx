@@ -12,6 +12,7 @@ const USE_PERIOD_SHORT_LABELS: Record<Item['usePeriod'], string> = {
   day: 'per day',
   week: 'per week',
   month: 'per month',
+  manual: 'manual recharge',
 };
 
 export function ItemChip({ item, onClick }: ItemChipProps) {

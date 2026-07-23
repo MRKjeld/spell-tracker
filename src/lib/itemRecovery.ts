@@ -13,6 +13,7 @@ export function defaultUsesRemaining(usePeriod: ItemUsePeriod, maxUses: number):
 export function shouldRecoverOnRest(item: Pick<ItemType, 'usePeriod' | 'lastReset'>, now: Date): boolean {
   switch (item.usePeriod) {
     case 'unlimited':
+    case 'manual':
       return false;
     case 'rest':
     case 'day':

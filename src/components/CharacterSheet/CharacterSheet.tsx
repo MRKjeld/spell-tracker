@@ -166,6 +166,20 @@ export function CharacterSheet() {
     setEquippedSlotViewTarget(null);
   }
 
+  function handleUseEquippedItemCharge() {
+    if (!equippedSlotViewTarget) return;
+    const equipped = character!.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+    if (equipped) consumeItemCharge(character!.id, equipped.id);
+    setEquippedSlotViewTarget(null);
+  }
+
+  function handleRechargeEquippedItem() {
+    if (!equippedSlotViewTarget) return;
+    const equipped = character!.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+    if (equipped) rechargeItem(character!.id, equipped.id);
+    setEquippedSlotViewTarget(null);
+  }
+
   function handleEquipItem(slot: BodySlotId) {
     if (!itemViewTarget) return;
     equipItem(character!.id, itemViewTarget.id, slot);
@@ -331,6 +345,8 @@ export function CharacterSheet() {
             <EquippedSlotItemModal
               slot={equippedSlotViewTarget}
               item={equipped}
+              onUseCharge={handleUseEquippedItemCharge}
+              onRecharge={handleRechargeEquippedItem}
               onUnequip={handleUnequipSlotItem}
               onClose={() => setEquippedSlotViewTarget(null)}
             />

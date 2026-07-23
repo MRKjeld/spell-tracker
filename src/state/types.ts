@@ -28,9 +28,11 @@ export interface SpellSelection {
 
 // How an item's uses/charges recover. 'rest' and 'day' both recover whenever
 // the character rests (this tracker only has one rest action); 'week' and
-// 'month' recover automatically once real-world time has elapsed, or can be
-// force-recharged from the item's view.
-export type ItemUsePeriod = 'unlimited' | 'rest' | 'day' | 'week' | 'month';
+// 'month' recover automatically once real-world time has elapsed; 'manual'
+// never auto-recovers (matches wondrous items with a fixed charge count and
+// no stated recharge period) — all can also be force-recharged from the
+// item's view.
+export type ItemUsePeriod = 'unlimited' | 'rest' | 'day' | 'week' | 'month' | 'manual';
 
 export interface Item {
   id: string;

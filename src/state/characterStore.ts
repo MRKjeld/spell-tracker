@@ -4,6 +4,8 @@ import { createId } from '../lib/id';
 import { computeSlots, pruneOrphanedFills } from '../lib/slotMath';
 import { defaultUsesRemaining, recoverItemsOnRest } from '../lib/itemRecovery';
 import { CASTING_ABILITY } from '../data/classes';
+import { getWondrousItemById } from '../data/wondrousItems';
+import type { WondrousItemEntry } from '../data/wondrousItems';
 import type { BodySlotId } from '../data/bodySlots';
 import type {
   Character,
@@ -45,6 +47,38 @@ function migrateLegacyEquipmentSlots(
     });
   }
   return migrated.length ? [...items, ...migrated] : items;
+}
+
+// Maps a wondrous item catalog entry's `uses.per` to the tracker's own
+// recharge periods. Entries with no stated period (uses.per is null) still
+// have a fixed charge count, but nothing says they recover on Rest — those
+// only recharge manually.
+function catalogUsesToPeriod(uses: WondrousItemEntry['uses']): ItemUsePeriod {
+  if (!uses) return 'unlimited';
+  switch (uses.per) {
+    case 'day':
+      return 'day';
+    case 'week':
+      return 'week';
+    case 'month':
+      return 'month';
+    default:
+      return 'manual';
+  }
+}
+
+// Wondrous items are always created with placeholder unlimited/0 charges
+// (see equipNewWondrousItem and migrateLegacyEquipmentSlots) and get their
+// real charge count filled in here, from the catalog, the first time this
+// runs on them. Once corrected, usePeriod is no longer 'unlimited' so this
+// never re-touches (and so never clobbers) a player's tracked usesRemaining.
+function reconcileWondrousItemCharges(item: Item): Item {
+  if (!item.wondrousItemId || item.usePeriod !== 'unlimited') return item;
+  const catalogEntry = getWondrousItemById(item.wondrousItemId);
+  if (!catalogEntry?.uses) return item;
+  const usePeriod = catalogUsesToPeriod(catalogEntry.uses);
+  const maxUses = catalogEntry.uses.quantity;
+  return { ...item, usePeriod, maxUses, usesRemaining: defaultUsesRemaining(usePeriod, maxUses) };
 }
 
 // Only one item may occupy a given body slot; equipping one bumps whatever
@@ -100,7 +134,7 @@ function backfillDefaults(character: Character): Character {
     spellcraft: rest.spellcraft ?? 0,
     spellFocusSchools: rest.spellFocusSchools ?? [],
     greaterSpellFocusSchools: rest.greaterSpellFocusSchools ?? [],
-    items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots),
+    items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots).map(reconcileWondrousItemCharges),
   };
 }
 

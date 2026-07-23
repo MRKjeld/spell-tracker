@@ -21,6 +21,7 @@ const USE_PERIOD_LABELS: Record<Item['usePeriod'], string> = {
   day: 'per day',
   week: 'per week',
   month: 'per month',
+  manual: 'recharged manually',
 };
 
 export function ItemViewModal({ item, onUseCharge, onRecharge, onRemove, onEquip, onUnequip, onClose }: ItemViewModalProps) {

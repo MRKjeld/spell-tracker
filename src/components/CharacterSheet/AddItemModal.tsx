@@ -13,6 +13,7 @@ const USE_PERIOD_LABELS: Record<ItemUsePeriod, string> = {
   day: 'Use(s) per day',
   week: 'Use(s) per week',
   month: 'Use(s) per month',
+  manual: 'Use(s), recharge manually',
 };
 
 export function AddItemModal({ onAdd, onClose }: AddItemModalProps) {
