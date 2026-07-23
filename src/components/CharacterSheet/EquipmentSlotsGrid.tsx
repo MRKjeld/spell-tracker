@@ -14,7 +14,7 @@ export function EquipmentSlotsGrid({ equipmentSlots, onSlotClick }: EquipmentSlo
       <div className="slot-grid-row-header">
         <h3>Worn Items</h3>
       </div>
-      <div className="slot-grid-chips">
+      <div className="slot-grid-chips slot-paperdoll">
         {BODY_SLOT_IDS.map((slot) => (
           <EquipmentSlotChip key={slot} slot={slot} fill={equipmentSlots[slot]} onClick={() => onSlotClick(slot)} />
         ))}

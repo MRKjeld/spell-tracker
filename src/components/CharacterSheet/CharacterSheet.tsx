@@ -11,7 +11,6 @@ import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
 import { SpellViewModal } from './SpellViewModal';
 import { CasterStatsModal } from './CasterStatsModal';
-import { EquipmentSection } from './EquipmentSection';
 import { AddItemModal } from './AddItemModal';
 import { ItemViewModal } from './ItemViewModal';
 import { EquipmentSlotsGrid } from './EquipmentSlotsGrid';
@@ -223,13 +222,11 @@ export function CharacterSheet() {
 
       {activeTab === 'items' && (
         <>
-          <EquipmentSlotsGrid equipmentSlots={character.equipmentSlots ?? {}} onSlotClick={handleEquipmentSlotClick} />
-
           <button type="button" onClick={() => setShowAddItem(true)} className="button-primary">
             + Add Item
           </button>
 
-          <EquipmentSection items={character.items ?? []} onItemClick={(item) => setItemViewTarget(item)} />
+          <EquipmentSlotsGrid equipmentSlots={character.equipmentSlots ?? {}} onSlotClick={handleEquipmentSlotClick} />
         </>
       )}
 

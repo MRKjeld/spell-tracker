@@ -272,6 +272,78 @@
   gap: 8px;
 }
 
+/* Paperdoll: item slots arranged to echo where they sit on a body.
+   Center spine runs head -> feet; hands/wrists form a side column
+   at torso height, with hands above wrists. */
+.slot-paperdoll {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) minmax(90px, 1fr) minmax(90px, 1fr);
+  grid-template-areas:
+    '.      head      headband'
+    '.      eyes      .'
+    '.      neck      .'
+    '.      shoulders .'
+    'hands  chest     .'
+    'wrists body      .'
+    '.      belt      .'
+    '.      feet      .';
+  gap: 8px;
+  justify-items: stretch;
+  flex-wrap: unset;
+}
+
+.slot-paperdoll [data-slot='head'] {
+  grid-area: head;
+}
+.slot-paperdoll [data-slot='headband'] {
+  grid-area: headband;
+}
+.slot-paperdoll [data-slot='eyes'] {
+  grid-area: eyes;
+}
+.slot-paperdoll [data-slot='neck'] {
+  grid-area: neck;
+}
+.slot-paperdoll [data-slot='shoulders'] {
+  grid-area: shoulders;
+}
+.slot-paperdoll [data-slot='hands'] {
+  grid-area: hands;
+}
+.slot-paperdoll [data-slot='wrists'] {
+  grid-area: wrists;
+}
+.slot-paperdoll [data-slot='chest'] {
+  grid-area: chest;
+}
+.slot-paperdoll [data-slot='body'] {
+  grid-area: body;
+}
+.slot-paperdoll [data-slot='belt'] {
+  grid-area: belt;
+}
+.slot-paperdoll [data-slot='feet'] {
+  grid-area: feet;
+}
+
+@media (max-width: 480px) {
+  .slot-paperdoll {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'head'
+      'headband'
+      'eyes'
+      'neck'
+      'shoulders'
+      'hands'
+      'wrists'
+      'chest'
+      'body'
+      'belt'
+      'feet';
+  }
+}
+
 .slot-chip {
   min-width: 96px;
   min-height: 48px;

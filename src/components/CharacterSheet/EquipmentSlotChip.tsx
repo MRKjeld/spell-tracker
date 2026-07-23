@@ -10,7 +10,12 @@ interface EquipmentSlotChipProps {
 
 export function EquipmentSlotChip({ slot, fill, onClick }: EquipmentSlotChipProps) {
   return (
-    <button type="button" className={`slot-chip ${fill ? 'slot-chip-filled' : 'slot-chip-empty'}`} onClick={onClick}>
+    <button
+      type="button"
+      className={`slot-chip ${fill ? 'slot-chip-filled' : 'slot-chip-empty'}`}
+      data-slot={slot}
+      onClick={onClick}
+    >
       <span className="slot-chip-source">{BODY_SLOT_LABELS[slot]}</span>
       {fill ? (
         <span className="slot-chip-spell">{fill.itemName}</span>
