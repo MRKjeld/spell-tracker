@@ -4,7 +4,17 @@ import { createId } from '../lib/id';
 import { computeSlots, pruneOrphanedFills } from '../lib/slotMath';
 import { defaultUsesRemaining, recoverItemsOnRest } from '../lib/itemRecovery';
 import { CASTING_ABILITY } from '../data/classes';
-import type { Character, ExtraSlotPool, Item, ItemUsePeriod, NewCharacterInput, SlotFill, SpellSelection } from './types';
+import type { BodySlotId } from '../data/bodySlots';
+import type {
+  Character,
+  EquippedSlotItem,
+  ExtraSlotPool,
+  Item,
+  ItemUsePeriod,
+  NewCharacterInput,
+  SlotFill,
+  SpellSelection,
+} from './types';
 
 interface CharacterStoreState {
   characters: Record<string, Character>;
@@ -21,6 +31,8 @@ interface CharacterStoreState {
   removeItem(charId: string, itemId: string): void;
   consumeItemCharge(charId: string, itemId: string): void;
   rechargeItem(charId: string, itemId: string): void;
+  equipSlotItem(charId: string, slot: BodySlotId, item: EquippedSlotItem): void;
+  unequipSlotItem(charId: string, slot: BodySlotId): void;
   replaceAllCharacters(chars: Character[]): void;
   addCharacters(chars: Character[]): void;
 }
@@ -33,6 +45,7 @@ function touch(character: Character): Character {
   const spellFocusSchools = character.spellFocusSchools ?? [];
   const greaterSpellFocusSchools = character.greaterSpellFocusSchools ?? [];
   const items = character.items ?? [];
+  const equipmentSlots = character.equipmentSlots ?? {};
   const computed = computeSlots(
     character.classId,
     character.level,
@@ -47,6 +60,7 @@ function touch(character: Character): Character {
     spellFocusSchools,
     greaterSpellFocusSchools,
     items,
+    equipmentSlots,
     slotFills: pruneOrphanedFills(character.slotFills, computed) as Record<string, SlotFill>,
     updatedAt: new Date().toISOString(),
   };
@@ -73,6 +87,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           extraSlotPools: [],
           slotFills: {},
           items: [],
+          equipmentSlots: {},
           createdAt: now,
           updatedAt: now,
         };
@@ -241,6 +256,28 @@ export const useCharacterStore = create<CharacterStoreState>()(
             i.id === itemId ? { ...i, usesRemaining: i.maxUses, lastReset: new Date().toISOString() } : i,
           );
           const updated = touch({ ...existing, items });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      equipSlotItem(charId, slot, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const updated = touch({
+            ...existing,
+            equipmentSlots: { ...existing.equipmentSlots, [slot]: item },
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      unequipSlotItem(charId, slot) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const { [slot]: _removed, ...restSlots } = existing.equipmentSlots ?? {};
+          const updated = touch({ ...existing, equipmentSlots: restSlots });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

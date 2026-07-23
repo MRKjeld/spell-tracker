@@ -5,6 +5,7 @@ import { CANTRIPS_AT_WILL, CASTING_ABILITY, CLASS_LABELS } from '../../data/clas
 import type { ClassId } from '../../data/classes';
 import { computeSlots } from '../../lib/slotMath';
 import type { Item, SlotFill } from '../../state/types';
+import type { BodySlotId } from '../../data/bodySlots';
 import { SlotGrid } from './SlotGrid';
 import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
@@ -13,6 +14,9 @@ import { CasterStatsModal } from './CasterStatsModal';
 import { EquipmentSection } from './EquipmentSection';
 import { AddItemModal } from './AddItemModal';
 import { ItemViewModal } from './ItemViewModal';
+import { EquipmentSlotsGrid } from './EquipmentSlotsGrid';
+import { WondrousItemPickerModal } from './WondrousItemPickerModal';
+import { EquippedSlotItemModal } from './EquippedSlotItemModal';
 
 export function CharacterSheet() {
   const { id } = useParams();
@@ -27,11 +31,15 @@ export function CharacterSheet() {
   const removeItem = useCharacterStore((s) => s.removeItem);
   const consumeItemCharge = useCharacterStore((s) => s.consumeItemCharge);
   const rechargeItem = useCharacterStore((s) => s.rechargeItem);
+  const equipSlotItem = useCharacterStore((s) => s.equipSlotItem);
+  const unequipSlotItem = useCharacterStore((s) => s.unequipSlotItem);
 
   const [activeTab, setActiveTab] = useState<'spells' | 'items'>('spells');
   const [showAddPool, setShowAddPool] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
+  const [slotPickerTarget, setSlotPickerTarget] = useState<BodySlotId | null>(null);
+  const [equippedSlotViewTarget, setEquippedSlotViewTarget] = useState<BodySlotId | null>(null);
   const [pickerTarget, setPickerTarget] = useState<{
     spellLevel: number | null;
     poolName?: string;
@@ -134,6 +142,27 @@ export function CharacterSheet() {
     }
   }
 
+  function handleEquipmentSlotClick(slot: BodySlotId) {
+    if (character!.equipmentSlots[slot]) {
+      setEquippedSlotViewTarget(slot);
+    } else {
+      setSlotPickerTarget(slot);
+    }
+  }
+
+  function handlePickSlotItem(itemId: string, itemName: string) {
+    if (slotPickerTarget) {
+      equipSlotItem(character!.id, slotPickerTarget, { itemId, itemName });
+    }
+    setSlotPickerTarget(null);
+  }
+
+  function handleUnequipSlotItem() {
+    if (!equippedSlotViewTarget) return;
+    unequipSlotItem(character!.id, equippedSlotViewTarget);
+    setEquippedSlotViewTarget(null);
+  }
+
   return (
     <div className="page page-has-footer">
       <div className="character-sheet-header">
@@ -194,6 +223,8 @@ export function CharacterSheet() {
 
       {activeTab === 'items' && (
         <>
+          <EquipmentSlotsGrid equipmentSlots={character.equipmentSlots} onSlotClick={handleEquipmentSlotClick} />
+
           <button type="button" onClick={() => setShowAddItem(true)} className="button-primary">
             + Add Item
           </button>
@@ -265,6 +296,24 @@ export function CharacterSheet() {
           onRecharge={handleRechargeItem}
           onRemove={handleRemoveItem}
           onClose={() => setItemViewTarget(null)}
+        />
+      )}
+
+      {slotPickerTarget && (
+        <WondrousItemPickerModal
+          slot={slotPickerTarget}
+          onPick={handlePickSlotItem}
+          onClose={() => setSlotPickerTarget(null)}
+        />
+      )}
+
+      {equippedSlotViewTarget && character.equipmentSlots[equippedSlotViewTarget] && (
+        <EquippedSlotItemModal
+          slot={equippedSlotViewTarget}
+          itemId={character.equipmentSlots[equippedSlotViewTarget]!.itemId}
+          itemName={character.equipmentSlots[equippedSlotViewTarget]!.itemName}
+          onUnequip={handleUnequipSlotItem}
+          onClose={() => setEquippedSlotViewTarget(null)}
         />
       )}
     </div>

@@ -1,5 +1,6 @@
 import type { AbilityId, ClassId } from '../data/classes';
 import type { PoolColorId } from '../data/poolColors';
+import type { BodySlotId } from '../data/bodySlots';
 
 export interface ExtraSlotPool {
   id: string;
@@ -41,6 +42,13 @@ export interface Item {
   lastReset: string; // ISO timestamp of the last time uses were recovered
 }
 
+// A wondrous item worn in one of a character's body slots, chosen from the
+// wondrous item catalog (see data/wondrousItems.ts).
+export interface EquippedSlotItem {
+  itemId: string; // wondrous item catalog id
+  itemName: string;
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -54,6 +62,7 @@ export interface Character {
   extraSlotPools: ExtraSlotPool[];
   slotFills: Record<string, SlotFill>; // keyed by deterministic slot-instance id
   items: Item[]; // Equipment segment; persists through rest (see restCharacter)
+  equipmentSlots: Partial<Record<BodySlotId, EquippedSlotItem>>; // worn wondrous items, keyed by body slot
   createdAt: string;
   updatedAt: string;
 }
