@@ -28,6 +28,7 @@ export function CharacterSheet() {
   const consumeItemCharge = useCharacterStore((s) => s.consumeItemCharge);
   const rechargeItem = useCharacterStore((s) => s.rechargeItem);
 
+  const [activeTab, setActiveTab] = useState<'spells' | 'items'>('spells');
   const [showAddPool, setShowAddPool] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
@@ -148,29 +149,58 @@ export function CharacterSheet() {
         </div>
       </div>
 
-      {CANTRIPS_AT_WILL[character.classId] && (
-        <p className="cantrips-at-will-note">
-          0-level spells are cast at will (unlimited) for {CLASS_LABELS[character.classId]}s — no slots to track.
-        </p>
+      <div className="character-sheet-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'spells'}
+          className={`character-sheet-tab${activeTab === 'spells' ? ' character-sheet-tab-active' : ''}`}
+          onClick={() => setActiveTab('spells')}
+        >
+          Spells
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'items'}
+          className={`character-sheet-tab${activeTab === 'items' ? ' character-sheet-tab-active' : ''}`}
+          onClick={() => setActiveTab('items')}
+        >
+          Items
+        </button>
+      </div>
+
+      {activeTab === 'spells' && (
+        <>
+          {CANTRIPS_AT_WILL[character.classId] && (
+            <p className="cantrips-at-will-note">
+              0-level spells are cast at will (unlimited) for {CLASS_LABELS[character.classId]}s — no slots to track.
+            </p>
+          )}
+
+          <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
+            + Add Spell
+          </button>
+
+          <SlotGrid
+            character={character}
+            levelSlots={computed.levelSlots}
+            levellessPools={computed.levellessPools}
+            onSlotClick={handleSlotClick}
+            onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
+          />
+        </>
       )}
 
-      <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
-        + Add Spell
-      </button>
+      {activeTab === 'items' && (
+        <>
+          <button type="button" onClick={() => setShowAddItem(true)} className="button-primary">
+            + Add Item
+          </button>
 
-      <SlotGrid
-        character={character}
-        levelSlots={computed.levelSlots}
-        levellessPools={computed.levellessPools}
-        onSlotClick={handleSlotClick}
-        onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
-      />
-
-      <EquipmentSection
-        items={character.items ?? []}
-        onAddItem={() => setShowAddItem(true)}
-        onItemClick={(item) => setItemViewTarget(item)}
-      />
+          <EquipmentSection items={character.items ?? []} onItemClick={(item) => setItemViewTarget(item)} />
+        </>
+      )}
 
       <div className="character-sheet-footer">
         <button type="button" onClick={handleRest} className="button-secondary">

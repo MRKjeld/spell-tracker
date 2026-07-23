@@ -3,11 +3,10 @@ import { ItemChip } from './ItemChip';
 
 interface EquipmentSectionProps {
   items: Item[];
-  onAddItem: () => void;
   onItemClick: (item: Item) => void;
 }
 
-export function EquipmentSection({ items, onAddItem, onItemClick }: EquipmentSectionProps) {
+export function EquipmentSection({ items, onItemClick }: EquipmentSectionProps) {
   return (
     <div className="slot-grid-row equipment-section">
       <div className="slot-grid-row-header">
@@ -15,9 +14,6 @@ export function EquipmentSection({ items, onAddItem, onItemClick }: EquipmentSec
         <span className="slot-grid-row-summary">
           {items.length} item{items.length === 1 ? '' : 's'}
         </span>
-        <button type="button" className="button-secondary equipment-add-button" onClick={onAddItem}>
-          + Add Item
-        </button>
       </div>
       {items.length === 0 ? (
         <p className="equipment-empty">No items yet.</p>
