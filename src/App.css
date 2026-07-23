@@ -428,9 +428,15 @@
   font-size: 13px;
 }
 
-.item-chip-uses {
+.item-chip-uses,
+.item-chip-equipped {
   font-size: 11px;
   opacity: 0.8;
+}
+
+.item-chip-equipped {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .item-view-activation {
@@ -440,6 +446,23 @@
 
 .item-view-uses {
   font-weight: 600;
+}
+
+.item-view-equip {
+  margin: 8px 0;
+}
+
+.item-view-worn {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.item-view-equip-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
 /* Add item form */

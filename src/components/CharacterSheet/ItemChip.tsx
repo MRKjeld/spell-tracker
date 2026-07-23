@@ -1,4 +1,5 @@
 import type { Item } from '../../state/types';
+import { BODY_SLOT_LABELS } from '../../data/bodySlots';
 
 interface ItemChipProps {
   item: Item;
@@ -25,7 +26,11 @@ export function ItemChip({ item, onClick }: ItemChipProps) {
       onClick={onClick}
     >
       <span className="item-chip-name">{item.name}</span>
-      <span className="item-chip-uses">{usesLabel}</span>
+      {item.equippedSlot ? (
+        <span className="item-chip-equipped">Worn — {BODY_SLOT_LABELS[item.equippedSlot]}</span>
+      ) : (
+        <span className="item-chip-uses">{usesLabel}</span>
+      )}
     </button>
   );
 }

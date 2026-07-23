@@ -2,22 +2,22 @@ import { Modal } from '../common/Modal';
 import type { BodySlotId } from '../../data/bodySlots';
 import { BODY_SLOT_LABELS } from '../../data/bodySlots';
 import { getWondrousItemById } from '../../data/wondrousItems';
+import type { Item } from '../../state/types';
 import { WondrousItemDetails } from './WondrousItemDetails';
 
 interface EquippedSlotItemModalProps {
   slot: BodySlotId;
-  itemId: string;
-  itemName: string;
+  item: Item;
   onUnequip: () => void;
   onClose: () => void;
 }
 
-export function EquippedSlotItemModal({ slot, itemId, itemName, onUnequip, onClose }: EquippedSlotItemModalProps) {
-  const item = getWondrousItemById(itemId);
+export function EquippedSlotItemModal({ slot, item, onUnequip, onClose }: EquippedSlotItemModalProps) {
+  const catalogEntry = item.wondrousItemId ? getWondrousItemById(item.wondrousItemId) : undefined;
 
   return (
-    <Modal title={`${BODY_SLOT_LABELS[slot]} — ${itemName}`} onClose={onClose}>
-      {item ? <WondrousItemDetails item={item} /> : <p>Item details not found.</p>}
+    <Modal title={`${BODY_SLOT_LABELS[slot]} — ${item.name}`} onClose={onClose}>
+      {catalogEntry ? <WondrousItemDetails item={catalogEntry} /> : item.activation && <p>{item.activation}</p>}
       <div className="spell-view-actions">
         <button type="button" className="button-danger" onClick={onUnequip}>
           Unequip

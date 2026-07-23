@@ -40,13 +40,8 @@ export interface Item {
   maxUses: number; // ignored when usePeriod is 'unlimited'
   usesRemaining: number; // ignored when usePeriod is 'unlimited'
   lastReset: string; // ISO timestamp of the last time uses were recovered
-}
-
-// A wondrous item worn in one of a character's body slots, chosen from the
-// wondrous item catalog (see data/wondrousItems.ts).
-export interface EquippedSlotItem {
-  itemId: string; // wondrous item catalog id
-  itemName: string;
+  wondrousItemId: string | null; // catalog id (see data/wondrousItems.ts), if picked from it
+  equippedSlot: BodySlotId | null; // the body slot this item currently occupies, if worn
 }
 
 export interface Character {
@@ -61,8 +56,7 @@ export interface Character {
   greaterSpellFocusSchools: string[]; // subset of spellFocusSchools, each at most once
   extraSlotPools: ExtraSlotPool[];
   slotFills: Record<string, SlotFill>; // keyed by deterministic slot-instance id
-  items: Item[]; // Equipment segment; persists through rest (see restCharacter)
-  equipmentSlots: Partial<Record<BodySlotId, EquippedSlotItem>>; // worn wondrous items, keyed by body slot
+  items: Item[]; // Equipment segment; every owned item, worn or not; persists through rest (see restCharacter)
   createdAt: string;
   updatedAt: string;
 }

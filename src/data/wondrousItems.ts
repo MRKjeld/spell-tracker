@@ -23,7 +23,7 @@ const SLOT_ALIASES: Record<string, BodySlotId> = {
   shoulder: 'shoulders',
 };
 
-function normalizeSlot(slot: string): BodySlotId | null {
+export function normalizeSlot(slot: string): BodySlotId | null {
   const key = slot.trim().toLowerCase();
   if ((BODY_SLOT_IDS as string[]).includes(key)) return key as BodySlotId;
   return SLOT_ALIASES[key] ?? null;

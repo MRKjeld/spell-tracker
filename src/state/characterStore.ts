@@ -7,7 +7,6 @@ import { CASTING_ABILITY } from '../data/classes';
 import type { BodySlotId } from '../data/bodySlots';
 import type {
   Character,
-  EquippedSlotItem,
   ExtraSlotPool,
   Item,
   ItemUsePeriod,
@@ -15,6 +14,48 @@ import type {
   SlotFill,
   SpellSelection,
 } from './types';
+
+// Pre-refactor characters stored worn wondrous items in a separate
+// `equipmentSlots` map instead of as items with an `equippedSlot`. Folded into
+// `items` on first load so the Equipment list has always owned everything.
+interface LegacyEquippedSlotItem {
+  itemId: string;
+  itemName: string;
+}
+
+function migrateLegacyEquipmentSlots(
+  items: Item[],
+  legacySlots: Partial<Record<BodySlotId, LegacyEquippedSlotItem>> | undefined,
+): Item[] {
+  if (!legacySlots) return items;
+  const now = new Date().toISOString();
+  const migrated: Item[] = [];
+  for (const [slot, slotItem] of Object.entries(legacySlots) as [BodySlotId, LegacyEquippedSlotItem][]) {
+    if (!slotItem || items.some((i) => i.equippedSlot === slot)) continue;
+    migrated.push({
+      id: createId(),
+      name: slotItem.itemName,
+      activation: '',
+      usePeriod: 'unlimited',
+      maxUses: 0,
+      usesRemaining: 0,
+      lastReset: now,
+      wondrousItemId: slotItem.itemId,
+      equippedSlot: slot,
+    });
+  }
+  return migrated.length ? [...items, ...migrated] : items;
+}
+
+// Only one item may occupy a given body slot; equipping one bumps whatever
+// was already there back to unworn-but-still-owned.
+function setEquippedSlot(items: Item[], itemId: string, slot: BodySlotId | null): Item[] {
+  return items.map((i) => {
+    if (i.id === itemId) return { ...i, equippedSlot: slot };
+    if (slot !== null && i.equippedSlot === slot) return { ...i, equippedSlot: null };
+    return i;
+  });
+}
 
 interface CharacterStoreState {
   characters: Record<string, Character>;
@@ -31,8 +72,9 @@ interface CharacterStoreState {
   removeItem(charId: string, itemId: string): void;
   consumeItemCharge(charId: string, itemId: string): void;
   rechargeItem(charId: string, itemId: string): void;
-  equipSlotItem(charId: string, slot: BodySlotId, item: EquippedSlotItem): void;
-  unequipSlotItem(charId: string, slot: BodySlotId): void;
+  equipNewWondrousItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
+  equipItem(charId: string, itemId: string, slot: BodySlotId): void;
+  unequipItem(charId: string, itemId: string): void;
   replaceAllCharacters(chars: Character[]): void;
   addCharacters(chars: Character[]): void;
 }
@@ -44,14 +86,21 @@ interface CharacterStoreState {
 // render/state change that never calls a mutator, so a character that predates
 // a newly-added field would otherwise stay undefined until first edited.
 function backfillDefaults(character: Character): Character {
+  const { equipmentSlots: legacyEquipmentSlots, ...rest } = character as Character & {
+    equipmentSlots?: Partial<Record<BodySlotId, { itemId: string; itemName: string }>>;
+  };
+  const items = (rest.items ?? []).map((i) => ({
+    ...i,
+    wondrousItemId: i.wondrousItemId ?? null,
+    equippedSlot: i.equippedSlot ?? null,
+  }));
   return {
-    ...character,
-    castingAbility: character.castingAbility ?? CASTING_ABILITY[character.classId],
-    spellcraft: character.spellcraft ?? 0,
-    spellFocusSchools: character.spellFocusSchools ?? [],
-    greaterSpellFocusSchools: character.greaterSpellFocusSchools ?? [],
-    items: character.items ?? [],
-    equipmentSlots: character.equipmentSlots ?? {},
+    ...rest,
+    castingAbility: rest.castingAbility ?? CASTING_ABILITY[rest.classId],
+    spellcraft: rest.spellcraft ?? 0,
+    spellFocusSchools: rest.spellFocusSchools ?? [],
+    greaterSpellFocusSchools: rest.greaterSpellFocusSchools ?? [],
+    items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots),
   };
 }
 
@@ -92,7 +141,6 @@ export const useCharacterStore = create<CharacterStoreState>()(
           extraSlotPools: [],
           slotFills: {},
           items: [],
-          equipmentSlots: {},
           createdAt: now,
           updatedAt: now,
         };
@@ -221,6 +269,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
             maxUses: item.maxUses,
             usesRemaining: defaultUsesRemaining(item.usePeriod, item.maxUses),
             lastReset: new Date().toISOString(),
+            wondrousItemId: null,
+            equippedSlot: null,
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
           return { characters: { ...state.characters, [charId]: updated } };
@@ -265,24 +315,42 @@ export const useCharacterStore = create<CharacterStoreState>()(
         });
       },
 
-      equipSlotItem(charId, slot, item) {
+      equipNewWondrousItem(charId, slot, item) {
         set((state) => {
           const existing = state.characters[charId];
           if (!existing) return state;
-          const updated = touch({
-            ...existing,
-            equipmentSlots: { ...existing.equipmentSlots, [slot]: item },
-          });
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: item.itemId,
+            equippedSlot: slot,
+          };
+          const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
+          const updated = touch({ ...existing, items: [...clearedItems, newItem] });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },
 
-      unequipSlotItem(charId, slot) {
+      equipItem(charId, itemId, slot) {
         set((state) => {
           const existing = state.characters[charId];
           if (!existing) return state;
-          const { [slot]: _removed, ...restSlots } = existing.equipmentSlots ?? {};
-          const updated = touch({ ...existing, equipmentSlots: restSlots });
+          const updated = touch({ ...existing, items: setEquippedSlot(existing.items ?? [], itemId, slot) });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      unequipItem(charId, itemId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const items = (existing.items ?? []).map((i) => (i.id === itemId ? { ...i, equippedSlot: null } : i));
+          const updated = touch({ ...existing, items });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

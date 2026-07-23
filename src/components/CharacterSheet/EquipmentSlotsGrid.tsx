@@ -1,14 +1,14 @@
 import { BODY_SLOT_IDS } from '../../data/bodySlots';
 import type { BodySlotId } from '../../data/bodySlots';
-import type { EquippedSlotItem } from '../../state/types';
+import type { Item } from '../../state/types';
 import { EquipmentSlotChip } from './EquipmentSlotChip';
 
 interface EquipmentSlotsGridProps {
-  equipmentSlots: Partial<Record<BodySlotId, EquippedSlotItem>>;
+  items: Item[];
   onSlotClick: (slot: BodySlotId) => void;
 }
 
-export function EquipmentSlotsGrid({ equipmentSlots, onSlotClick }: EquipmentSlotsGridProps) {
+export function EquipmentSlotsGrid({ items, onSlotClick }: EquipmentSlotsGridProps) {
   return (
     <div className="slot-grid-row">
       <div className="slot-grid-row-header">
@@ -16,7 +16,12 @@ export function EquipmentSlotsGrid({ equipmentSlots, onSlotClick }: EquipmentSlo
       </div>
       <div className="slot-grid-chips slot-paperdoll">
         {BODY_SLOT_IDS.map((slot) => (
-          <EquipmentSlotChip key={slot} slot={slot} fill={equipmentSlots[slot]} onClick={() => onSlotClick(slot)} />
+          <EquipmentSlotChip
+            key={slot}
+            slot={slot}
+            itemName={items.find((i) => i.equippedSlot === slot)?.name}
+            onClick={() => onSlotClick(slot)}
+          />
         ))}
       </div>
     </div>

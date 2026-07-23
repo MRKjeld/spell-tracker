@@ -14,6 +14,7 @@ import { CasterStatsModal } from './CasterStatsModal';
 import { AddItemModal } from './AddItemModal';
 import { ItemViewModal } from './ItemViewModal';
 import { EquipmentSlotsGrid } from './EquipmentSlotsGrid';
+import { EquipmentSection } from './EquipmentSection';
 import { WondrousItemPickerModal } from './WondrousItemPickerModal';
 import { EquippedSlotItemModal } from './EquippedSlotItemModal';
 
@@ -30,8 +31,9 @@ export function CharacterSheet() {
   const removeItem = useCharacterStore((s) => s.removeItem);
   const consumeItemCharge = useCharacterStore((s) => s.consumeItemCharge);
   const rechargeItem = useCharacterStore((s) => s.rechargeItem);
-  const equipSlotItem = useCharacterStore((s) => s.equipSlotItem);
-  const unequipSlotItem = useCharacterStore((s) => s.unequipSlotItem);
+  const equipNewWondrousItem = useCharacterStore((s) => s.equipNewWondrousItem);
+  const equipItem = useCharacterStore((s) => s.equipItem);
+  const unequipItem = useCharacterStore((s) => s.unequipItem);
 
   const [activeTab, setActiveTab] = useState<'spells' | 'items'>('spells');
   const [showAddPool, setShowAddPool] = useState(false);
@@ -142,7 +144,8 @@ export function CharacterSheet() {
   }
 
   function handleEquipmentSlotClick(slot: BodySlotId) {
-    if (character!.equipmentSlots?.[slot]) {
+    const equipped = character!.items.some((i) => i.equippedSlot === slot);
+    if (equipped) {
       setEquippedSlotViewTarget(slot);
     } else {
       setSlotPickerTarget(slot);
@@ -151,15 +154,28 @@ export function CharacterSheet() {
 
   function handlePickSlotItem(itemId: string, itemName: string) {
     if (slotPickerTarget) {
-      equipSlotItem(character!.id, slotPickerTarget, { itemId, itemName });
+      equipNewWondrousItem(character!.id, slotPickerTarget, { itemId, itemName });
     }
     setSlotPickerTarget(null);
   }
 
   function handleUnequipSlotItem() {
     if (!equippedSlotViewTarget) return;
-    unequipSlotItem(character!.id, equippedSlotViewTarget);
+    const equipped = character!.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+    if (equipped) unequipItem(character!.id, equipped.id);
     setEquippedSlotViewTarget(null);
+  }
+
+  function handleEquipItem(slot: BodySlotId) {
+    if (!itemViewTarget) return;
+    equipItem(character!.id, itemViewTarget.id, slot);
+    setItemViewTarget(null);
+  }
+
+  function handleUnequipItem() {
+    if (!itemViewTarget) return;
+    unequipItem(character!.id, itemViewTarget.id);
+    setItemViewTarget(null);
   }
 
   return (
@@ -226,7 +242,9 @@ export function CharacterSheet() {
             + Add Item
           </button>
 
-          <EquipmentSlotsGrid equipmentSlots={character.equipmentSlots ?? {}} onSlotClick={handleEquipmentSlotClick} />
+          <EquipmentSlotsGrid items={character.items} onSlotClick={handleEquipmentSlotClick} />
+
+          <EquipmentSection items={character.items} onItemClick={(item) => setItemViewTarget(item)} />
         </>
       )}
 
@@ -292,6 +310,8 @@ export function CharacterSheet() {
           onUseCharge={handleUseItemCharge}
           onRecharge={handleRechargeItem}
           onRemove={handleRemoveItem}
+          onEquip={handleEquipItem}
+          onUnequip={handleUnequipItem}
           onClose={() => setItemViewTarget(null)}
         />
       )}
@@ -304,15 +324,18 @@ export function CharacterSheet() {
         />
       )}
 
-      {equippedSlotViewTarget && character.equipmentSlots?.[equippedSlotViewTarget] && (
-        <EquippedSlotItemModal
-          slot={equippedSlotViewTarget}
-          itemId={character.equipmentSlots[equippedSlotViewTarget]!.itemId}
-          itemName={character.equipmentSlots[equippedSlotViewTarget]!.itemName}
-          onUnequip={handleUnequipSlotItem}
-          onClose={() => setEquippedSlotViewTarget(null)}
-        />
-      )}
+      {equippedSlotViewTarget &&
+        (() => {
+          const equipped = character.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+          return equipped ? (
+            <EquippedSlotItemModal
+              slot={equippedSlotViewTarget}
+              item={equipped}
+              onUnequip={handleUnequipSlotItem}
+              onClose={() => setEquippedSlotViewTarget(null)}
+            />
+          ) : null;
+        })()}
     </div>
   );
 }
