@@ -18,6 +18,7 @@ import { EquipmentSection } from './EquipmentSection';
 import { WondrousItemPickerModal } from './WondrousItemPickerModal';
 import { BaseArmorPickerModal } from './BaseArmorPickerModal';
 import { EquippedSlotItemModal } from './EquippedSlotItemModal';
+import { ActionsSection } from './ActionsSection';
 import { getBaseArmorCategoriesForSlot } from '../../data/baseArmor';
 
 // Slots filled from the mundane armor/shield catalog instead of the wondrous
@@ -44,7 +45,7 @@ export function CharacterSheet() {
   const equipItem = useCharacterStore((s) => s.equipItem);
   const unequipItem = useCharacterStore((s) => s.unequipItem);
 
-  const [activeTab, setActiveTab] = useState<'spells' | 'items'>('spells');
+  const [activeTab, setActiveTab] = useState<'actions' | 'spells' | 'items'>('spells');
   const [showAddPool, setShowAddPool] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
@@ -224,6 +225,15 @@ export function CharacterSheet() {
         <button
           type="button"
           role="tab"
+          aria-selected={activeTab === 'actions'}
+          className={`character-sheet-tab${activeTab === 'actions' ? ' character-sheet-tab-active' : ''}`}
+          onClick={() => setActiveTab('actions')}
+        >
+          Actions
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={activeTab === 'spells'}
           className={`character-sheet-tab${activeTab === 'spells' ? ' character-sheet-tab-active' : ''}`}
           onClick={() => setActiveTab('spells')}
@@ -240,6 +250,10 @@ export function CharacterSheet() {
           Items
         </button>
       </div>
+
+      {activeTab === 'actions' && (
+        <ActionsSection items={character.items} onUseCharge={(itemId) => consumeItemCharge(character.id, itemId)} />
+      )}
 
       {activeTab === 'spells' && (
         <>

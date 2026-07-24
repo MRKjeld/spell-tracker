@@ -425,6 +425,72 @@
   color: var(--text-muted);
 }
 
+/* Actions tab */
+.action-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  background: var(--surface);
+}
+
+.action-card-depleted {
+  opacity: 0.6;
+}
+
+.action-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.action-card-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.action-card-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.action-badge {
+  background: var(--border);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.action-badge-type {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.action-badge-uses {
+  color: var(--text-muted);
+}
+
+.action-card-body {
+  white-space: pre-line;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+.action-card-use {
+  margin: 0;
+}
+
 /* Add item form */
 .add-item-form {
   display: flex;
