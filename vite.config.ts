@@ -49,6 +49,17 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    chunkSizeWarningLimit: 4000,
+    rolldownOptions: {
+      output: {
+        manualChunks(id) {
+          const match = id.match(/([a-zA-Z]+)\.generated\.json$/);
+          if (match) return `data-${match[1]}`;
+        },
+      },
+    },
+  },
   server: {
     allowedHosts: ['.pinggy-free.link', '.pinggy.net'],
   }
