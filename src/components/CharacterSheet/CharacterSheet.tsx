@@ -16,7 +16,15 @@ import { ItemViewModal } from './ItemViewModal';
 import { EquipmentSlotsGrid } from './EquipmentSlotsGrid';
 import { EquipmentSection } from './EquipmentSection';
 import { WondrousItemPickerModal } from './WondrousItemPickerModal';
+import { BaseArmorPickerModal } from './BaseArmorPickerModal';
 import { EquippedSlotItemModal } from './EquippedSlotItemModal';
+import { getBaseArmorCategoriesForSlot } from '../../data/baseArmor';
+
+// Slots filled from the mundane armor/shield catalog instead of the wondrous
+// item catalog: 'armor' takes worn armor, 'mainHand'/'offhand' take shields.
+function isBaseArmorSlot(slot: BodySlotId): boolean {
+  return getBaseArmorCategoriesForSlot(slot).length > 0;
+}
 
 export function CharacterSheet() {
   const { id } = useParams();
@@ -32,6 +40,7 @@ export function CharacterSheet() {
   const consumeItemCharge = useCharacterStore((s) => s.consumeItemCharge);
   const rechargeItem = useCharacterStore((s) => s.rechargeItem);
   const equipNewWondrousItem = useCharacterStore((s) => s.equipNewWondrousItem);
+  const equipNewBaseArmorItem = useCharacterStore((s) => s.equipNewBaseArmorItem);
   const equipItem = useCharacterStore((s) => s.equipItem);
   const unequipItem = useCharacterStore((s) => s.unequipItem);
 
@@ -154,7 +163,11 @@ export function CharacterSheet() {
 
   function handlePickSlotItem(itemId: string, itemName: string) {
     if (slotPickerTarget) {
-      equipNewWondrousItem(character!.id, slotPickerTarget, { itemId, itemName });
+      if (isBaseArmorSlot(slotPickerTarget)) {
+        equipNewBaseArmorItem(character!.id, slotPickerTarget, { itemId, itemName });
+      } else {
+        equipNewWondrousItem(character!.id, slotPickerTarget, { itemId, itemName });
+      }
     }
     setSlotPickerTarget(null);
   }
@@ -330,13 +343,20 @@ export function CharacterSheet() {
         />
       )}
 
-      {slotPickerTarget && (
-        <WondrousItemPickerModal
-          slot={slotPickerTarget}
-          onPick={handlePickSlotItem}
-          onClose={() => setSlotPickerTarget(null)}
-        />
-      )}
+      {slotPickerTarget &&
+        (isBaseArmorSlot(slotPickerTarget) ? (
+          <BaseArmorPickerModal
+            slot={slotPickerTarget}
+            onPick={handlePickSlotItem}
+            onClose={() => setSlotPickerTarget(null)}
+          />
+        ) : (
+          <WondrousItemPickerModal
+            slot={slotPickerTarget}
+            onPick={handlePickSlotItem}
+            onClose={() => setSlotPickerTarget(null)}
+          />
+        ))}
 
       {equippedSlotViewTarget &&
         (() => {

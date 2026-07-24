@@ -1,0 +1,1175 @@
+[
+  {
+    "id": "absorbing-shield",
+    "name": "Absorbing Shield",
+    "slot": "shield",
+    "price": "50,170 gp",
+    "aura": "strong transmutation",
+    "cl": "17th",
+    "weight": "15 lbs.",
+    "description": "This +1 heavy steel shield is made of metal, but i ts color is a flat black that seems to absorb light. Once every 2 days, on command, it can disintegrate an object that it touches, as the spell but requiring a melee touch attack. This effect only functions as an attack-it can't be activated to target a creature or weapon as it strikes the shield.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, disintegrate",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "avalanche-shield",
+    "name": "Avalanche Shield",
+    "slot": "shield",
+    "price": "19,170 gp",
+    "aura": "strong evocation",
+    "cl": "12th",
+    "weight": "10 lbs.",
+    "description": "The front of this +1 bashing heavy steel shield looks as though it is crafted from hundreds of bits of rubble and larger stones. When used to make a shield bash attack, stones fall from shield and cling to the target of the shield bash. The target must succeed at a DC 14 Fortitude saving throw or be entangled for 1d4 rounds. Once per day on command, the target's wielder can choose to petrify the target of a shield bash instead. The target must succeed at a DC 16 Fortitude saving throw or become petrified for 1 minute.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bull's strength, shape stone, flesh to stone",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "bastion-of-the-inheritor",
+    "name": "Bastion of the Inheritor",
+    "slot": "shield",
+    "price": "22,170 gp",
+    "aura": "faint abjuration",
+    "cl": "5th",
+    "weight": "15 lbs.",
+    "description": "This +1 rallying heavy steel shield prominently displays the sword emblem of the god Iomedae, and functions as a holy symbol for her worshipers. When using this shield, the wearer reduces the extra damage she takes from anarchic weapons, smite good, smite law, and unholy weapons by her tier, to a minimum of 0. When its wearer uses the smite evil class feature, she can expend one use of mythic power to extend the deflection bonus to AC she gains against her target to all allies in a 10-foot-radius burst centered on her. This bonus lasts for 1 minute or until the smite evil ends, whichever comes first.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, Mythic Crafter, magic circle against evil, remove fear, sanctify armor",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "battlement-shield",
+    "name": "Battlement Shield",
+    "slot": "shield",
+    "price": "16,180 gp",
+    "aura": "moderate conjuration",
+    "cl": "9th",
+    "weight": "45 lbs.",
+    "description": "Once per day on command, this +2 tower shield can transform into a solid, 1-foot-thick, 10-foot-by-10-foot wall of masonry with a battlement on top and an arrow slit in each 5-foot length. The wall acts as cover just like any physical wall. The wielder can touch the wall with one hand and command it to revert to a tower shield either resting on the ground and balanced against his hand or strapped to his arm in the normal fashion. The wall has all the characteristics of any other foot-thick wall of masonry (hardness 8, 90 hit points, break DC 35). Attacks sufficient to destroy the wall cause it to immediately transform back into a shield, which loses half its hit points and gains the broken condition. The shield remains in wall form until destroyed or commanded to return to shield form. The wall cannot appear in a space too small to accommodate it.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, wall of stone",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 2,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "belligerent-shield",
+    "name": "Belligerent Shield",
+    "slot": "shield",
+    "price": "36,170 gp",
+    "aura": "strong transmutation",
+    "cl": "12th",
+    "weight": "15 lbs.",
+    "description": "This +1 animated bashing heavy steel shield rattles in anticipation during battle. When loosed into the air to defend its wearer, the belligerent shield attacks as well as defends. Each round starting the round after animation, the shield makes a single shield bash attack against a foe of its wearer's choice within the wearer's reach. This works as a standard shield bash attack using the wearer's normal attack bonus with the shield, except that the wearer retains the shield bonus to AC, and while the shield's attack is treated as an off-hand attack, the wearer does not take offhand penalties on her own attacks unless she is fighting with two weapons herself. If the wearer has any feats or abilities that benefit shield bashing attacks, they apply to attacks made by the belligerent shield.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bull's strength, animate objects",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "bloodfeast-shield",
+    "name": "Bloodfeast Shield",
+    "slot": "shield",
+    "price": "18,770 gp",
+    "aura": "strong necromancy",
+    "cl": "12th",
+    "weight": "15 lbs.",
+    "description": "Three flensed skulls jut from the face of this +2 heavy steel shield. Three times per day as a free action, the shield's wearer can command the heads to attack independently of her, biting with the wearer's base attack bonus (making multiple attacks if the wearer has a high enough base attack bonus). This attack is in addition to any actions performed by the wearer, and deals 1d6 points of damage plus 1 point of Constitution damage.\nWhen using the bloodfeast shield's ability, if the wearer is a vampire (or regains hit points from blood drain in a similar manner), she also heals 5 hit points or gains 5 temporary hit points for 1 hour.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, vampiric touch",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "free"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "breach-barrier",
+    "name": "Breach Barrier",
+    "slot": "none",
+    "price": "2,370 gp",
+    "aura": "faint abjuration",
+    "cl": "3rd",
+    "weight": "15 lbs.",
+    "description": "This +1 heavy steel shield is often stylized by its dwarven crafters to look like a door or archway. Once per day after uttering a command word, the wielder can press this shield against a portal to secure it as per the hold portal spell. The shield remains adhered to the portal for 3 minutes, after which the shield comes free. The wielder can remove the shield from her arm as a move action, leaving the shield attached to the portal for the remainder of the duration. Before the end of the duration, the wielder can pull the shield from the portal, automatically ending the effect.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, hold portal",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "move"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "brilliant-bulwark",
+    "name": "Brilliant Bulwark",
+    "slot": "none",
+    "price": "9,655 gp",
+    "aura": "moderate evocation",
+    "cl": "10th",
+    "weight": "4 lbs.",
+    "description": "This +1 blinding buckler is made from a lustrous glass that is as hard as steel and reflects light like a mirror. The shield glows as a torch, though this light can be suppressed or resumed on command. The shield can be commanded to shine light as per daylight for up to 10 minutes each day. This duration need not be consecutive, but it must be used in 1-minute increments. The wielder can also expend this duration while activating the buckler's blinding ability to increase the save DC by 1 for every 2 minutes of daylight duration expended. The shield must sit in natural bright light for at least 1 hour after its 10 minutes of daylight is expended before the ability can be used again.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, daylight, light",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "buckler"
+  },
+  {
+    "id": "broadside-bulwark",
+    "name": "Broadside Bulwark",
+    "slot": "shield",
+    "price": "19,007 gp",
+    "aura": "moderate evocation",
+    "cl": "10th",
+    "weight": "10 lbs.",
+    "description": "The front of this +2 heavy wooden shield has several small holes that resemble the gun ports on a naval ship. There are seven such holes in total on the front of shield, each varying in size, with an equal number of thin hemp strings on the reverse side. As a standard action, the wielder of the broadside bulwark can pull one of the strings, causing a small red bead to fly out from the associated gun port. This bead travels 30 feet forward and detonates as a fireball spell (Reflex DC 14 half), leaving the wielder outside the blast radius unless it contacts something before reaching 30 feet. After a string is pulled, its associated gun port is permanently closes and can no longer be used.\nThe gun ports are different sizes, and include three small ports that deal 3d6 points of fire damage, three larger ports that deal 6d6 points of fire damage, and one massive port in the center of the shield that deals 9d6 points of fire damage.\nOnce all the gun ports have been fired, the shield takes on a blackened, charred look and grants the wielder fire resistance 5.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, fireball, resist energy",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 2,
+    "shieldType": "heavy wooden shield"
+  },
+  {
+    "id": "bronze-whisperers-shield",
+    "name": "Bronze Whisperer's Shield",
+    "slot": "shield",
+    "price": "4,279 gp",
+    "aura": "faint evocation and transmutation",
+    "cl": "3rd",
+    "weight": "6 lbs.",
+    "description": "This +1 light steel shield is decorated with bronze gears and vaguely resembles a feminine metal mask with a rune on its forehead. As a standard action, the wearer can command it to noisily transform into a buckler or back into its light shield form. Once per day, the wearer can use it to deliver a shocking grasp.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, minor creation, shocking grasp",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "standard"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "light steel shield"
+  },
+  {
+    "id": "burglars-buckler",
+    "name": "Burglar's Buckler",
+    "slot": "shield",
+    "price": "4,655 gp",
+    "aura": "faint transmutation",
+    "cl": "5th",
+    "weight": "5 lbs.",
+    "description": "This unassuming +1 buckler has an array of small tools and implements embedded into the backside of its rim, able to be folded and snapped out for use at a moment's notice to attack, defend, or accomplish roguish tasks. A burglar's buckler grants the wielder a +2 competence bonus on Disable Device and Sleight of Hand checks, combat maneuver checks made to perform dirty tricks, and to CMD against dirty tricks.\nOnce per day on command, the wielder may transform a burglar's buckler into any mundane tool weighing 1 to 5 pounds, such as a crowbar, hammer, saw, small shovel, grappling hook, artisan's tools, or thieves' tools. The burglar's buckler retains its normal hardness and hit points in this form and can be converted back into shield form on command.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, major creation",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "buckler"
+  },
+  {
+    "id": "casters-shield",
+    "name": "Caster's Shield",
+    "slot": "shield",
+    "price": "3,153 gp",
+    "aura": "moderate abjuration",
+    "cl": "6th",
+    "weight": "5 lbs.",
+    "description": "This +1 light wooden shield has a leather strip on the back on which a spellcaster can scribe a single spell as on a scroll. A spell so scribed requires half the normal cost in raw materials. The strip cannot accommodate spells of higher than 3rd level. The strip is reusable.\nA random caster's shield has a 50% chance of having a single medium scroll spell on it. The spell is divine (01–80 on d%) or arcane (81–100). A caster's shield has a 5% arcane spell failure chance. The price of the shield is modified by the value of the scroll spell if one is currently scribed.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, Scribe Scroll, creator must be at least 6th level",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "light wooden shield"
+  },
+  {
+    "id": "casters-shield-greater",
+    "name": "Caster's Shield, Greater",
+    "slot": "shield",
+    "price": "10,153 gp",
+    "aura": "moderate abjuration",
+    "cl": "11th",
+    "weight": "5 lbs.",
+    "description": "This +3 light wooden shield acts in all ways like a caster's shield, but the strip can accommodate spells of up to 5th level.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, Scribe Scroll",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 3,
+    "shieldType": "light wooden shield"
+  },
+  {
+    "id": "celestial-shield",
+    "name": "Celestial Shield",
+    "slot": "shield",
+    "price": "13,170 gp",
+    "aura": "moderate evocation",
+    "cl": "7th",
+    "weight": "7 lbs.",
+    "description": "This gold-edged +2 blinding heavy steel shield is impossibly light and handy despite its size. It has no armor check penalty or arcane spell failure chance, and it allows the wielder to use feather fall on himself once per day. A creature wearing celestial armor while wielding a celestial shield may command the armor to provide overland flight rather than fly once per day.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, feather fall, overland flight",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "challenging-shield",
+    "name": "Challenging Shield",
+    "slot": "shield",
+    "price": "5,170 gp",
+    "aura": "faint abjuration",
+    "cl": "1st",
+    "weight": "15 lbs.",
+    "description": "This +1 heavy steel shield bears the symbol of Gorum, the Lord in Iron, on its face. In the hands of a character with the challenge class feature, this shield grants additional abilities. By spending one use of her challenge class feature as an immediate action, the wearer of a challenging shield can apply her Charisma bonus to her shield bonus to AC against a target of her challenge for 1 minute.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, nereid's grace (Pathfinder RPG Advanced Race Guide 179)",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "clawhand-shield",
+    "name": "Clawhand Shield",
+    "slot": "shield",
+    "price": "8,158 gp",
+    "aura": "moderate necromancy",
+    "cl": "9th",
+    "weight": "8 lbs.",
+    "description": "This shield is made of bone and ivory, but has been imbued with magic to function as a +2 mithral heavy steel shield (though it is not considered to be made of metal). The shield has stylized animal claws encircling its outer rim. If the wearer is grappled, pinned, or swallowed whole, as a standard action he can cause the claws to animate and make a single melee attack dealing 1d8 points of damage + the wielder's Strength modifier (1d6 + his Strength modifier for a Small wielder) without requiring a successful combat maneuver check to do so. This is considered a weapon attack with a one-handed weapon the wielder is proficient with, not a shield bash.\nAdditionally, the claws can animate to perform the somatic components of a spell as long as the arm holding the shield would be able to provide these components if it weren't carrying a shield. As a result, the shield has no arcane spell failure chance.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, summon nature's ally I",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "collapsible-tower",
+    "name": "Collapsible Tower",
+    "slot": "shield",
+    "price": "8,170 gp",
+    "aura": "moderate transmutation",
+    "cl": "6th",
+    "weight": "15 lbs.",
+    "description": "Three times per day, this +2 heavy steel shield can be commanded to transform into a +2 tower shield. It can stay in tower shield form for 1 minute or until it is commanded to take its normal form again (a swift action). A collapsible tower's weight does not change when it takes tower shield form.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, shrink item",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "darkwood-buckler",
+    "name": "Darkwood Buckler",
+    "slot": "shield",
+    "price": "203 gp",
+    "aura": "no aura (nonmagical)",
+    "cl": "",
+    "weight": "2-1/2 lbs.",
+    "description": "This nonmagical masterwork light wooden shield is made out of darkwood. It has no enhancement bonus, but its construction material makes it lighter than a normal wooden shield. It has no armor check penalty.",
+    "construction": {
+      "requirements": "",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": null,
+    "shieldType": "light wooden shield"
+  },
+  {
+    "id": "darkwood-shield",
+    "name": "Darkwood Shield",
+    "slot": "shield",
+    "price": "257 gp",
+    "aura": "no aura (nonmagical)",
+    "cl": "",
+    "weight": "5 lbs.",
+    "description": "This nonmagical masterwork heavy wooden shield is made out of darkwood. It has no enhancement bonus, but its construction material makes it lighter than a normal wooden shield. It has no armor check penalty.",
+    "construction": {
+      "requirements": "",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": null,
+    "shieldType": "heavy wooden shield"
+  },
+  {
+    "id": "dragonslayers-shield",
+    "name": "Dragonslayer's Shield",
+    "slot": "shield",
+    "price": "7,170 gp",
+    "aura": "faint abjuration",
+    "cl": "5th",
+    "weight": "15 lbs.",
+    "description": "This +2 heavy steel shield has a distinct curve to its shape and often bears the device of a valiant knight. The wearer of this shield gains a +2 bonus on Reflex saves against effects that originate or burst from a point outside his own square, as though he had cover. It does not protect against spread effects. This bonus does not stack with that granted by actual cover or give cover to any creature other than the wearer. In addition, the dragonslayer's shield grants its wielder a +2 morale bonus on Will saves against the frightful presence ability.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, remove fear, shield of faith",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "driftwood-shield",
+    "name": "Driftwood Shield",
+    "slot": "shield",
+    "price": "2,527 gp",
+    "aura": "faint divination and transmutation",
+    "cl": "3rd",
+    "weight": "10 lbs.",
+    "description": "This +1 heavy wooden shield looks like it is made from pieces of driftwood lashed together with seaweed. The bearer may use know direction at will. Once per day when s truck by a melee attack, the bearer of a driftwood shield can use warp wood as an immediate action, affecting one Small or smaller wooden object wielded, held, or carried by the opponent who attacked her.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, know direction, warp wood",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "immediate"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy wooden shield"
+  },
+  {
+    "id": "elephant-shield",
+    "name": "Elephant Shield",
+    "slot": "shield",
+    "price": "21,340 gp",
+    "aura": "moderate evocation and transmutation",
+    "cl": "6th",
+    "weight": "10 lbs.",
+    "description": "This +2 leather madu is designed in the form of a bull elephant's head, complete with imposing ivory tusks. The shield provides a +3 circumstance bonus on combat maneuver checks made to bull rush opponents. If used as a weapon, the elephant shield grants a +1 enhancement bonus on attack rolls and damage rolls and deals damage as if it were one size category larger than it is. Once per day, the bearer of the elephant shield can have the trunk of the shield lash out, allowing the wielder to attempt a grapple combat maneuver check against a foe as a swift action. This combat maneuver doesn't provoke attacks of opportunity.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, beast shape I, force punch",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "leather madu"
+  },
+  {
+    "id": "elysian-shield",
+    "name": "Elysian Shield",
+    "slot": "shield",
+    "price": "52,620 gp",
+    "aura": "strong conjuration",
+    "cl": "13th",
+    "weight": "45 lbs.",
+    "description": "This +2 ghost touch tower shield is engraved with funerary runes depicting the peaceful rest of the contented dead. The wielder of an elysian shield is immune to the create spawn ability of undead, and once per day as an immediate action can negate a single energy drain, ability drain, or ability damage attack by an undead creature. In addition, once per day as a standard action, the wielder can release a wave of positive energy that panics undead, as the Turn Undead feat (Will DC 20 negates).",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, Turn Undead, death ward, etherealness",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "immediate"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "equalizer-shield",
+    "name": "Equalizer Shield",
+    "slot": "shield",
+    "price": "120,830 gp",
+    "aura": "strong abjuration",
+    "cl": "12th",
+    "weight": "23 lbs.",
+    "description": "Shined to a mirror finish and fitted with supple leather straps, this +1 mithral tower shield displays no decoration or markings on its highly reflective surface. Once per day, the bearer of this shield can issue a challenge to a foe and ring the shield like a gong, resulting in a resonating blast that negates all magic in a 10-foot radius, as per antimagic field. This effect lasts for 1 minute.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, antimagic field",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "force-tower",
+    "name": "Force Tower",
+    "slot": "shield",
+    "price": "46,030 gp",
+    "aura": "moderate evocation",
+    "cl": "7th",
+    "weight": "22 lbs.",
+    "description": "This +1 arrow deflection ghost touch mithral tower shield glows with a perpetual bluish radiance. Infused with magical force, a force tower renders its wielder immune to magic missiles and also allows its wielder to use its arrow deflection special ability to deflect magical rays and ranged touch attacks. The Reflex save DC to deflect such attacks is equal to 20 + the level of the spell (or 1/2 the class level or Hit Dice of the creature that created the effect, if a supernatural effect). If a spell or effect creates multiple rays or attacks, the force tower deflects only one of them per round.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, etherealness, resilient sphere, shield",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": null,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "fortress-shield",
+    "name": "Fortress Shield",
+    "slot": "shield",
+    "price": "19,180 gp",
+    "aura": "moderate conjuration",
+    "cl": "11th",
+    "weight": "45 lbs.",
+    "description": "The wearer of this +1 tower shield may, as a full-round action, transform the shield into a 1-inch-thick cube of iron that springs into being around him, completely enclosing his space. The cube has hardness 10 and 30 hit points per side. This cube grants the wearer total cover against everything outside the cube, including (as it is perfectly sealed) swarms and gas attacks. The inside of the cube is dark, and air cannot get in or out so the wearer must hold his breath starting on the third round after activating the cube. Attacks sufficient to destroy one side of the cube cause it to immediately transform back into a shield, which loses half its hit points and gains the broken condition. Otherwise, the cube reverts to shield form upon command, if the wearer moves from his current space, or if the wearer falls unconscious or dies.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, wall of iron",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "guard-of-man",
+    "name": "Guard of Man",
+    "slot": "shield",
+    "price": "17,180 gp",
+    "aura": "strong abjuration",
+    "cl": "15th",
+    "weight": "45 lbs.",
+    "description": "This massive, imposing +2 spell resistance (13) tower shield is a metal bulwark engraved with the main edicts of the Laws of Man. The spell resistance special ability of this shield works only against divine spells and does not ward the bearer against arcane magic. While held, the shield grants a +4 resistance bonus on Fortitude saving throws against divine spells and spell-like abilities.\nThree times per day as a swift action, when the wielder of a guard of man is in the area of channeled energy (regardless of whether she is excluded by an effect such as Selective Channeling), she can rebuke the god powering the ability. Using this ability causes the text on the guard of man to glow and decreases the amount of channeled energy by half (minimum 1). This reduction affects the channeled energy itself, and thus reduces the effect on all targets within its area. The power of the channeled energy can be further reduced with a successful Will saving throw, as normal.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, spell resistance, creator must be an atheist",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": null,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "gunners-buckler",
+    "name": "Gunner's Buckler",
+    "slot": "shield",
+    "price": "10,155 gp",
+    "aura": "faint abjuration",
+    "cl": "3rd",
+    "weight": "2 lbs.",
+    "description": "The top edge of this +1 mithral buckler features a notched gun rest. A character wearing a gunner's buckler who uses a firearm while threatened by an opponent in melee does not provoke attacks of opportunity, but takes a –4 penalty on all ranged attack rolls in any round in which he makes a ranged attack while threatened in melee.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, cat's grace, shield",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "buckler"
+  },
+  {
+    "id": "icon-of-order",
+    "name": "Icon of Order",
+    "slot": "shield",
+    "price": "26,170 gp",
+    "aura": "moderate abjuration",
+    "cl": "9th",
+    "weight": "15 lbs.",
+    "description": "An icon of order is a +2 heavy steel shield that typically displays the sword-and-sunburst holy symbol of Iomedae on a white field. The wielder of an icon of order gains a +2 sacred bonus on saves against spells and effects with the chaotic descriptor. Once per day, the wielder can cast protection from chaos as a swift action.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, Quicken Spell, protection from chaos",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "lens-of-the-dark-tapestry",
+    "name": "Lens of the Dark Tapestry",
+    "slot": "shield",
+    "price": "29,170 gp",
+    "aura": "moderate evocation",
+    "cl": "7th",
+    "weight": "30 lbs.",
+    "description": "The matte surface of this +1 voidglass heavy shield is cold to the touch. The shield's face contains a disorienting field of flickering stars. On command, the wearer of this shield can take 1 point of Wisdom drain to banish a single creature within 30 feet into the Dark Tapestry. The target of this ability must succeed at a DC 16 Will save or be teleported into the airless void of space. The target can attempt a new saving throw as a full-round action each round to return. While banished in this way, the target takes 3d6 points of cold damage per round and must hold its breath or begin to suffocate. If the Wisdom damage is negated or does not occur, the ability does not function. If the Wisdom drain is healed, any banished creature returns, and the shield becomes permanently nonmagical.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, teleport",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "heavy shield"
+  },
+  {
+    "id": "lions-shield",
+    "name": "Lion's Shield",
+    "slot": "shield",
+    "price": "9,170 gp",
+    "aura": "moderate conjuration",
+    "cl": "10th",
+    "weight": "15 lbs.",
+    "description": "This +2 heavy steel shield is fashioned to appear to be a roaring lion's head. Three times per day as a free action, the lion's head can be commanded to attack (independently of the shield wearer), biting with the wielder's base attack bonus (including multiple attacks, if the wielder has them) and dealing 2d6 points of damage. This attack is in addition to any actions performed by the wielder.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, summon nature's ally IV",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "free"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "living-steel-heavy-shield",
+    "name": "Living Steel Heavy Shield",
+    "slot": "shield",
+    "price": "120 gp",
+    "aura": "no aura (nonmagical)",
+    "cl": "",
+    "weight": "15 lbs.",
+    "description": "This nonmagical heavy steel shield is made out of living steel. It has no enhancement bonus, but its material and construction can damage metal weapons that strike it. Whenever the wielder of a metal weapon (other than one made of adamantine) rolls a natural 1 on an attack against a creature wielding this shield, the item must make a DC 20 Fortitude save or gain the broken condition. If the weapon already has the broken condition, it is instead destroyed.",
+    "construction": {
+      "requirements": "",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": null,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "lockpick-shield",
+    "name": "Lockpick Shield",
+    "slot": "shield",
+    "price": "7,159 gp",
+    "aura": "moderate transmutation",
+    "cl": "11th",
+    "weight": "6 lbs.",
+    "description": "With a command word, the bearer of this +2 light steel shield can cause a series of lockpicks and tiny tools to extend from the front of the shield and begin picking a lock or disabling a detected trap. The shield attempts a Disable Device check with a +10 total skill bonus. The shield is treated as using thieves' tools, and can't gain any additional bonuses on the check from spells, the aid another action, or other abilities. The shield performs the work on the wearer's behalf, freeing her to take other actions. She must still remain in contact with the target of the Disable Device attempt for the normal number of rounds, but can move around the target, as long as she never breaks contact. The wearer is still the subject of any effects that result from the success or failure of the Disable Device check.\nWhile picking a lock or disabling a device with the shield, the wearer loses her shield bonus to Armor Class, though the bonus does apply against any result of the Disable Device check that targets Armor Class (such as an attack from a trap triggered by the shield failing its check by 5 or more).",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, animate objects",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 2,
+    "shieldType": "light steel shield"
+  },
+  {
+    "id": "lyrune-quah-klar",
+    "name": "Lyrune-Quah Klar",
+    "slot": "shield",
+    "price": "19,912 gp",
+    "aura": "moderate illusion",
+    "cl": "7th",
+    "weight": "6 lbs.",
+    "description": "Considered the greatest archers among the Shoanti people, the folk of the Lyrune-Quah tribe treasure this +2 klar shaped from the skull of a lion. The specific shape of the skull allows the wielder to properly hold and shoot a shortbow (though not a longbow) while still benefiting from the Lyrune-Quah klar's shield bonus.\nUp to three times per day as a free action, the wielder of a Lyrune-Quah klar can utter praise to the nature totem of the moon. The next arrow fired after the prayer trails a line of shimmering stars in its wake. If a creature is struck by this arrow, the stars orbit it for the next 8 rounds, negating any concealment for the target and causing it to emit light as if it were holding a sunrod.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, wandering star motes, creator must be proficient with shortbow",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "free"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "klar shaped from the skull of"
+  },
+  {
+    "id": "maelstrom-shield",
+    "name": "Maelstrom Shield",
+    "slot": "shield",
+    "price": "14,170 gp",
+    "aura": "faint evocation",
+    "cl": "5th",
+    "weight": "10 lbs.",
+    "description": "The device of this +1 bashing heavy steel shield features a magical image of the trackless seas, complete with rolling waves and crashing whitecaps. When used to make a shield bash attack, the shield's wielder can make a trip attack as a free action against the same target without provoking an attack of opportunity from the creature being tripped. On command, the wielder can make the shield produce a gallon of fresh drinkable water. Once per day on command, the wielder can use the maelstrom shield to emit a stream of water as the hydraulic push spell.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bull's strength, control water, hydraulic push (Advanced Player's Guide)",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "free"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "maidens-aegis",
+    "name": "Maiden's Aegis",
+    "slot": "shield",
+    "price": "9,170 gp",
+    "aura": "moderate abjuration",
+    "cl": "6th",
+    "weight": "15 lbs.",
+    "description": "These +2 heavy steel shields were often issued to Gray Maiden unit leaders, and many still carry them today. Once per day as a swift action, the wielder of a maiden's aegis can reduce the enhancement bonus of the shield to +1 to grant a +1 enhancement bonus to up to four other shields within a 30-foot radius. This effect persists for 10 minutes, but it ends for any individual shield that moves more than 30 feet from the maiden's aegis that granted the bonus.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, magic vestment",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shields"
+  },
+  {
+    "id": "mithral-heavy-shield",
+    "name": "Mithral Heavy Shield",
+    "slot": "shield",
+    "price": "1,020 gp",
+    "aura": "no aura (nonmagical)",
+    "cl": "",
+    "weight": "5 lbs.",
+    "description": "This heavy shield is made of mithral and is thus much lighter than a standard steel shield. It has a 5% arcane spell failure chance and no armor check penalty.",
+    "construction": {
+      "requirements": "",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": null,
+    "shieldType": "heavy shield"
+  },
+  {
+    "id": "mwangi-spirit-shield",
+    "name": "Mwangi Spirit Shield",
+    "slot": "shield",
+    "price": "19,393 gp",
+    "aura": "strong transmutation",
+    "cl": "15th",
+    "weight": "5 lbs.",
+    "description": "This large wood-and-hide shield is similar to other Mwangi shields, but the totem animal painted on the shield's face seems to move when the shield is carried. Crafted by Mwangi shamans to grant its wielder the power of tribal totem spirits, a Mwangi spirit shield functions as a +1 ghost touch light wooden shield. Once per day on command, the shield can grant its bearer bull's strength for 1 minute.\nOther versions of the Mwangi spirit shield exist; some are known to grant cat's grace or bear's endurance to their wielders instead of bull's strength.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bull's strength, etherealness",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "light wooden shield"
+  },
+  {
+    "id": "okeno-madu",
+    "name": "Okeno Madu",
+    "slot": "shield",
+    "price": "5,590 gp",
+    "aura": "faint enchantment",
+    "cl": "3rd",
+    "weight": "5 lbs.",
+    "description": "A common sight among the more deplorable slavers of Katapesh, this +1 leather madu is adorned with body parts- ranging from fingers and toes to severed heads- each one crudely affixed to the shield's spikes. The wielder of the shield gains a +4 competence bonus on Intimidate checks while the shield is visible. The wearer and any associated companions take a –4 penalty on all Diplomacy checks made against good-aligned creatures while the shield is visible.\nOnce per day as a standard action, the wielder of an Okeno madu can shake the shield, causing the fetishes to rattle uncontrollably for 3 rounds. When he shakes the shield, the wielder can choose one creature within 35 feet to suffer the effects of the spell castigate (Pathfinder RPG Advanced Player's Guide 210) as long as the fetishes continue shaking.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, castigate",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "standard"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "leather madu"
+  },
+  {
+    "id": "phalanx-shield",
+    "name": "Phalanx Shield",
+    "slot": "shield",
+    "price": "14,080 gp",
+    "aura": "moderate evocation",
+    "cl": "7th",
+    "weight": "30 lbs.",
+    "description": "Once per day as a standard action, the wielder of this +2 adamantine tower shield can conjure two spiritual allies (as per the spell). These conjured allies last for 1 minute and can neither attack nor move beyond spaces that are adjacent to the wielder of the phalanx shield. Both allies gain a +4 enhancement bonus to AC and have the Shield Wall teamwork feat.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, spiritual ally",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "standard"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "quick-block-buckler",
+    "name": "Quick Block Buckler",
+    "slot": "shield",
+    "price": "36,155 gp",
+    "aura": "strong abjuration",
+    "cl": "14th",
+    "weight": "15 lbs.",
+    "description": "Once per round as an immediate action, this +3 arrow deflection buckler can be used to block an incoming melee attack. When used in this way, the buckler's enhancement bonus increases by +2 against that attack. The buckler's user must decide to use this ability before the attack roll is made. When the shield's user blocks a melee attack in this way, it cannot use its arrow deflection special ability for 1 round.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, shield",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 3,
+    "shieldType": "buckler"
+  },
+  {
+    "id": "saviths-iron",
+    "name": "Savith's Iron",
+    "slot": "none",
+    "price": "59,170 gp",
+    "aura": "strong abjuration and transmutation",
+    "cl": "13th",
+    "weight": "15 lbs.",
+    "description": "This large iron shield acts as a +1 animated light fortification heavy steel shield. The shield's bearer is immune to poison, although poisons in effect before the shield is wielded still run their course. While Savith's Iron is wielded, poisoned attacks instead bolster the bearer: if the bearer is subjected by a foe to a poison that deals ability score damage, the bearer gains a +4 enhancement bonus to the ability score the poison would normally damage. This bonus lasts for 1 minute; each additional dose of the same poison extends the effect for 1 additional minute. The bearer can benefit from only one bonus at a time, but can choose to benefit from a new poison in place of an old one. For example, when the bearer of Savith's Iron is stung by a wyvern, she gains a +4 enhancement bonus to her Constitution score for 1 minute; if she then comes in contact with terinav root, she must to decide whether to maintain her Constitution bonus or swap it out for a +4 enhancement bonus to her Dexterity. Savith's Iron does not grant the wielder bonuses from poisons she takes willingly or those applied by an ally, and poisons that don't inflict ability score damage have no effect.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, animate objects, limited wish or miracle, neutralize poison",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "scarab-shield",
+    "name": "Scarab Shield",
+    "slot": "shield",
+    "price": "4,399 gp",
+    "aura": "faint conjuration",
+    "cl": "3rd",
+    "weight": "6 lbs.",
+    "description": "This +1 light steel shield is fashioned in the shape of a scarab beetle-a creature that functions as a psychopomp for Pharasma, guiding the souls of the departed into the afterlife. Scarab shields are especially favored by archaeologists and tomb raiders for the protection they grant against guardians and vermin frequently found in ancient ruins and forgotten tombs.\nOnce per day on command, a scarab shield grants its wielder a +2 sacred bonus on saving throws against fear and death effects for 3 minutes. At any time while this bonus is in effect, the wielder can end the effect as a swift action for a burst of healing energy. The wielder loses the saving throw bonus, but is healed of 1d8+3 points of damage.\nIn addition, a scarab shield can protect its wielder from swarms. If a mindless swarm attempts to enter the wielder's space, the swarm must attempt a DC 11 Will save. If the save succeeds, the swarm can enter the wielder's space and attack the wielder normally. If the save fails, the swarm instinctively avoids the space occupied by the wielder, completely ignoring the wielder for 3 rounds. This effect ends if the wielder makes any attacks, but the wielder may use non-attack spells or otherwise act without ending the effect. This ability functions once per day.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, blessing of courage and life, sanctuary",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "light steel shield"
+  },
+  {
+    "id": "shield-of-covered-retreat",
+    "name": "Shield of Covered Retreat",
+    "slot": "shield",
+    "price": "8,157 gp",
+    "aura": "moderate abjuration",
+    "cl": "8th",
+    "weight": "10 lbs.",
+    "description": "A shield of covered retreat is a wide wooden kite shield emblazoned with the image of a mighty tree, the original design of which is thought to come from Nirmathas. Three times per day as a swift action, the bearer of this +1 arrow deflection heavy wooden shield can select a single square within 5 feet (including the square occupied by the bearer) and extend a barrier of protective force around the square that lasts for 1d4 rounds. The barrier appears as a shimmer in the air, but it does not impede vision, movement, or other actions. As long as this barrier is in place, the creature occupying the square can stand up from prone or leave the square without provoking attacks of opportunity, even if the square is threatened by another creature. Other actions provoke attacks of opportunity as normal. Large or larger creatures cannot benefit from this effect. A creature occupying the square is not hindered by the barrier and may make attacks of opportunity normally.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, shield",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy wooden shield"
+  },
+  {
+    "id": "shield-of-hags",
+    "name": "Shield of Hags",
+    "slot": "shield",
+    "price": "20,273 gp",
+    "aura": "moderate necromancy",
+    "cl": "7th",
+    "weight": "5 lbs.",
+    "description": "Found with disturbing frequency amid treasure caches in the wilderness of Loric Fells, this +1 light wooden shield has what appears to be a human face stretched across its front, with the weathered skin held in place by thick iron studs. Three times per day on command, the open mouth of the face can emit one of the two following effects: A burst of terrified screams that causes creatures in a 30-foot cone to become panicked as if by the fear spell. A successful DC 16 Will save causes a creature to become shaken for 1 round instead.\nA tortured voice pleading for help. Anyone within 60 feet of the shield hears the voice in her own language, spoken as if by a member of her own race.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, fear, tongues",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "light wooden shield"
+  },
+  {
+    "id": "shield-of-sunrise",
+    "name": "Shield of Sunrise",
+    "slot": "shield",
+    "price": "7,659 gp",
+    "aura": "moderate evocation",
+    "cl": "5th",
+    "weight": "6 lbs.",
+    "description": "This +1 bashing light steel shield features a brilliant sun motif, and always seems comfortably warm to the touch. Once per day when the shield's bearer successfully hits a creature with a shield bash attack, he may activate the shield as a swift action to mark the target with radiant energy. This radiant energy lasts for 1d4 rounds. During this time, the marked creature shines like a sunrod, and the wielder's allies gain a +1 insight bonus on attack rolls against the marked creature as long as they are within 30 feet of it. If the marked creature is vulnerable to light, this insight bonus increases to +3.\nWhen a marked creature is hit by a melee or ranged attack, the radiant energy discharges in a burst of light, dealing 1d6 points of damage to the marked creature and ending the marking effect. If the creature is vulnerable to light, it is also dazed for 1 round.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, daybreak arrow, tactical acumen",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "swift"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "light steel shield"
+  },
+  {
+    "id": "shield-of-the-mazeborn",
+    "name": "Shield of the Mazeborn",
+    "slot": "shield",
+    "price": "18,170 gp",
+    "aura": "faint divination and enchantment",
+    "cl": "5th",
+    "weight": "15 lbs.",
+    "description": "This +1 bashing heavy steel shield resembles a bull's head with a complex, maze-like rune inscribed on the creature's forehead. In addition to the shield's bashing ability, the shield allows the wielder to use know direction at will and find the path once per week. As long as the shield is equipped, it also grants the wearer immunity to the maze spell.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bull's strength, find the path, know direction",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "week",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "shieldmarshals-ward",
+    "name": "Shieldmarshal's Ward",
+    "slot": "shield",
+    "price": "17,155 gp",
+    "aura": "moderate abjuration",
+    "cl": "9th",
+    "weight": "5 lbs.",
+    "description": "Crafted from magnetic ore warped by exposure to the Mana Wastes, this +1 arrow deflection buckler is thought to be one of the original shields granted by Duke Alkenstar to the first shieldmarshals.\nWhenever the bearer of this shield successfully deflects a projectile using the shield, she can, as a free action, expend one use of mythic power to redirect the deflected projectile toward any creature to which she has a clear line of effect, using the original attacker's attack and damage rolls. The range increment penalty on the attack roll of this deflected projectile is calculated from the original point at which the projectile was fired. For example, a foe fires an arrow from his shortbow (range increment 60 feet) at a mythic character bearing a shieldmarshal's ward who is 100 feet away, taking a –2 penalty on his attack roll. The mythic character deflects the arrow toward the same foe, meaning the arrow has traveled a total of 200 feet, which imposes a –6 penalty on the attack roll to hit the foe (since three range increments of 60 feet equals 180 feet).\nA character who possesses levels in the shieldmarshal prestige class (Pathfinder Campaign Setting: Paths of Prestige 48) can bear a shieldmarshal's ward without penalty, even if she isn't proficient with it.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, Mythic Crafter, protection from arrows, shield, telekinesis",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "buckler"
+  },
+  {
+    "id": "spell-ward-tower-shield",
+    "name": "Spell Ward Tower Shield",
+    "slot": "shield",
+    "price": "25,180 gp",
+    "aura": "strong abjuration",
+    "cl": "15th",
+    "weight": "15 lbs.",
+    "description": "This +2 spell resistance (13) tower shield grants a +4 resistance bonus on Reflex saving throws against spells and spell-like abilities. Once per day, when the wearer succeeds at a saving throw against a spell or spell-like ability that allows a Reflex saving throw for half damage, she may spend an immediate action to instead take no damage from that spell or spell-like ability.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, cat's grace, spell resistance",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "immediate"
+    },
+    "enhancementBonus": null,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "spellbane-shield",
+    "name": "Spellbane Shield",
+    "slot": "shield",
+    "price": "79,180 gp",
+    "aura": "strong abjuration",
+    "cl": "15th",
+    "weight": "45 lbs.",
+    "description": "This massive iron-covered +2 tower shield grants the wielder a +3 resistance bonus on saving throws against spells, spelllike abilities and supernatural abilities, and reduces hit point damage taken from such sources by 10 points.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, spell resistance",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 2,
+    "shieldType": "tower shield"
+  },
+  {
+    "id": "spined-shield",
+    "name": "Spined Shield",
+    "slot": "shield",
+    "price": "5,580 gp",
+    "aura": "moderate evocation",
+    "cl": "6th",
+    "weight": "15 lbs.",
+    "description": "This +1 heavy steel shield is covered in spines. It acts as a normal spiked shield. On command up to three times per day, the shield's wearer can fire one of the shield's spines. A fired spine has a +1 enhancement bonus, a range increment of 120 feet, and deals 1d10 points of damage (19–20/×2). Fired spines regenerate each day.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, magic missile",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "spiteful-shield",
+    "name": "Spiteful Shield",
+    "slot": "shield",
+    "price": "14,170 gp",
+    "aura": "moderate illusion",
+    "cl": "8th",
+    "weight": "15 lbs.",
+    "description": "This +2 mirrored heavy steel shield is infused with the spite of divs, allowing its bearer to terrify and disgust foes with twisted reflections of themselves. As a move action up to three times per day, the wielder can show an adjacent creature its reflection in the shield's mirrored surface. As the creature looks at its mirror image, the image changes to show the creature hideously warped, covered with plague sores, or otherwise twisted. The creature must succeed at a DC 16 Will save or become shaken and sickened for 2d4 rounds. This is a mind-affecting fear effect, and it can be avoided as though it were a gaze attack.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, phantasmal killer, spell turning",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "move"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "stalkers-fang-shoanti",
+    "name": "Stalker's Fang (Shoanti)",
+    "slot": "shield",
+    "price": "11,462 gp",
+    "aura": "faint transmutation",
+    "cl": "5th",
+    "weight": "6 lbs.",
+    "description": "The following suit of armor is generally available only to members of the indicated race or ethnicity.\nThe Shoanti craft this +1 keen klar from the skull of a horned spirestalker. Its enhancement bonus applies to attack rolls and damage rolls for attacks made with the blade, as well as to its shield bonus to AC. If the wielder confirms a critical hit against a creature that is denied its Dexterity bonus to AC, the target takes an additional 1d6 points of bleed damage.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bleed, keen edge, creator must be a Shoanti",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": null,
+    "shieldType": null
+  },
+  {
+    "id": "starsling-buckler",
+    "name": "Starsling Buckler",
+    "slot": "none",
+    "price": "14,000 gp",
+    "aura": "moderate evocation and transmutation",
+    "cl": "6th",
+    "weight": "5 lbs.",
+    "description": "This +2 buckler is emblazoned with a swirl of stars and comets. Many of the Saoc Brethren commissioned these bucklers as markers of high social standing; they had them each decorated with unique depictions of constellations, comets, phases of the moon, or other distinctive astronomical sights, and used them as much as decor as for defense.\nAs a swift action, the user of a starsling buckler can cause the face to illuminate and whirl to life, duplicating the effect of the light spell. The stars, comets, and sun begin to glow as they lift off the shield and spin around in a brilliant display. They can be fired from the spinning celestial vortex as if via a +2 sling (the user is considered proficient with the sling for purposes of resolving such attacks from a starsling buckler). All feats and proficiencies related to slings apply to stars fired from a starsling buckler. These sling attacks cannot be made as offhand weapon attacks. The shield contains five sling stars- once all five have been fired, new sling stars are restored to the shield automatically after 1 minute.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, light, magic stone",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 2,
+    "shieldType": "buckler"
+  },
+  {
+    "id": "storvals-fang",
+    "name": "Storval's Fang",
+    "slot": "none",
+    "price": "38,312 gp",
+    "aura": "moderate transmutation",
+    "cl": "6th",
+    "weight": "6 lbs.",
+    "description": "This metal +1 klar is shaped like the head of a storm roc, whose sharp feathers serve as the klar's spikes, and it hums and crackles like a distant stormy sky. When used to make a shield bash attack, a Storval's fang deals an additional 1d6 points of sonic damage. In addition, the wielder gains electricity resistance 5. When the wielder confirms a critical hit with a Storval's fang, it unleashes a thunderclap, deafening the target of the critical hit for 1 minute unless that target succeeds at a DC 16 Fortitude saving throw.\nIf the wielder of a Storval's fang also wields a Storval's thunder and uses the Thunder and Fang feat, each weapon deals an additional 1d6 points of electricity damage, the DCs to negate their critical hit effects increase by 2, and a creature that fails such a saving throw is also pushed back 10 feet and knocked prone.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, lightning bolt, resist energy, sound burst, creator must be of Shoanti descent",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 1,
+    "shieldType": "klar"
+  },
+  {
+    "id": "surefooted-shield",
+    "name": "Surefooted Shield",
+    "slot": "shield",
+    "price": "14,200 gp",
+    "aura": "moderate abjuration",
+    "cl": "6th",
+    "weight": "15 lbs.",
+    "description": "The face of this +2 heavy steel shield is lined with sheets of riveted steel to absorb more impact. A surefooted shield grants its wielder a +2 bonus on his CMD versus awesome blow, bull rush, and overrun combat maneuvers and on Reflex saves against trample attacks.\nAdditionally, up to three times per day, whenever an enemy's melee attack misses the wielder, an enemy fails a combat maneuver against the wielder, or the wielder succeeds at a Reflex save against a trample attack, the wielder can move 5 feet as an immediate action; this movement does not provoke attacks of opportunity and does not count as a 5-foot step.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, abjuring step",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 3,
+      "per": "day",
+      "action": "immediate"
+    },
+    "enhancementBonus": 2,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "tempest-shield",
+    "name": "Tempest Shield",
+    "slot": "shield",
+    "price": "15,170 gp",
+    "aura": "moderate evocation",
+    "cl": "6th",
+    "weight": "10 lbs.",
+    "description": "The face of this +1 bashing heavy steel shield swirls with the image of swirling clouds, driving rain, or falling snow. When used to make a shield bash attack, the shield's wielder can make a bull rush maneuver as a free action against her target without provoking an attack of opportunity from the creature being bull rushed. Once per day on command, the wielder can cause the tempest shield to emit a s tream of high-powered air as the gust of wind spell.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bull's strength, gust of wind",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": "free"
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "volcanic-shield",
+    "name": "Volcanic Shield",
+    "slot": "shield",
+    "price": "14,170 gp",
+    "aura": "faint evocation",
+    "cl": "5th",
+    "weight": "10 lbs.",
+    "description": "This +1 bashing heavy steel shield burns with an internal fire upon its boss, gaining the flaming weapon special ability when used to make shield bash attacks. On command, the wielder can make the shield belch forth smoke as a smokestick, but this smoke does not impair the shield user's vision. Once per day, the wielder may cause the volcanic shield to erupt in a cascade of brimstone as the flaming hands spell.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, bull's strength, burning hands, pyrotechnics",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "winged-shield",
+    "name": "Winged Shield",
+    "slot": "shield",
+    "price": "17,257 gp",
+    "aura": "faint transmutation",
+    "cl": "5th",
+    "weight": "10 lbs.",
+    "description": "This heavy wooden shield has a +3 enhancement bonus. Arching bird wings are carved into the face of the shield. Once per day, it can be commanded to fly ( as the spell), carrying the wielder. The shield can carry up to 133 pounds and move at 60 feet per round, or up to 266 pounds and move at 40 feet per round.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, fly",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": null,
+    "shieldType": "heavy wooden shield"
+  },
+  {
+    "id": "wyrmslayers-shield",
+    "name": "Wyrmslayer's Shield",
+    "slot": "shield",
+    "price": "20,170 gp",
+    "aura": "moderate abjuration",
+    "cl": "9th",
+    "weight": "15 lbs.",
+    "description": "This +4 heavy steel shield acts in all ways as a dragonslayer's shield, except it grants a +6 morale bonus on Will saves against the frightful presence ability instead of a +2 morale bonus.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, remove fear, shield of faith",
+      "cost": ""
+    },
+    "uses": null,
+    "enhancementBonus": 4,
+    "shieldType": "heavy steel shield"
+  },
+  {
+    "id": "zombie-skin-shield",
+    "name": "Zombie Skin Shield",
+    "slot": "shield",
+    "price": "2,159 gp",
+    "aura": "moderate abjuration",
+    "cl": "5th",
+    "weight": "15 lbs.",
+    "description": "This +1 light steel shield is wrapped in a layer of gray skin. Once per day, the wearer can animate the skin as a human zombie under her control, as if she had created it with animate dead, for a period of 5 minutes. When the time expires, the zombie returns to the shield. If the zombie is destroyed or cannot reach the shield by the time it expires, placing the shield on a Medium humanoid corpse for 1 hour recreates the shield's skin.",
+    "construction": {
+      "requirements": "Craft Magic Arms and Armor, animate dead",
+      "cost": ""
+    },
+    "uses": {
+      "quantity": 1,
+      "per": "day",
+      "action": null
+    },
+    "enhancementBonus": 1,
+    "shieldType": "light steel shield"
+  }
+]

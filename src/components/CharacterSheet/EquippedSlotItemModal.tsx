@@ -2,8 +2,10 @@ import { Modal } from '../common/Modal';
 import type { BodySlotId } from '../../data/bodySlots';
 import { BODY_SLOT_LABELS } from '../../data/bodySlots';
 import { getWondrousItemById } from '../../data/wondrousItems';
+import { getBaseArmorItemById } from '../../data/baseArmor';
 import type { Item } from '../../state/types';
 import { WondrousItemDetails } from './WondrousItemDetails';
+import { BaseArmorDetails } from './BaseArmorDetails';
 
 interface EquippedSlotItemModalProps {
   slot: BodySlotId;
@@ -25,12 +27,15 @@ const USE_PERIOD_LABELS: Record<Item['usePeriod'], string> = {
 
 export function EquippedSlotItemModal({ slot, item, onUseCharge, onRecharge, onUnequip, onClose }: EquippedSlotItemModalProps) {
   const catalogEntry = item.wondrousItemId ? getWondrousItemById(item.wondrousItemId) : undefined;
+  const baseArmorEntry = item.baseArmorId ? getBaseArmorItemById(item.baseArmorId) : undefined;
   const isUnlimited = item.usePeriod === 'unlimited';
   const depleted = !isUnlimited && item.usesRemaining <= 0;
 
   return (
     <Modal title={`${BODY_SLOT_LABELS[slot]} — ${item.name}`} onClose={onClose}>
-      {catalogEntry ? <WondrousItemDetails item={catalogEntry} /> : item.activation && <p>{item.activation}</p>}
+      {catalogEntry && <WondrousItemDetails item={catalogEntry} />}
+      {baseArmorEntry && <BaseArmorDetails item={baseArmorEntry} />}
+      {!catalogEntry && !baseArmorEntry && item.activation && <p>{item.activation}</p>}
 
       {!isUnlimited && (
         <p className="item-view-uses">

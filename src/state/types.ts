@@ -43,6 +43,7 @@ export interface Item {
   usesRemaining: number; // ignored when usePeriod is 'unlimited'
   lastReset: string; // ISO timestamp of the last time uses were recovered
   wondrousItemId: string | null; // catalog id (see data/wondrousItems.ts), if picked from it
+  baseArmorId: string | null; // catalog id (see data/baseArmor.ts), if picked from it
   equippedSlot: BodySlotId | null; // the body slot this item currently occupies, if worn
 }
 

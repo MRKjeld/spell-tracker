@@ -43,6 +43,7 @@ function migrateLegacyEquipmentSlots(
       usesRemaining: 0,
       lastReset: now,
       wondrousItemId: slotItem.itemId,
+      baseArmorId: null,
       equippedSlot: slot,
     });
   }
@@ -107,6 +108,7 @@ interface CharacterStoreState {
   consumeItemCharge(charId: string, itemId: string): void;
   rechargeItem(charId: string, itemId: string): void;
   equipNewWondrousItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
+  equipNewBaseArmorItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
   equipItem(charId: string, itemId: string, slot: BodySlotId): void;
   unequipItem(charId: string, itemId: string): void;
   replaceAllCharacters(chars: Character[]): void;
@@ -126,6 +128,7 @@ function backfillDefaults(character: Character): Character {
   const items = (rest.items ?? []).map((i) => ({
     ...i,
     wondrousItemId: i.wondrousItemId ?? null,
+    baseArmorId: i.baseArmorId ?? null,
     equippedSlot: i.equippedSlot ?? null,
   }));
   return {
@@ -304,6 +307,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
             usesRemaining: defaultUsesRemaining(item.usePeriod, item.maxUses),
             lastReset: new Date().toISOString(),
             wondrousItemId: null,
+            baseArmorId: null,
             equippedSlot: null,
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
@@ -362,6 +366,29 @@ export const useCharacterStore = create<CharacterStoreState>()(
             usesRemaining: 0,
             lastReset: new Date().toISOString(),
             wondrousItemId: item.itemId,
+            baseArmorId: null,
+            equippedSlot: slot,
+          };
+          const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
+          const updated = touch({ ...existing, items: [...clearedItems, newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      equipNewBaseArmorItem(charId, slot, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: null,
+            baseArmorId: item.itemId,
             equippedSlot: slot,
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);

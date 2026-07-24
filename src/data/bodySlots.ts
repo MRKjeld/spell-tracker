@@ -8,6 +8,7 @@ export type BodySlotId =
   | 'wrists'
   | 'chest'
   | 'body'
+  | 'armor'
   | 'belt'
   | 'feet'
   | 'mainHand'
@@ -25,6 +26,7 @@ export const BODY_SLOT_IDS: BodySlotId[] = [
   'wrists',
   'chest',
   'body',
+  'armor',
   'belt',
   'feet',
   'mainHand',
@@ -43,6 +45,7 @@ export const BODY_SLOT_LABELS: Record<BodySlotId, string> = {
   wrists: 'Wrist',
   chest: 'Chest',
   body: 'Body',
+  armor: 'Armor',
   belt: 'Belt',
   feet: 'Feet',
   mainHand: 'Main Hand',
@@ -51,7 +54,7 @@ export const BODY_SLOT_LABELS: Record<BodySlotId, string> = {
   leg: 'Leg',
 };
 
-// The Worn Items grid: 3 columns x 9 rows, read left-to-right / top-to-bottom.
+// The Worn Items grid: 3 columns x 10 rows, read left-to-right / top-to-bottom.
 // `null` marks a cell that reserves space in the grid but renders nothing.
 // A slot id that appears twice (e.g. 'shoulders') is the same underlying
 // slot rendered in two places — equipping into either cell affects both.
@@ -62,6 +65,7 @@ export const WORN_ITEMS_LAYOUT: (BodySlotId | null)[] = [
   'shoulders', 'neck', 'shoulders',
   'wrists', 'chest', 'wrists',
   'hands', 'body', 'hands',
+  null, 'armor', null,
   'ring', 'belt', 'ring',
   'leg', null, 'leg',
   'feet', null, 'feet',

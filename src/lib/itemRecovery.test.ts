@@ -12,6 +12,7 @@ function makeItem(overrides: Partial<Item>): Item {
     usesRemaining: 0,
     lastReset: '2026-01-01T00:00:00.000Z',
     wondrousItemId: null,
+    baseArmorId: null,
     equippedSlot: null,
     ...overrides,
   };
