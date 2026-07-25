@@ -1,5 +1,6 @@
 import { CLASS_IDS } from '../data/classes';
 import { createId } from './id';
+import { migrateLegacyClassLevels } from './classLevels';
 import type { Character } from '../state/types';
 
 interface ExportPayload {
@@ -23,18 +24,21 @@ export function exportCharacters(characters: Character[]): void {
   URL.revokeObjectURL(url);
 }
 
+// Accepts both the current shape (a `classLevels` array) and pre-multiclass
+// exports (a single `classId`/`level`), the latter folded into a one-entry
+// `classLevels` array below by migrateLegacyClassLevels.
 function isValidCharacter(value: unknown): value is Character {
   if (typeof value !== 'object' || value === null) return false;
-  const c = value as Partial<Character>;
+  const c = value as Partial<Character> & { classId?: unknown; level?: unknown };
+  if (typeof c.name !== 'string' || typeof c.abilityScores !== 'object' || c.abilityScores === null) return false;
+  const classLevels = migrateLegacyClassLevels(c);
   return (
-    typeof c.name === 'string' &&
-    typeof c.classId === 'string' &&
-    (CLASS_IDS as string[]).includes(c.classId) &&
-    typeof c.level === 'number' &&
-    c.level >= 1 &&
-    c.level <= 20 &&
-    typeof c.abilityScores === 'object' &&
-    c.abilityScores !== null
+    Array.isArray(classLevels) &&
+    classLevels.length > 0 &&
+    classLevels.every(
+      (cl) =>
+        (CLASS_IDS as string[]).includes(cl.classId) && typeof cl.level === 'number' && cl.level >= 1 && cl.level <= 20,
+    )
   );
 }
 
@@ -56,6 +60,7 @@ export async function parseImportFile(file: File): Promise<Character[]> {
   return valid.map((c) => ({
     ...c,
     id: createId(),
+    classLevels: migrateLegacyClassLevels(c)!,
     extraSlotPools: c.extraSlotPools ?? [],
     slotFills: c.slotFills ?? {},
     items: c.items ?? [],

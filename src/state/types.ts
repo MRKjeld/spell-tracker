@@ -5,6 +5,7 @@ import type { BaseArmorCategory } from '../data/baseArmor';
 
 export interface ExtraSlotPool {
   id: string;
+  classId: ClassId; // which class's Spells tab this pool's slots appear under
   name: string; // e.g. "Domain: Fire", "Drow Innate"
   spellLevel: number | null; // 0-9, or null for a level-less pool that forms its own segment
   count: number;
@@ -35,6 +36,7 @@ export interface SpellSelection {
 // (see SpellPickerModal's restrictToSpellIds).
 export interface LearnedSpell {
   id: string;
+  classId: ClassId; // which class's Known Spells list this belongs to
   spellId: string;
   spellName: string;
   spellLevel: number;
@@ -95,13 +97,22 @@ export interface CharacterAction {
   calculationIds: string[]; // references into Character.calculations
 }
 
+// One entry per class the character has levels in. A character always has
+// at least one. BAB (see computeBAB) and, for casters, spell slots (see
+// computeSlots) are each computed per entry off that class's own level, then
+// combined -- BAB by summing, spell slots by giving each caster class its own
+// Spells tab (see CharacterSheet).
+export interface ClassLevelEntry {
+  classId: ClassId;
+  level: number; // 1-20, levels in this class specifically
+  castingAbility: AbilityId; // defaults to the class's usual ability, but overridable; ignored for non-casters
+}
+
 export interface Character {
   id: string;
   name: string;
-  classId: ClassId;
-  level: number; // 1-20
+  classLevels: ClassLevelEntry[];
   abilityScores: Record<AbilityId, number>;
-  castingAbility: AbilityId; // defaults to the class's usual ability, but overridable
   spellcraft: number;
   spellFocusSchools: string[]; // spell school keys (see SCHOOL_LABELS), each at most once
   greaterSpellFocusSchools: string[]; // subset of spellFocusSchools, each at most once
@@ -119,10 +130,8 @@ export interface Character {
 export type NewCharacterInput = Pick<
   Character,
   | 'name'
-  | 'classId'
-  | 'level'
+  | 'classLevels'
   | 'abilityScores'
-  | 'castingAbility'
   | 'spellcraft'
   | 'spellFocusSchools'
   | 'greaterSpellFocusSchools'

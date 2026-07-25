@@ -79,10 +79,10 @@ export function computeSlots(
     const instances: SlotInstance[] = [];
 
     for (let i = 0; i < base[spellLevel]; i++) {
-      instances.push({ id: `base-${spellLevel}-${i}`, origin: 'base' });
+      instances.push({ id: `${classId}-base-${spellLevel}-${i}`, origin: 'base' });
     }
     for (let i = 0; i < bonus[spellLevel]; i++) {
-      instances.push({ id: `bonus-${spellLevel}-${i}`, origin: 'bonus' });
+      instances.push({ id: `${classId}-bonus-${spellLevel}-${i}`, origin: 'bonus' });
     }
 
     const poolsAtThisLevel = extraPools.filter((pool) => pool.spellLevel === spellLevel);

@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createId } from '../lib/id';
-import { computeSlots, pruneOrphanedFills } from '../lib/slotMath';
+import { computeSlots } from '../lib/slotMath';
 import { defaultUsesRemaining, recoverItemsOnRest } from '../lib/itemRecovery';
-import { CASTING_ABILITY } from '../data/classes';
+import { isCasterClass } from '../data/classes';
 import type { ClassId } from '../data/classes';
+import { migrateLegacyClassLevels } from '../lib/classLevels';
 import { getWondrousItemById } from '../data/wondrousItems';
 import type { WondrousItemEntry } from '../data/wondrousItems';
 import type { BodySlotId } from '../data/bodySlots';
@@ -135,7 +136,7 @@ interface CharacterStoreState {
   unequipItem(charId: string, itemId: string): void;
   learnSpell(
     charId: string,
-    spell: { spellId: string; spellName: string; spellLevel: number; sourceClassId: ClassId | null },
+    spell: { classId: ClassId; spellId: string; spellName: string; spellLevel: number; sourceClassId: ClassId | null },
   ): void;
   unlearnSpell(charId: string, learnedSpellId: string): void;
   addModifier(charId: string, modifier: { name: string; value: number }): void;
@@ -155,8 +156,11 @@ interface CharacterStoreState {
 // render/state change that never calls a mutator, so a character that predates
 // a newly-added field would otherwise stay undefined until first edited.
 function backfillDefaults(character: Character): Character {
-  const { equipmentSlots: legacyEquipmentSlots, ...rest } = character as Character & {
+  const { equipmentSlots: legacyEquipmentSlots, classId: _legacyClassId, level: _legacyLevel, castingAbility: _legacyCastingAbility, ...rest } = character as Character & {
     equipmentSlots?: Partial<Record<BodySlotId, { itemId: string; itemName: string }>>;
+    classId?: ClassId;
+    level?: number;
+    castingAbility?: string;
   };
   const items = (rest.items ?? []).map((i) => ({
     ...i,
@@ -167,9 +171,11 @@ function backfillDefaults(character: Character): Character {
     category: i.category ?? null,
     equippedSlot: i.equippedSlot ?? null,
   }));
+  const classLevels = migrateLegacyClassLevels(character) ?? rest.classLevels ?? [];
+  const primaryClassId = classLevels[0]?.classId;
   return {
     ...rest,
-    castingAbility: rest.castingAbility ?? CASTING_ABILITY[rest.classId] ?? 'str',
+    classLevels,
     spellcraft: rest.spellcraft ?? 0,
     spellFocusSchools: rest.spellFocusSchools ?? [],
     greaterSpellFocusSchools: rest.greaterSpellFocusSchools ?? [],
@@ -177,22 +183,28 @@ function backfillDefaults(character: Character): Character {
     modifiers: rest.modifiers ?? [],
     calculations: rest.calculations ?? [],
     actions: rest.actions ?? [],
-    learnedSpells: rest.learnedSpells ?? [],
+    extraSlotPools: (rest.extraSlotPools ?? []).map((p) => ({ ...p, classId: p.classId ?? primaryClassId })),
+    learnedSpells: (rest.learnedSpells ?? []).map((s) => ({ ...s, classId: s.classId ?? s.sourceClassId ?? primaryClassId })),
   };
 }
 
 function touch(character: Character): Character {
   const filled = backfillDefaults(character);
-  const computed = computeSlots(
-    filled.classId,
-    filled.level,
-    filled.abilityScores,
-    filled.extraSlotPools,
-    filled.castingAbility,
-  );
+  const validSlotIds = new Set<string>();
+  for (const cl of filled.classLevels) {
+    if (!isCasterClass(cl.classId)) continue;
+    const pools = filled.extraSlotPools.filter((p) => p.classId === cl.classId);
+    const computed = computeSlots(cl.classId, cl.level, filled.abilityScores, pools, cl.castingAbility);
+    for (const ls of computed.levelSlots) for (const i of ls.instances) validSlotIds.add(i.id);
+    for (const p of computed.levellessPools) for (const i of p.instances) validSlotIds.add(i.id);
+  }
+  const prunedFills: Record<string, SlotFill> = {};
+  for (const [slotId, fill] of Object.entries(filled.slotFills)) {
+    if (validSlotIds.has(slotId)) prunedFills[slotId] = fill;
+  }
   return {
     ...filled,
-    slotFills: pruneOrphanedFills(filled.slotFills, computed) as Record<string, SlotFill>,
+    slotFills: prunedFills,
     updatedAt: new Date().toISOString(),
   };
 }
@@ -208,10 +220,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
         const character: Character = {
           id,
           name: input.name,
-          classId: input.classId,
-          level: input.level,
+          classLevels: input.classLevels,
           abilityScores: input.abilityScores,
-          castingAbility: input.castingAbility ?? CASTING_ABILITY[input.classId] ?? 'str',
           spellcraft: input.spellcraft,
           spellFocusSchools: input.spellFocusSchools,
           greaterSpellFocusSchools: input.greaterSpellFocusSchools,

@@ -83,6 +83,20 @@
   gap: 12px;
 }
 
+.character-form .class-levels-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.class-level-row {
+  align-items: flex-end;
+}
+
+.class-level-row > button {
+  padding: 8px 10px;
+}
+
 .form-actions {
   display: flex;
   gap: 8px;

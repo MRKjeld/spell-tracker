@@ -7,16 +7,17 @@ import { POOL_COLOR_HEX, POOL_COLOR_TEXT } from '../../data/poolColors';
 interface SlotChipProps {
   instance: SlotInstance;
   fill: SlotFill | undefined;
-  characterClassId: ClassId;
+  // The class whose Spells tab this slot belongs to -- used only to decide
+  // whether to show a "from X" tag (when the fill was picked from a
+  // different class's list than the tab it's sitting in).
+  tabClassId: ClassId;
   onClick: () => void;
 }
 
-export function SlotChip({ instance, fill, characterClassId, onClick }: SlotChipProps) {
+export function SlotChip({ instance, fill, tabClassId, onClick }: SlotChipProps) {
   const originLabel = instance.origin === 'pool' ? instance.poolName : instance.origin === 'bonus' ? 'Bonus' : null;
   const fromOtherClass =
-    fill && fill.sourceClassId !== null && fill.sourceClassId !== characterClassId
-      ? CLASS_LABELS[fill.sourceClassId]
-      : null;
+    fill && fill.sourceClassId !== null && fill.sourceClassId !== tabClassId ? CLASS_LABELS[fill.sourceClassId] : null;
 
   const filledSourceParts = [originLabel, fromOtherClass ? `from ${fromOtherClass}` : null].filter(Boolean);
   const stateClass = fill ? (fill.used ? 'slot-chip-used' : 'slot-chip-filled') : 'slot-chip-empty';

@@ -1,18 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
-import {
-  CANTRIPS_AT_WILL,
-  CASTER_TYPE,
-  CASTING_ABILITY,
-  CLASS_LABELS,
-  computeBAB,
-  isCasterClass,
-} from '../../data/classes';
+import { CANTRIPS_AT_WILL, CASTER_TYPE, CLASS_LABELS, isCasterClass } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { computeSlots } from '../../lib/slotMath';
+import type { ComputedSlots } from '../../lib/slotMath';
 import { formatModifier } from '../../lib/casterStats';
 import { getSpellById } from '../../data/spells';
+import { getCasterClassLevels, getTotalBAB } from '../../lib/classLevels';
 import type { Item, SlotFill } from '../../state/types';
 import type { BodySlotId } from '../../data/bodySlots';
 import { SlotGrid } from './SlotGrid';
@@ -40,6 +35,13 @@ import { getSystemModifiers, isSystemModifierId } from '../../lib/systemModifier
 // item catalog: 'armor' takes worn armor, 'mainHand'/'offhand' take shields.
 function isBaseArmorSlot(slot: BodySlotId): boolean {
   return getBaseArmorCategoriesForSlot(slot).length > 0;
+}
+
+const SPELLS_TAB_PREFIX = 'spells:';
+type TabId = 'actions' | 'items' | `${typeof SPELLS_TAB_PREFIX}${string}`;
+
+function spellsTabId(classId: ClassId): TabId {
+  return `${SPELLS_TAB_PREFIX}${classId}`;
 }
 
 export function CharacterSheet() {
@@ -70,10 +72,12 @@ export function CharacterSheet() {
   const learnSpell = useCharacterStore((s) => s.learnSpell);
   const unlearnSpell = useCharacterStore((s) => s.unlearnSpell);
 
-  const isCaster = character ? isCasterClass(character.classId) : false;
-  const casterType = character ? CASTER_TYPE[character.classId] : undefined;
+  const casterClassLevels = useMemo(
+    () => (character ? getCasterClassLevels(character.classLevels) : []),
+    [character],
+  );
 
-  const [activeTab, setActiveTab] = useState<'actions' | 'spells' | 'items'>(isCaster ? 'spells' : 'actions');
+  const [activeTab, setActiveTab] = useState<TabId>('actions');
   const [showAddPool, setShowAddPool] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [showItemPicker, setShowItemPicker] = useState(false);
@@ -85,29 +89,50 @@ export function CharacterSheet() {
   const [slotPickerTarget, setSlotPickerTarget] = useState<BodySlotId | null>(null);
   const [equippedSlotViewTarget, setEquippedSlotViewTarget] = useState<BodySlotId | null>(null);
   const [pickerTarget, setPickerTarget] = useState<{
+    classId: ClassId;
     spellLevel: number | null;
     poolName?: string;
     slotInstanceId: string;
   } | null>(null);
   const [viewTarget, setViewTarget] = useState<{
+    classId: ClassId;
     slotInstanceId: string;
     fill: SlotFill;
     spellLevel: number | null;
   } | null>(null);
-  const [showCasterStats, setShowCasterStats] = useState(false);
+  const [casterStatsClassId, setCasterStatsClassId] = useState<ClassId | null>(null);
 
-  const computed = useMemo(() => {
-    if (!character) return { levelSlots: [], levellessPools: [] };
-    // Older persisted characters predate this field, so fall back to the class default.
-    const castingAbility = character.castingAbility ?? CASTING_ABILITY[character.classId];
-    return computeSlots(
-      character.classId,
-      character.level,
-      character.abilityScores,
-      character.extraSlotPools,
-      castingAbility,
-    );
-  }, [character]);
+  // The class whose Spells tab is currently active, if any -- resolved at
+  // render time (rather than kept perfectly in sync via an effect) so a tab
+  // pointing at a class removed via Edit just falls back cleanly.
+  const activeSpellClassId: ClassId | null =
+    activeTab.startsWith(SPELLS_TAB_PREFIX) &&
+    casterClassLevels.some((cl) => spellsTabId(cl.classId) === activeTab)
+      ? (activeTab.slice(SPELLS_TAB_PREFIX.length) as ClassId)
+      : null;
+  const resolvedTab: TabId =
+    activeTab === 'items'
+      ? 'items'
+      : activeSpellClassId
+        ? activeTab
+        : activeTab === 'actions'
+          ? 'actions'
+          : casterClassLevels[0]
+            ? spellsTabId(casterClassLevels[0].classId)
+            : 'actions';
+  const resolvedSpellClassId: ClassId | null = activeSpellClassId ?? (
+    resolvedTab.startsWith(SPELLS_TAB_PREFIX) ? (resolvedTab.slice(SPELLS_TAB_PREFIX.length) as ClassId) : null
+  );
+
+  const computedByClass = useMemo(() => {
+    const map: Partial<Record<ClassId, ComputedSlots>> = {};
+    if (!character) return map;
+    for (const cl of casterClassLevels) {
+      const pools = character.extraSlotPools.filter((p) => p.classId === cl.classId);
+      map[cl.classId] = computeSlots(cl.classId, cl.level, character.abilityScores, pools, cl.castingAbility);
+    }
+    return map;
+  }, [character, casterClassLevels]);
 
   const systemModifiers = useMemo(() => {
     if (!character) return [];
@@ -123,12 +148,24 @@ export function CharacterSheet() {
     );
   }
 
-  function handleSlotClick(spellLevel: number | null, slotInstanceId: string, poolName?: string) {
+  const activeClassLevel = resolvedSpellClassId
+    ? character.classLevels.find((cl) => cl.classId === resolvedSpellClassId)
+    : undefined;
+  const activeComputed: ComputedSlots = (resolvedSpellClassId && computedByClass[resolvedSpellClassId]) || {
+    levelSlots: [],
+    levellessPools: [],
+  };
+  const activeCasterType = resolvedSpellClassId ? CASTER_TYPE[resolvedSpellClassId] : undefined;
+  const activeLearnedSpells = resolvedSpellClassId
+    ? character.learnedSpells.filter((s) => s.classId === resolvedSpellClassId)
+    : [];
+
+  function handleSlotClick(classId: ClassId, spellLevel: number | null, slotInstanceId: string, poolName?: string) {
     const fill = character!.slotFills[slotInstanceId];
     if (fill) {
-      setViewTarget({ slotInstanceId, fill, spellLevel });
+      setViewTarget({ classId, slotInstanceId, fill, spellLevel });
     } else {
-      setPickerTarget({ spellLevel, poolName, slotInstanceId });
+      setPickerTarget({ classId, spellLevel, poolName, slotInstanceId });
     }
   }
 
@@ -166,10 +203,11 @@ export function CharacterSheet() {
   }
 
   function handleLearn(spellId: string, spellName: string, sourceClassId: ClassId | null) {
+    if (!resolvedSpellClassId) return;
     const spell = getSpellById(spellId);
-    const effectiveClassId = sourceClassId ?? character!.classId;
+    const effectiveClassId = sourceClassId ?? resolvedSpellClassId;
     const spellLevel = spell?.levels[effectiveClassId] ?? 0;
-    learnSpell(character!.id, { spellId, spellName, spellLevel, sourceClassId });
+    learnSpell(character!.id, { classId: resolvedSpellClassId, spellId, spellName, spellLevel, sourceClassId });
     setShowLearnPicker(false);
   }
 
@@ -288,16 +326,23 @@ export function CharacterSheet() {
       <div className="character-sheet-header">
         <div>
           <h1>{character.name}</h1>
-          {isCaster ? (
-            <button type="button" className="class-level-trigger" onClick={() => setShowCasterStats(true)}>
-              {CLASS_LABELS[character.classId]} {character.level}
-            </button>
-          ) : (
-            <span>
-              {CLASS_LABELS[character.classId]} {character.level}
-            </span>
-          )}
-          <span className="bab-badge"> · BAB {formatModifier(computeBAB(character.classId, character.level))}</span>
+          <span className="class-level-line">
+            {character.classLevels.map((cl, i) => (
+              <span key={cl.classId}>
+                {i > 0 && ' / '}
+                {isCasterClass(cl.classId) ? (
+                  <button type="button" className="class-level-trigger" onClick={() => setCasterStatsClassId(cl.classId)}>
+                    {CLASS_LABELS[cl.classId]} {cl.level}
+                  </button>
+                ) : (
+                  <span>
+                    {CLASS_LABELS[cl.classId]} {cl.level}
+                  </span>
+                )}
+              </span>
+            ))}
+          </span>
+          <span className="bab-badge"> · BAB {formatModifier(getTotalBAB(character.classLevels))}</span>
         </div>
         <div className="character-sheet-header-actions">
           <Link to={`/${character.id}/edit`}>Edit Character</Link>
@@ -309,35 +354,36 @@ export function CharacterSheet() {
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === 'actions'}
-          className={`character-sheet-tab${activeTab === 'actions' ? ' character-sheet-tab-active' : ''}`}
+          aria-selected={resolvedTab === 'actions'}
+          className={`character-sheet-tab${resolvedTab === 'actions' ? ' character-sheet-tab-active' : ''}`}
           onClick={() => setActiveTab('actions')}
         >
           Actions
         </button>
-        {isCaster && (
+        {casterClassLevels.map((cl) => (
           <button
+            key={cl.classId}
             type="button"
             role="tab"
-            aria-selected={activeTab === 'spells'}
-            className={`character-sheet-tab${activeTab === 'spells' ? ' character-sheet-tab-active' : ''}`}
-            onClick={() => setActiveTab('spells')}
+            aria-selected={resolvedTab === spellsTabId(cl.classId)}
+            className={`character-sheet-tab${resolvedTab === spellsTabId(cl.classId) ? ' character-sheet-tab-active' : ''}`}
+            onClick={() => setActiveTab(spellsTabId(cl.classId))}
           >
-            Spells
+            Spells{casterClassLevels.length > 1 ? ` (${CLASS_LABELS[cl.classId]})` : ''}
           </button>
-        )}
+        ))}
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === 'items'}
-          className={`character-sheet-tab${activeTab === 'items' ? ' character-sheet-tab-active' : ''}`}
+          aria-selected={resolvedTab === 'items'}
+          className={`character-sheet-tab${resolvedTab === 'items' ? ' character-sheet-tab-active' : ''}`}
           onClick={() => setActiveTab('items')}
         >
           Items
         </button>
       </div>
 
-      {activeTab === 'actions' && (
+      {resolvedTab === 'actions' && (
         <ActionsSection
           modifiers={[...character.modifiers, ...systemModifiers]}
           calculations={character.calculations}
@@ -349,11 +395,12 @@ export function CharacterSheet() {
         />
       )}
 
-      {activeTab === 'spells' && (
+      {resolvedSpellClassId && activeClassLevel && (
         <>
-          {CANTRIPS_AT_WILL[character.classId] && (
+          {CANTRIPS_AT_WILL[resolvedSpellClassId] && (
             <p className="cantrips-at-will-note">
-              0-level spells are cast at will (unlimited) for {CLASS_LABELS[character.classId]}s — no slots to track.
+              0-level spells are cast at will (unlimited) for {CLASS_LABELS[resolvedSpellClassId]}s — no slots to
+              track.
             </p>
           )}
 
@@ -361,31 +408,34 @@ export function CharacterSheet() {
             <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
               + Spell
             </button>
-            {casterType === 'arcane' && (
+            {activeCasterType === 'arcane' && (
               <button type="button" onClick={() => setShowLearnPicker(true)}>
                 + Learn
               </button>
             )}
           </div>
 
-          {casterType === 'arcane' && (
+          {activeCasterType === 'arcane' && (
             <KnownSpellsSection
-              learnedSpells={character.learnedSpells}
+              learnedSpells={activeLearnedSpells}
               onUnlearn={(learnedSpellId) => unlearnSpell(character.id, learnedSpellId)}
             />
           )}
 
           <SlotGrid
             character={character}
-            levelSlots={computed.levelSlots}
-            levellessPools={computed.levellessPools}
-            onSlotClick={handleSlotClick}
+            tabClassId={resolvedSpellClassId}
+            levelSlots={activeComputed.levelSlots}
+            levellessPools={activeComputed.levellessPools}
+            onSlotClick={(spellLevel, slotInstanceId, poolName) =>
+              handleSlotClick(resolvedSpellClassId, spellLevel, slotInstanceId, poolName)
+            }
             onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
           />
         </>
       )}
 
-      {activeTab === 'items' && (
+      {resolvedTab === 'items' && (
         <>
           <div className="actions-toolbar">
             <button type="button" onClick={() => setShowItemPicker(true)} className="button-primary">
@@ -408,12 +458,12 @@ export function CharacterSheet() {
         </button>
       </div>
 
-      {showAddPool && (
+      {showAddPool && resolvedSpellClassId && (
         <AddSlotPoolModal
-          defaultClassId={character.classId}
-          existingPools={character.extraSlotPools}
+          defaultClassId={resolvedSpellClassId}
+          existingPools={character.extraSlotPools.filter((p) => p.classId === resolvedSpellClassId)}
           onAdd={(name, spellLevel, spells, color) =>
-            addExtraPool(character.id, { name, spellLevel, count: 1, color }, spells)
+            addExtraPool(character.id, { classId: resolvedSpellClassId, name, spellLevel, count: 1, color }, spells)
           }
           onClose={() => setShowAddPool(false)}
         />
@@ -421,12 +471,13 @@ export function CharacterSheet() {
 
       {pickerTarget && (
         <SpellPickerModal
-          defaultClassId={character.classId}
+          defaultClassId={pickerTarget.classId}
           spellLevel={pickerTarget.spellLevel}
           poolName={pickerTarget.poolName}
           restrictToSpellIds={
-            casterType === 'arcane'
+            activeCasterType === 'arcane'
               ? character.learnedSpells
+                  .filter((s) => s.classId === pickerTarget.classId)
                   .filter((s) => pickerTarget.spellLevel === null || s.spellLevel === pickerTarget.spellLevel)
                   .map((s) => s.spellId)
               : undefined
@@ -436,8 +487,13 @@ export function CharacterSheet() {
         />
       )}
 
-      {showLearnPicker && (
-        <SpellPickerModal defaultClassId={character.classId} spellLevel={null} onPick={handleLearn} onClose={() => setShowLearnPicker(false)} />
+      {showLearnPicker && resolvedSpellClassId && (
+        <SpellPickerModal
+          defaultClassId={resolvedSpellClassId}
+          spellLevel={null}
+          onPick={handleLearn}
+          onClose={() => setShowLearnPicker(false)}
+        />
       )}
 
       {viewTarget && (
@@ -446,6 +502,7 @@ export function CharacterSheet() {
           spellName={viewTarget.fill.spellName}
           used={viewTarget.fill.used}
           character={character}
+          tabClassId={viewTarget.classId}
           sourceClassId={viewTarget.fill.sourceClassId}
           slotSpellLevel={viewTarget.spellLevel}
           onToggleUsed={handleToggleUsed}
@@ -454,16 +511,21 @@ export function CharacterSheet() {
         />
       )}
 
-      {showCasterStats && (
-        <CasterStatsModal
-          classId={character.classId}
-          level={character.level}
-          abilityScores={character.abilityScores}
-          castingAbility={character.castingAbility ?? CASTING_ABILITY[character.classId]}
-          spellcraft={character.spellcraft}
-          onClose={() => setShowCasterStats(false)}
-        />
-      )}
+      {casterStatsClassId &&
+        (() => {
+          const cl = character.classLevels.find((c) => c.classId === casterStatsClassId);
+          if (!cl) return null;
+          return (
+            <CasterStatsModal
+              classId={cl.classId}
+              level={cl.level}
+              abilityScores={character.abilityScores}
+              castingAbility={cl.castingAbility}
+              spellcraft={character.spellcraft}
+              onClose={() => setCasterStatsClassId(null)}
+            />
+          );
+        })()}
 
       {showAddItem && (
         <AddItemModal onAdd={(item) => addItem(character.id, item)} onClose={() => setShowAddItem(false)} />

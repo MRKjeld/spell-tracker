@@ -2,7 +2,6 @@ import { Modal } from '../common/Modal';
 import { getSpellById } from '../../data/spells';
 import { SpellDetails } from './SpellDetails';
 import type { AbilityId, ClassId } from '../../data/classes';
-import { CASTING_ABILITY } from '../../data/classes';
 import { abilityModifier } from '../../data/bonusSpells';
 import { computeSpellSaveDC, hasSavingThrow } from '../../lib/casterStats';
 import { schoolThemeColor } from '../../data/schoolThemes';
@@ -13,6 +12,10 @@ interface SpellViewModalProps {
   spellName: string;
   used: boolean;
   character: Character;
+  // The class whose Spells tab this slot belongs to -- provides the caster
+  // level/casting ability used below, distinct from sourceClassId (which
+  // class's list the spell itself was picked from).
+  tabClassId: ClassId;
   sourceClassId: ClassId | null;
   slotSpellLevel: number | null;
   onToggleUsed: () => void;
@@ -25,6 +28,7 @@ export function SpellViewModal({
   spellName,
   used,
   character,
+  tabClassId,
   sourceClassId,
   slotSpellLevel,
   onToggleUsed,
@@ -32,12 +36,13 @@ export function SpellViewModal({
   onClose,
 }: SpellViewModalProps) {
   const spell = getSpellById(spellId);
+  const classLevel = character.classLevels.find((cl) => cl.classId === tabClassId);
 
   let saveDC: number | undefined;
   if (spell && hasSavingThrow(spell.savingThrow)) {
-    const effectiveClassId = sourceClassId ?? character.classId;
+    const effectiveClassId = sourceClassId ?? tabClassId;
     const effectiveSpellLevel = slotSpellLevel ?? spell.levels[effectiveClassId] ?? 0;
-    const castingAbility: AbilityId = character.castingAbility ?? CASTING_ABILITY[character.classId] ?? 'str';
+    const castingAbility: AbilityId = classLevel?.castingAbility ?? 'str';
     const castingAbilityModifier = abilityModifier(character.abilityScores[castingAbility]);
     const hasSpellFocus = character.spellFocusSchools.includes(spell.school);
     const hasGreaterSpellFocus = character.greaterSpellFocusSchools.includes(spell.school);
@@ -47,7 +52,7 @@ export function SpellViewModal({
   return (
     <Modal title={spellName} onClose={onClose} accentColor={spell ? schoolThemeColor(spell.school) : undefined}>
       {spell ? (
-        <SpellDetails spell={spell} saveDC={saveDC} casterLevel={character.level} themed />
+        <SpellDetails spell={spell} saveDC={saveDC} casterLevel={classLevel?.level} themed />
       ) : (
         <p>Spell details not found.</p>
       )}

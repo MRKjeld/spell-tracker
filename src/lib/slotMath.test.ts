@@ -62,7 +62,7 @@ describe('bonus spells', () => {
 
 describe('computeSlots', () => {
   it('totals base + bonus + pool counts, and instances match totalCount', () => {
-    const pools = [{ id: 'p1', name: 'Domain', spellLevel: 1, count: 1 }];
+    const pools = [{ id: 'p1', classId: 'wizard' as const, name: 'Domain', spellLevel: 1, count: 1 }];
     const { levelSlots } = computeSlots('wizard', 5, { ...NEUTRAL_SCORES, int: 18 }, pools, 'int');
     for (const ls of levelSlots) {
       expect(ls.instances.length).toBe(ls.totalCount);
@@ -75,14 +75,14 @@ describe('computeSlots', () => {
   });
 
   it('a pool at a spell level beyond the class max still renders', () => {
-    const pools = [{ id: 'p1', name: 'Weird Boon', spellLevel: 6, count: 2 }];
+    const pools = [{ id: 'p1', classId: 'paladin' as const, name: 'Weird Boon', spellLevel: 6, count: 2 }];
     const { levelSlots } = computeSlots('paladin', 4, NEUTRAL_SCORES, pools, 'cha');
     const level6 = levelSlots.find((r) => r.spellLevel === 6)!;
     expect(level6.totalCount).toBe(2);
   });
 
   it('a level-less pool forms its own segment and is absent from levelSlots', () => {
-    const pools = [{ id: 'p1', name: 'Drow Innate', spellLevel: null, count: 3 }];
+    const pools = [{ id: 'p1', classId: 'wizard' as const, name: 'Drow Innate', spellLevel: null, count: 3 }];
     const { levelSlots, levellessPools } = computeSlots('wizard', 5, NEUTRAL_SCORES, pools, 'int');
     for (const ls of levelSlots) {
       expect(ls.poolCounts).toEqual([]);
@@ -103,9 +103,9 @@ describe('computeSlots', () => {
 
   it('level-less pools with matching names merge into one segment; different names stay separate', () => {
     const pools = [
-      { id: 'p1', name: 'Drow', spellLevel: null, count: 1 },
-      { id: 'p2', name: 'Drow Innate', spellLevel: null, count: 1 },
-      { id: 'p3', name: 'Drow', spellLevel: null, count: 2 },
+      { id: 'p1', classId: 'wizard' as const, name: 'Drow', spellLevel: null, count: 1 },
+      { id: 'p2', classId: 'wizard' as const, name: 'Drow Innate', spellLevel: null, count: 1 },
+      { id: 'p3', classId: 'wizard' as const, name: 'Drow', spellLevel: null, count: 2 },
     ];
     const { levellessPools } = computeSlots('wizard', 5, NEUTRAL_SCORES, pools, 'int');
     expect(levellessPools).toHaveLength(2);
@@ -155,15 +155,15 @@ describe('pruneOrphanedFills', () => {
   it('drops fills whose slot instance no longer exists', () => {
     const computed = computeSlots('wizard', 1, NEUTRAL_SCORES, [], 'int');
     const fills = {
-      'base-0-0': { spellId: 'a', spellName: 'A', sourceClassId: 'wizard' },
-      'base-9-0': { spellId: 'b', spellName: 'B', sourceClassId: 'wizard' }, // no 9th-level slots at level 1
+      'wizard-base-0-0': { spellId: 'a', spellName: 'A', sourceClassId: 'wizard' },
+      'wizard-base-9-0': { spellId: 'b', spellName: 'B', sourceClassId: 'wizard' }, // no 9th-level slots at level 1
     };
     const pruned = pruneOrphanedFills(fills, computed);
-    expect(Object.keys(pruned)).toEqual(['base-0-0']);
+    expect(Object.keys(pruned)).toEqual(['wizard-base-0-0']);
   });
 
   it('keeps fills belonging to a level-less pool', () => {
-    const pools = [{ id: 'p1', name: 'Drow Innate', spellLevel: null, count: 1 }];
+    const pools = [{ id: 'p1', classId: 'wizard' as const, name: 'Drow Innate', spellLevel: null, count: 1 }];
     const computed = computeSlots('wizard', 1, NEUTRAL_SCORES, pools, 'int');
     const fills = {
       'pool-p1-0': { spellId: 'a', spellName: 'A', sourceClassId: 'wizard' },

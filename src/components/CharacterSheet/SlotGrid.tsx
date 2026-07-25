@@ -1,11 +1,13 @@
 import type { LevellessPoolSlots, SpellLevelSlots } from '../../lib/slotMath';
 import type { Character } from '../../state/types';
+import type { ClassId } from '../../data/classes';
 import type { PoolColorId } from '../../data/poolColors';
 import { POOL_COLOR_HEX, POOL_COLOR_TEXT } from '../../data/poolColors';
 import { SlotChip } from './SlotChip';
 
 interface SlotGridProps {
   character: Character;
+  tabClassId: ClassId;
   levelSlots: SpellLevelSlots[];
   levellessPools: LevellessPoolSlots[];
   onSlotClick: (spellLevel: number | null, slotInstanceId: string, poolName?: string) => void;
@@ -17,7 +19,7 @@ function poolTagStyle(color: PoolColorId | undefined) {
   return { backgroundColor: POOL_COLOR_HEX[color], color: POOL_COLOR_TEXT[color] };
 }
 
-export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, onRemovePool }: SlotGridProps) {
+export function SlotGrid({ character, tabClassId, levelSlots, levellessPools, onSlotClick, onRemovePool }: SlotGridProps) {
   const visibleLevels = levelSlots.filter((ls) => ls.totalCount > 0);
 
   if (visibleLevels.length === 0 && levellessPools.length === 0) {
@@ -49,7 +51,7 @@ export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, o
                 key={instance.id}
                 instance={instance}
                 fill={character.slotFills[instance.id]}
-                characterClassId={character.classId}
+                tabClassId={tabClassId}
                 onClick={() => onSlotClick(ls.spellLevel, instance.id)}
               />
             ))}
@@ -81,7 +83,7 @@ export function SlotGrid({ character, levelSlots, levellessPools, onSlotClick, o
                 key={instance.id}
                 instance={instance}
                 fill={character.slotFills[instance.id]}
-                characterClassId={character.classId}
+                tabClassId={tabClassId}
                 onClick={() => onSlotClick(null, instance.id, pool.poolName)}
               />
             ))}

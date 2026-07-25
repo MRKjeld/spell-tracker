@@ -3,6 +3,10 @@ import { useCharacterStore } from '../../state/characterStore';
 import { CLASS_LABELS } from '../../data/classes';
 import { ImportExportControls } from '../ImportExportControls';
 
+function classSummary(classLevels: { classId: keyof typeof CLASS_LABELS; level: number }[]): string {
+  return classLevels.map((cl) => `${CLASS_LABELS[cl.classId]} ${cl.level}`).join(' / ');
+}
+
 export function CharacterList() {
   const characters = useCharacterStore((s) => s.characters);
   const deleteCharacter = useCharacterStore((s) => s.deleteCharacter);
@@ -18,7 +22,7 @@ export function CharacterList() {
         {list.map((c) => (
           <li key={c.id} className="character-list-row">
             <Link to={`/${c.id}`}>
-              {c.name} ({CLASS_LABELS[c.classId]} {c.level})
+              {c.name} ({classSummary(c.classLevels)})
             </Link>
             <span className="character-list-actions">
               <Link to={`/${c.id}/edit`}>Edit</Link>

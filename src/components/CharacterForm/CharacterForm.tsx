@@ -2,11 +2,13 @@ import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
-import { CASTING_ABILITY, CLASS_IDS, CLASS_LABELS, isCasterClass } from '../../data/classes';
+import { CLASS_IDS, CLASS_LABELS, isCasterClass } from '../../data/classes';
 import type { AbilityId, ClassId } from '../../data/classes';
 import { SCHOOL_LABELS } from '../../data/spells';
 import { schoolThemeColor, schoolThemeTextColor } from '../../data/schoolThemes';
 import { NumberInput } from '../common/NumberInput';
+import { createDefaultClassLevel, defaultCastingAbilityFor, isAnyCaster } from '../../lib/classLevels';
+import type { ClassLevelEntry } from '../../state/types';
 
 // Universal has no school proper, so it isn't a valid Spell Focus target.
 const FOCUSABLE_SCHOOLS = Object.keys(SCHOOL_LABELS).filter((school) => school !== 'uni');
@@ -40,11 +42,9 @@ export function CharacterForm({ mode }: CharacterFormProps) {
   const existing = mode === 'edit' && id ? characters[id] : undefined;
 
   const [name, setName] = useState(existing?.name ?? '');
-  const [classId, setClassId] = useState<ClassId>(existing?.classId ?? 'wizard');
-  const [castingAbility, setCastingAbility] = useState<AbilityId>(
-    existing?.castingAbility ?? CASTING_ABILITY[existing?.classId ?? 'wizard'] ?? 'str',
+  const [classLevels, setClassLevels] = useState<ClassLevelEntry[]>(
+    existing?.classLevels ?? [createDefaultClassLevel('wizard')],
   );
-  const [level, setLevel] = useState(existing?.level ?? 1);
   const [abilityScores, setAbilityScores] = useState<Record<AbilityId, number>>(
     existing?.abilityScores ?? { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
   );
@@ -58,11 +58,26 @@ export function CharacterForm({ mode }: CharacterFormProps) {
   const [showSpellFocusPicker, setShowSpellFocusPicker] = useState(false);
   const [showGreaterSpellFocusPicker, setShowGreaterSpellFocusPicker] = useState(false);
 
-  const isCaster = isCasterClass(classId);
+  const isCaster = isAnyCaster(classLevels);
+  const usedClassIds = new Set(classLevels.map((cl) => cl.classId));
+  const canAddClass = usedClassIds.size < CLASS_IDS.length;
 
-  function handleClassChange(newClassId: ClassId) {
-    setClassId(newClassId);
-    setCastingAbility(CASTING_ABILITY[newClassId] ?? 'str');
+  function updateClassLevel(index: number, patch: Partial<ClassLevelEntry>) {
+    setClassLevels((prev) => prev.map((cl, i) => (i === index ? { ...cl, ...patch } : cl)));
+  }
+
+  function handleClassChange(index: number, newClassId: ClassId) {
+    updateClassLevel(index, { classId: newClassId, castingAbility: defaultCastingAbilityFor(newClassId) });
+  }
+
+  function addClassLevel() {
+    const nextClassId = CLASS_IDS.find((id) => !usedClassIds.has(id));
+    if (!nextClassId) return;
+    setClassLevels((prev) => [...prev, createDefaultClassLevel(nextClassId)]);
+  }
+
+  function removeClassLevel(index: number) {
+    setClassLevels((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
   }
 
   function addSpellFocusSchool(school: string) {
@@ -90,10 +105,8 @@ export function CharacterForm({ mode }: CharacterFormProps) {
     e.preventDefault();
     const payload = {
       name,
-      classId,
-      level,
+      classLevels,
       abilityScores,
-      castingAbility,
       spellcraft,
       spellFocusSchools,
       greaterSpellFocusSchools,
@@ -116,36 +129,60 @@ export function CharacterForm({ mode }: CharacterFormProps) {
           <input value={name} onChange={(e) => setName(e.target.value)} required />
         </label>
 
-        <div className="form-row">
-          <label>
-            Class
-            <select value={classId} onChange={(e) => handleClassChange(e.target.value as ClassId)}>
-              {CLASS_IDS.map((id) => (
-                <option key={id} value={id}>
-                  {CLASS_LABELS[id]}
-                </option>
-              ))}
-            </select>
-          </label>
+        <fieldset className="class-levels-fieldset">
+          <legend>Classes</legend>
+          {classLevels.map((cl, index) => (
+            <div className="form-row class-level-row" key={index}>
+              <label>
+                Class
+                <select value={cl.classId} onChange={(e) => handleClassChange(index, e.target.value as ClassId)}>
+                  {CLASS_IDS.filter((id) => id === cl.classId || !usedClassIds.has(id)).map((id) => (
+                    <option key={id} value={id}>
+                      {CLASS_LABELS[id]}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-          {isCaster && (
-            <label>
-              Caster Modifier
-              <select value={castingAbility} onChange={(e) => setCastingAbility(e.target.value as AbilityId)}>
-                {CASTING_ABILITIES.map(({ id, label }) => (
-                  <option key={id} value={id}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <label>
+                Level
+                <NumberInput
+                  min={1}
+                  max={20}
+                  value={cl.level}
+                  onChange={(next) => updateClassLevel(index, { level: next })}
+                />
+              </label>
+
+              {isCasterClass(cl.classId) && (
+                <label>
+                  Caster Modifier
+                  <select
+                    value={cl.castingAbility}
+                    onChange={(e) => updateClassLevel(index, { castingAbility: e.target.value as AbilityId })}
+                  >
+                    {CASTING_ABILITIES.map(({ id, label }) => (
+                      <option key={id} value={id}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {classLevels.length > 1 && (
+                <button type="button" onClick={() => removeClassLevel(index)} title="Remove class">
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          {canAddClass && (
+            <button type="button" onClick={addClassLevel}>
+              + Add Class
+            </button>
           )}
-        </div>
-
-        <label>
-          Level
-          <NumberInput min={1} max={20} value={level} onChange={setLevel} />
-        </label>
+        </fieldset>
 
         <fieldset>
           <legend>Ability Scores</legend>
