@@ -50,3 +50,44 @@ export function searchWeaponItems(query: string, includeDescription = false): We
       (includeDescription && item.description.toLowerCase().includes(normalized)),
   );
 }
+
+// `category` entries that mean the weapon isn't something held in a hand slot
+// at all (ammunition, siege-engine parts/mods, or a siege engine itself).
+const NON_HAND_CATEGORIES = new Set(['Ammunition', 'Modification', 'Explosive', 'Siege']);
+function isSiegeMounted(category: string): boolean {
+  return category.startsWith('Direct-Fire') || category.startsWith('Indirect-Fire') || category === 'Close Assault';
+}
+
+// Whether this weapon can occupy the mainHand/offhand slots at all. Covers
+// Light/One-Handed/Two-Handed melee weapons as well as Ranged weapons (bows,
+// crossbows, slings, thrown weapons) -- the source data doesn't tag Ranged
+// weapons with a handedness, so they're treated as usable in either hand.
+export function isHandWeapon(entry: WeaponItemEntry): boolean {
+  return !entry.category.some((c) => NON_HAND_CATEGORIES.has(c) || isSiegeMounted(c));
+}
+
+// Two-handed weapons occupy both mainHand and offhand once equipped.
+export function isTwoHandedWeapon(entry: WeaponItemEntry): boolean {
+  return entry.category.includes('Two-Handed');
+}
+
+export function isTwoHandedWeaponItemId(weaponItemId: string | null | undefined): boolean {
+  if (!weaponItemId) return false;
+  const entry = getWeaponItemById(weaponItemId);
+  return entry ? isTwoHandedWeapon(entry) : false;
+}
+
+export function getWeaponItemsForHandSlot(): WeaponItemEntry[] {
+  return WEAPON_ITEMS.filter(isHandWeapon);
+}
+
+export function searchWeaponItemsForHandSlot(query: string, includeDescription = false): WeaponItemEntry[] {
+  const normalized = query.trim().toLowerCase();
+  const list = getWeaponItemsForHandSlot();
+  if (!normalized) return list;
+  return list.filter(
+    (item) =>
+      item.name.toLowerCase().includes(normalized) ||
+      (includeDescription && item.description.toLowerCase().includes(normalized)),
+  );
+}

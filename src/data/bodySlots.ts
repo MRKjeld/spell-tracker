@@ -13,7 +13,8 @@ export type BodySlotId =
   | 'feet'
   | 'mainHand'
   | 'offhand'
-  | 'ring'
+  | 'ring1'
+  | 'ring2'
   | 'leg';
 
 export const BODY_SLOT_IDS: BodySlotId[] = [
@@ -31,7 +32,8 @@ export const BODY_SLOT_IDS: BodySlotId[] = [
   'feet',
   'mainHand',
   'offhand',
-  'ring',
+  'ring1',
+  'ring2',
   'leg',
 ];
 
@@ -50,7 +52,8 @@ export const BODY_SLOT_LABELS: Record<BodySlotId, string> = {
   feet: 'Feet',
   mainHand: 'Main Hand',
   offhand: 'Offhand',
-  ring: 'Ring',
+  ring1: 'Ring 1',
+  ring2: 'Ring 2',
   leg: 'Leg',
 };
 
@@ -58,6 +61,8 @@ export const BODY_SLOT_LABELS: Record<BodySlotId, string> = {
 // `null` marks a cell that reserves space in the grid but renders nothing.
 // A slot id that appears twice (e.g. 'shoulders') is the same underlying
 // slot rendered in two places — equipping into either cell affects both.
+// 'ring1'/'ring2' are genuinely distinct slots (unlike the other repeats)
+// so two different rings can be worn at once.
 export const WORN_ITEMS_LAYOUT: (BodySlotId | null)[] = [
   null, 'headband', null,
   null, 'head', null,
@@ -66,7 +71,7 @@ export const WORN_ITEMS_LAYOUT: (BodySlotId | null)[] = [
   'wrists', 'chest', 'wrists',
   'hands', 'body', 'hands',
   null, 'armor', null,
-  'ring', 'belt', 'ring',
+  'ring1', 'belt', 'ring2',
   'leg', null, 'leg',
   'feet', null, 'feet',
 ];

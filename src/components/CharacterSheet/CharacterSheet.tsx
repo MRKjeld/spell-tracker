@@ -23,18 +23,25 @@ import { EquipmentSlotsGrid } from './EquipmentSlotsGrid';
 import { EquipmentSection } from './EquipmentSection';
 import { WondrousItemPickerModal } from './WondrousItemPickerModal';
 import { BaseArmorPickerModal } from './BaseArmorPickerModal';
+import { HandItemPickerModal } from './HandItemPickerModal';
+import { RingPickerModal } from './RingPickerModal';
 import { EquippedSlotItemModal } from './EquippedSlotItemModal';
 import { ActionsSection } from './ActionsSection';
 import { AddModifierModal } from './AddModifierModal';
 import { AddCalculationModal } from './AddCalculationModal';
 import { AddActionModal } from './AddActionModal';
-import { getBaseArmorCategoriesForSlot } from '../../data/baseArmor';
+import { findItemForSlot } from '../../lib/equipmentSlots';
 import { getSystemModifiers, isSystemModifierId } from '../../lib/systemModifiers';
 
-// Slots filled from the mundane armor/shield catalog instead of the wondrous
-// item catalog: 'armor' takes worn armor, 'mainHand'/'offhand' take shields.
-function isBaseArmorSlot(slot: BodySlotId): boolean {
-  return getBaseArmorCategoriesForSlot(slot).length > 0;
+// Which catalog/picker a given body slot is filled from: 'armor' takes worn
+// armor, 'mainHand'/'offhand' take shields and hand-eligible weapons,
+// 'ring1'/'ring2' take rings, and everything else uses the wondrous catalog.
+type SlotPickerKind = 'armor' | 'hand' | 'ring' | 'wondrous';
+function getSlotPickerKind(slot: BodySlotId): SlotPickerKind {
+  if (slot === 'armor') return 'armor';
+  if (slot === 'mainHand' || slot === 'offhand') return 'hand';
+  if (slot === 'ring1' || slot === 'ring2') return 'ring';
+  return 'wondrous';
 }
 
 const SPELLS_TAB_PREFIX = 'spells:';
@@ -56,11 +63,15 @@ export function CharacterSheet() {
   const addItem = useCharacterStore((s) => s.addItem);
   const addWondrousItem = useCharacterStore((s) => s.addWondrousItem);
   const addBaseArmorItem = useCharacterStore((s) => s.addBaseArmorItem);
+  const addWeaponItem = useCharacterStore((s) => s.addWeaponItem);
+  const addRingItem = useCharacterStore((s) => s.addRingItem);
   const removeItem = useCharacterStore((s) => s.removeItem);
   const consumeItemCharge = useCharacterStore((s) => s.consumeItemCharge);
   const rechargeItem = useCharacterStore((s) => s.rechargeItem);
   const equipNewWondrousItem = useCharacterStore((s) => s.equipNewWondrousItem);
   const equipNewBaseArmorItem = useCharacterStore((s) => s.equipNewBaseArmorItem);
+  const equipNewWeaponItem = useCharacterStore((s) => s.equipNewWeaponItem);
+  const equipNewRingItem = useCharacterStore((s) => s.equipNewRingItem);
   const equipItem = useCharacterStore((s) => s.equipItem);
   const unequipItem = useCharacterStore((s) => s.unequipItem);
   const addModifier = useCharacterStore((s) => s.addModifier);
@@ -229,11 +240,20 @@ export function CharacterSheet() {
     setItemViewTarget(null);
   }
 
-  function handlePickCatalogItem(pick: { kind: 'wondrous' | 'baseArmor'; itemId: string; itemName: string }) {
+  function handlePickCatalogItem(pick: {
+    kind: 'wondrous' | 'baseArmor' | 'weapon' | 'ring';
+    itemId: string;
+    itemName: string;
+  }) {
+    const { itemId, itemName } = pick;
     if (pick.kind === 'wondrous') {
-      addWondrousItem(character!.id, { itemId: pick.itemId, itemName: pick.itemName });
+      addWondrousItem(character!.id, { itemId, itemName });
+    } else if (pick.kind === 'baseArmor') {
+      addBaseArmorItem(character!.id, { itemId, itemName });
+    } else if (pick.kind === 'weapon') {
+      addWeaponItem(character!.id, { itemId, itemName });
     } else {
-      addBaseArmorItem(character!.id, { itemId: pick.itemId, itemName: pick.itemName });
+      addRingItem(character!.id, { itemId, itemName });
     }
     setShowItemPicker(false);
   }
@@ -269,7 +289,7 @@ export function CharacterSheet() {
   }
 
   function handleEquipmentSlotClick(slot: BodySlotId) {
-    const equipped = character!.items.some((i) => i.equippedSlot === slot);
+    const equipped = findItemForSlot(character!.items, slot);
     if (equipped) {
       setEquippedSlotViewTarget(slot);
     } else {
@@ -277,34 +297,50 @@ export function CharacterSheet() {
     }
   }
 
-  function handlePickSlotItem(itemId: string, itemName: string) {
+  function handlePickArmorItem(itemId: string, itemName: string) {
+    if (slotPickerTarget) equipNewBaseArmorItem(character!.id, slotPickerTarget, { itemId, itemName });
+    setSlotPickerTarget(null);
+  }
+
+  function handlePickHandItem(pick: { kind: 'shield' | 'weapon'; itemId: string; itemName: string }) {
     if (slotPickerTarget) {
-      if (isBaseArmorSlot(slotPickerTarget)) {
+      const { itemId, itemName } = pick;
+      if (pick.kind === 'shield') {
         equipNewBaseArmorItem(character!.id, slotPickerTarget, { itemId, itemName });
       } else {
-        equipNewWondrousItem(character!.id, slotPickerTarget, { itemId, itemName });
+        equipNewWeaponItem(character!.id, slotPickerTarget, { itemId, itemName });
       }
     }
     setSlotPickerTarget(null);
   }
 
+  function handlePickRingItem(itemId: string, itemName: string) {
+    if (slotPickerTarget) equipNewRingItem(character!.id, slotPickerTarget, { itemId, itemName });
+    setSlotPickerTarget(null);
+  }
+
+  function handlePickWondrousItem(itemId: string, itemName: string) {
+    if (slotPickerTarget) equipNewWondrousItem(character!.id, slotPickerTarget, { itemId, itemName });
+    setSlotPickerTarget(null);
+  }
+
   function handleUnequipSlotItem() {
     if (!equippedSlotViewTarget) return;
-    const equipped = character!.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+    const equipped = findItemForSlot(character!.items, equippedSlotViewTarget);
     if (equipped) unequipItem(character!.id, equipped.id);
     setEquippedSlotViewTarget(null);
   }
 
   function handleUseEquippedItemCharge() {
     if (!equippedSlotViewTarget) return;
-    const equipped = character!.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+    const equipped = findItemForSlot(character!.items, equippedSlotViewTarget);
     if (equipped) consumeItemCharge(character!.id, equipped.id);
     setEquippedSlotViewTarget(null);
   }
 
   function handleRechargeEquippedItem() {
     if (!equippedSlotViewTarget) return;
-    const equipped = character!.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+    const equipped = findItemForSlot(character!.items, equippedSlotViewTarget);
     if (equipped) rechargeItem(character!.id, equipped.id);
     setEquippedSlotViewTarget(null);
   }
@@ -574,23 +610,47 @@ export function CharacterSheet() {
       )}
 
       {slotPickerTarget &&
-        (isBaseArmorSlot(slotPickerTarget) ? (
-          <BaseArmorPickerModal
-            slot={slotPickerTarget}
-            onPick={handlePickSlotItem}
-            onClose={() => setSlotPickerTarget(null)}
-          />
-        ) : (
-          <WondrousItemPickerModal
-            slot={slotPickerTarget}
-            onPick={handlePickSlotItem}
-            onClose={() => setSlotPickerTarget(null)}
-          />
-        ))}
+        (() => {
+          const kind = getSlotPickerKind(slotPickerTarget);
+          if (kind === 'armor') {
+            return (
+              <BaseArmorPickerModal
+                slot={slotPickerTarget}
+                onPick={handlePickArmorItem}
+                onClose={() => setSlotPickerTarget(null)}
+              />
+            );
+          }
+          if (kind === 'hand') {
+            return (
+              <HandItemPickerModal
+                slot={slotPickerTarget}
+                onPick={handlePickHandItem}
+                onClose={() => setSlotPickerTarget(null)}
+              />
+            );
+          }
+          if (kind === 'ring') {
+            return (
+              <RingPickerModal
+                slot={slotPickerTarget}
+                onPick={handlePickRingItem}
+                onClose={() => setSlotPickerTarget(null)}
+              />
+            );
+          }
+          return (
+            <WondrousItemPickerModal
+              slot={slotPickerTarget}
+              onPick={handlePickWondrousItem}
+              onClose={() => setSlotPickerTarget(null)}
+            />
+          );
+        })()}
 
       {equippedSlotViewTarget &&
         (() => {
-          const equipped = character.items.find((i) => i.equippedSlot === equippedSlotViewTarget);
+          const equipped = findItemForSlot(character.items, equippedSlotViewTarget);
           return equipped ? (
             <EquippedSlotItemModal
               slot={equippedSlotViewTarget}

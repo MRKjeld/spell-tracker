@@ -5,6 +5,8 @@ import { BODY_SLOT_IDS, BODY_SLOT_LABELS } from '../../data/bodySlots';
 import type { BodySlotId } from '../../data/bodySlots';
 import { getWondrousItemById, normalizeSlot } from '../../data/wondrousItems';
 import { defaultSlotForBaseArmorCategory, getBaseArmorItemById } from '../../data/baseArmor';
+import { getWeaponItemById } from '../../data/weapons';
+import { getRingItemById } from '../../data/rings';
 
 interface ItemViewModalProps {
   item: Item;
@@ -30,11 +32,17 @@ export function ItemViewModal({ item, onUseCharge, onRecharge, onRemove, onEquip
   const depleted = !isUnlimited && item.usesRemaining <= 0;
   const catalogEntry = item.wondrousItemId ? getWondrousItemById(item.wondrousItemId) : undefined;
   const baseArmorEntry = item.baseArmorId ? getBaseArmorItemById(item.baseArmorId) : undefined;
+  const weaponEntry = item.weaponItemId ? getWeaponItemById(item.weaponItemId) : undefined;
+  const ringEntry = item.ringItemId ? getRingItemById(item.ringItemId) : undefined;
   const defaultSlot = catalogEntry
     ? normalizeSlot(catalogEntry.slot)
     : baseArmorEntry
       ? defaultSlotForBaseArmorCategory(baseArmorEntry.category)
-      : item.slot;
+      : weaponEntry
+        ? 'mainHand'
+        : ringEntry
+          ? 'ring1'
+          : item.slot;
   const [equipSlot, setEquipSlot] = useState<BodySlotId>(defaultSlot ?? BODY_SLOT_IDS[0]);
 
   return (

@@ -8,8 +8,11 @@ import type { ClassId } from '../data/classes';
 import { migrateLegacyClassLevels } from '../lib/classLevels';
 import { getWondrousItemById } from '../data/wondrousItems';
 import type { WondrousItemEntry } from '../data/wondrousItems';
+import { getRingItemById } from '../data/rings';
+import { isTwoHandedWeaponItemId } from '../data/weapons';
 import type { BodySlotId } from '../data/bodySlots';
 import type { BaseArmorCategory } from '../data/baseArmor';
+import { occupiedSlots } from '../lib/equipmentSlots';
 import type {
   Calculation,
   Character,
@@ -52,6 +55,8 @@ function migrateLegacyEquipmentSlots(
       lastReset: now,
       wondrousItemId: slotItem.itemId,
       baseArmorId: null,
+      weaponItemId: null,
+      ringItemId: null,
       slot: null,
       category: null,
       equippedSlot: slot,
@@ -92,12 +97,31 @@ function reconcileWondrousItemCharges(item: Item): Item {
   return { ...item, usePeriod, maxUses, usesRemaining: defaultUsesRemaining(usePeriod, maxUses) };
 }
 
+// Same as reconcileWondrousItemCharges, but for rings -- a separate catalog
+// (see data/rings.ts) with the same shape.
+function reconcileRingItemCharges(item: Item): Item {
+  if (!item.ringItemId || item.usePeriod !== 'unlimited') return item;
+  const catalogEntry = getRingItemById(item.ringItemId);
+  if (!catalogEntry?.uses) return item;
+  const usePeriod = catalogUsesToPeriod(catalogEntry.uses);
+  const maxUses = catalogEntry.uses.quantity;
+  return { ...item, usePeriod, maxUses, usesRemaining: defaultUsesRemaining(usePeriod, maxUses) };
+}
+
 // Only one item may occupy a given body slot; equipping one bumps whatever
-// was already there back to unworn-but-still-owned.
-function setEquippedSlot(items: Item[], itemId: string, slot: BodySlotId | null): Item[] {
+// was already there back to unworn-but-still-owned. A two-handed weapon
+// always anchors at 'mainHand' (even if picked via the offhand slot) and
+// also claims 'offhand', bumping whatever occupied either slot.
+function setEquippedSlot(items: Item[], itemId: string, slot: BodySlotId | null, twoHanded = false): Item[] {
+  const anchor: BodySlotId | null = twoHanded && slot === 'offhand' ? 'mainHand' : slot;
+  const claimed = new Set<BodySlotId>();
+  if (anchor) {
+    claimed.add(anchor);
+    if (twoHanded) claimed.add(anchor === 'mainHand' ? 'offhand' : 'mainHand');
+  }
   return items.map((i) => {
-    if (i.id === itemId) return { ...i, equippedSlot: slot };
-    if (slot !== null && i.equippedSlot === slot) return { ...i, equippedSlot: null };
+    if (i.id === itemId) return { ...i, equippedSlot: anchor };
+    if (claimed.size > 0 && occupiedSlots(i).some((s) => claimed.has(s))) return { ...i, equippedSlot: null };
     return i;
   });
 }
@@ -130,8 +154,12 @@ interface CharacterStoreState {
   rechargeItem(charId: string, itemId: string): void;
   equipNewWondrousItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
   equipNewBaseArmorItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
+  equipNewWeaponItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
+  equipNewRingItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
   addWondrousItem(charId: string, item: { itemId: string; itemName: string }): void;
   addBaseArmorItem(charId: string, item: { itemId: string; itemName: string }): void;
+  addWeaponItem(charId: string, item: { itemId: string; itemName: string }): void;
+  addRingItem(charId: string, item: { itemId: string; itemName: string }): void;
   equipItem(charId: string, itemId: string, slot: BodySlotId): void;
   unequipItem(charId: string, itemId: string): void;
   learnSpell(
@@ -167,6 +195,8 @@ function backfillDefaults(character: Character): Character {
     description: i.description ?? '',
     wondrousItemId: i.wondrousItemId ?? null,
     baseArmorId: i.baseArmorId ?? null,
+    weaponItemId: i.weaponItemId ?? null,
+    ringItemId: i.ringItemId ?? null,
     slot: i.slot ?? null,
     category: i.category ?? null,
     equippedSlot: i.equippedSlot ?? null,
@@ -179,7 +209,9 @@ function backfillDefaults(character: Character): Character {
     spellcraft: rest.spellcraft ?? 0,
     spellFocusSchools: rest.spellFocusSchools ?? [],
     greaterSpellFocusSchools: rest.greaterSpellFocusSchools ?? [],
-    items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots).map(reconcileWondrousItemCharges),
+    items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots)
+      .map(reconcileWondrousItemCharges)
+      .map(reconcileRingItemCharges),
     modifiers: rest.modifiers ?? [],
     calculations: rest.calculations ?? [],
     actions: rest.actions ?? [],
@@ -363,6 +395,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: null,
             baseArmorId: null,
+            weaponItemId: null,
+            ringItemId: null,
             slot: item.slot,
             category: item.category,
             equippedSlot: null,
@@ -425,6 +459,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: item.itemId,
             baseArmorId: null,
+            weaponItemId: null,
+            ringItemId: null,
             slot: null,
             category: null,
             equippedSlot: slot,
@@ -450,6 +486,63 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: null,
             baseArmorId: item.itemId,
+            weaponItemId: null,
+            ringItemId: null,
+            slot: null,
+            category: null,
+            equippedSlot: slot,
+          };
+          const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
+          const updated = touch({ ...existing, items: [...clearedItems, newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      equipNewWeaponItem(charId, slot, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const twoHanded = isTwoHandedWeaponItemId(item.itemId);
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            description: '',
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: null,
+            baseArmorId: null,
+            weaponItemId: item.itemId,
+            ringItemId: null,
+            slot: null,
+            category: null,
+            equippedSlot: slot,
+          };
+          const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot, twoHanded);
+          const updated = touch({ ...existing, items: [...clearedItems, newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      equipNewRingItem(charId, slot, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            description: '',
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: null,
+            baseArmorId: null,
+            weaponItemId: null,
+            ringItemId: item.itemId,
             slot: null,
             category: null,
             equippedSlot: slot,
@@ -475,6 +568,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: item.itemId,
             baseArmorId: null,
+            weaponItemId: null,
+            ringItemId: null,
             slot: null,
             category: null,
             equippedSlot: null,
@@ -499,6 +594,60 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: null,
             baseArmorId: item.itemId,
+            weaponItemId: null,
+            ringItemId: null,
+            slot: null,
+            category: null,
+            equippedSlot: null,
+          };
+          const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addWeaponItem(charId, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            description: '',
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: null,
+            baseArmorId: null,
+            weaponItemId: item.itemId,
+            ringItemId: null,
+            slot: null,
+            category: null,
+            equippedSlot: null,
+          };
+          const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addRingItem(charId, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            description: '',
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: null,
+            baseArmorId: null,
+            weaponItemId: null,
+            ringItemId: item.itemId,
             slot: null,
             category: null,
             equippedSlot: null,
@@ -512,7 +661,12 @@ export const useCharacterStore = create<CharacterStoreState>()(
         set((state) => {
           const existing = state.characters[charId];
           if (!existing) return state;
-          const updated = touch({ ...existing, items: setEquippedSlot(existing.items ?? [], itemId, slot) });
+          const item = (existing.items ?? []).find((i) => i.id === itemId);
+          const twoHanded = item ? isTwoHandedWeaponItemId(item.weaponItemId) : false;
+          const updated = touch({
+            ...existing,
+            items: setEquippedSlot(existing.items ?? [], itemId, slot, twoHanded),
+          });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

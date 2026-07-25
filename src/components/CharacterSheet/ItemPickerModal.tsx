@@ -10,15 +10,22 @@ import {
   searchBaseArmorItemsForSlot,
 } from '../../data/baseArmor';
 import type { BaseArmorItemEntry } from '../../data/baseArmor';
+import { searchWeaponItems, searchWeaponItemsForHandSlot } from '../../data/weapons';
+import type { WeaponItemEntry } from '../../data/weapons';
+import { searchRingItems } from '../../data/rings';
+import type { RingItemEntry } from '../../data/rings';
 import { WondrousItemDetails } from './WondrousItemDetails';
 import { BaseArmorDetails } from './BaseArmorDetails';
+import { WeaponDetails } from './WeaponDetails';
 
 type CatalogEntry =
   | { kind: 'wondrous'; item: WondrousItemEntry }
-  | { kind: 'baseArmor'; item: BaseArmorItemEntry };
+  | { kind: 'baseArmor'; item: BaseArmorItemEntry }
+  | { kind: 'weapon'; item: WeaponItemEntry }
+  | { kind: 'ring'; item: RingItemEntry };
 
 interface ItemPickerModalProps {
-  onPick: (pick: { kind: 'wondrous' | 'baseArmor'; itemId: string; itemName: string }) => void;
+  onPick: (pick: { kind: 'wondrous' | 'baseArmor' | 'weapon' | 'ring'; itemId: string; itemName: string }) => void;
   onClose: () => void;
 }
 
@@ -38,9 +45,18 @@ export function ItemPickerModal({ onPick, onClose }: ItemPickerModalProps) {
         : getBaseArmorCategoriesForSlot(slot).length > 0
           ? searchBaseArmorItemsForSlot(slot, query, searchDescriptions)
           : [];
+    const weapons =
+      slot === 'all' || slot === 'mainHand' || slot === 'offhand'
+        ? slot === 'all'
+          ? searchWeaponItems(query, searchDescriptions)
+          : searchWeaponItemsForHandSlot(query, searchDescriptions)
+        : [];
+    const rings = slot === 'all' || slot === 'ring1' || slot === 'ring2' ? searchRingItems(query, searchDescriptions) : [];
     return [
       ...wondrous.map((item): CatalogEntry => ({ kind: 'wondrous', item })),
       ...baseArmor.map((item): CatalogEntry => ({ kind: 'baseArmor', item })),
+      ...weapons.map((item): CatalogEntry => ({ kind: 'weapon', item })),
+      ...rings.map((item): CatalogEntry => ({ kind: 'ring', item })),
     ];
   }, [slot, query, searchDescriptions]);
 
@@ -100,7 +116,7 @@ export function ItemPickerModal({ onPick, onClose }: ItemPickerModalProps) {
         {results.map((result) => {
           const { kind, item } = result;
           const expanded = expandedIds.has(item.id);
-          const price = kind === 'wondrous' ? item.price : item.costRaw || 'no cost';
+          const price = kind === 'wondrous' || kind === 'ring' ? item.price : item.costRaw || 'no cost';
           return (
             <li key={`${kind}-${item.id}`}>
               <div className="spell-picker-row">
@@ -122,8 +138,10 @@ export function ItemPickerModal({ onPick, onClose }: ItemPickerModalProps) {
                 </button>
               </div>
               {expanded ? (
-                kind === 'wondrous' ? (
+                kind === 'wondrous' || kind === 'ring' ? (
                   <WondrousItemDetails item={item} />
+                ) : kind === 'weapon' ? (
+                  <WeaponDetails item={item} />
                 ) : (
                   <BaseArmorDetails item={item} />
                 )

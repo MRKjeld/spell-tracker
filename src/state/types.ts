@@ -62,13 +62,19 @@ export interface Item {
   lastReset: string; // ISO timestamp of the last time uses were recovered
   wondrousItemId: string | null; // catalog id (see data/wondrousItems.ts), if picked from it
   baseArmorId: string | null; // catalog id (see data/baseArmor.ts), if picked from it
-  // For custom items only (no wondrousItemId/baseArmorId): which body slot this
-  // item is meant to fill, and, when that slot is 'armor'/'mainHand'/'offhand',
-  // its base-armor category — mirrors how catalog items imply a slot/category.
-  // Null slot means an unslotted, inventory-only item (e.g. a potion or wand).
+  weaponItemId: string | null; // catalog id (see data/weapons.ts), if picked from it
+  ringItemId: string | null; // catalog id (see data/rings.ts), if picked from it
+  // For custom items only (no wondrousItemId/baseArmorId/weaponItemId/ringItemId):
+  // which body slot this item is meant to fill, and, when that slot is
+  // 'armor'/'mainHand'/'offhand', its base-armor category — mirrors how
+  // catalog items imply a slot/category. Null slot means an unslotted,
+  // inventory-only item (e.g. a potion or wand).
   slot: BodySlotId | null;
   category: BaseArmorCategory | null;
-  equippedSlot: BodySlotId | null; // the body slot this item currently occupies, if worn
+  // The body slot this item currently occupies, if worn. A two-handed weapon
+  // is always anchored here at 'mainHand' and also fills 'offhand' — see
+  // lib/equipmentSlots.ts's occupiedSlots for the item's full occupied set.
+  equippedSlot: BodySlotId | null;
 }
 
 // A single named bonus/penalty, e.g. "Strength" +4 or "Point-Blank Shot" +1.

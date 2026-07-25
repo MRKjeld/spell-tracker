@@ -21,6 +21,7 @@ export interface WondrousItemEntry {
 const SLOT_ALIASES: Record<string, BodySlotId> = {
   wrist: 'wrists',
   shoulder: 'shoulders',
+  ring: 'ring1',
 };
 
 export function normalizeSlot(slot: string): BodySlotId | null {

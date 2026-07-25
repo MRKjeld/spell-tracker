@@ -1,6 +1,7 @@
 import { WORN_ITEMS_LAYOUT } from '../../data/bodySlots';
 import type { BodySlotId } from '../../data/bodySlots';
 import type { Item } from '../../state/types';
+import { findItemForSlot } from '../../lib/equipmentSlots';
 import { EquipmentSlotChip } from './EquipmentSlotChip';
 
 interface EquipmentSlotsGridProps {
@@ -22,7 +23,7 @@ export function EquipmentSlotsGrid({ items, onSlotClick }: EquipmentSlotsGridPro
             <EquipmentSlotChip
               key={`${slot}-${index}`}
               slot={slot}
-              itemName={items.find((i) => i.equippedSlot === slot)?.name}
+              itemName={findItemForSlot(items, slot)?.name}
               onClick={() => onSlotClick(slot)}
             />
           ),
