@@ -13,6 +13,7 @@ import type { BodySlotId } from '../../data/bodySlots';
 import { SlotGrid } from './SlotGrid';
 import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
+import { LearnSpellsModal } from './LearnSpellsModal';
 import { SpellViewModal } from './SpellViewModal';
 import { CasterStatsModal } from './CasterStatsModal';
 import { KnownSpellsSection } from './KnownSpellsSection';
@@ -213,12 +214,26 @@ export function CharacterSheet() {
     setPickerTarget(null);
   }
 
-  function handleLearn(spellId: string, spellName: string, sourceClassId: ClassId | null) {
+  function handleLearnConfirm(selectedSpellIds: string[]) {
     if (!resolvedSpellClassId) return;
-    const spell = getSpellById(spellId);
-    const effectiveClassId = sourceClassId ?? resolvedSpellClassId;
-    const spellLevel = spell?.levels[effectiveClassId] ?? 0;
-    learnSpell(character!.id, { classId: resolvedSpellClassId, spellId, spellName, spellLevel, sourceClassId });
+    const selectedSet = new Set(selectedSpellIds);
+    const currentIds = new Set(activeLearnedSpells.map((s) => s.spellId));
+
+    for (const learned of activeLearnedSpells) {
+      if (!selectedSet.has(learned.spellId)) unlearnSpell(character!.id, learned.id);
+    }
+    for (const spellId of selectedSpellIds) {
+      if (currentIds.has(spellId)) continue;
+      const spell = getSpellById(spellId);
+      const spellLevel = spell?.levels[resolvedSpellClassId] ?? 0;
+      learnSpell(character!.id, {
+        classId: resolvedSpellClassId,
+        spellId,
+        spellName: spell?.name ?? '',
+        spellLevel,
+        sourceClassId: null,
+      });
+    }
     setShowLearnPicker(false);
   }
 
@@ -451,13 +466,6 @@ export function CharacterSheet() {
             )}
           </div>
 
-          {activeCasterType === 'arcane' && (
-            <KnownSpellsSection
-              learnedSpells={activeLearnedSpells}
-              onUnlearn={(learnedSpellId) => unlearnSpell(character.id, learnedSpellId)}
-            />
-          )}
-
           <SlotGrid
             character={character}
             tabClassId={resolvedSpellClassId}
@@ -468,6 +476,13 @@ export function CharacterSheet() {
             }
             onRemovePool={(poolId) => removeExtraPool(character.id, poolId)}
           />
+
+          {activeCasterType === 'arcane' && (
+            <KnownSpellsSection
+              learnedSpells={activeLearnedSpells}
+              onUnlearn={(learnedSpellId) => unlearnSpell(character.id, learnedSpellId)}
+            />
+          )}
         </>
       )}
 
@@ -524,10 +539,10 @@ export function CharacterSheet() {
       )}
 
       {showLearnPicker && resolvedSpellClassId && (
-        <SpellPickerModal
-          defaultClassId={resolvedSpellClassId}
-          spellLevel={null}
-          onPick={handleLearn}
+        <LearnSpellsModal
+          classId={resolvedSpellClassId}
+          learnedSpellIds={activeLearnedSpells.map((s) => s.spellId)}
+          onConfirm={handleLearnConfirm}
           onClose={() => setShowLearnPicker(false)}
         />
       )}
