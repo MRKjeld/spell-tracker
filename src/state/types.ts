@@ -55,6 +55,32 @@ export interface Item {
   equippedSlot: BodySlotId | null; // the body slot this item currently occupies, if worn
 }
 
+// A single named bonus/penalty, e.g. "Strength" +4 or "Point-Blank Shot" +1.
+// Built up once via Add Modifier, then reused across any number of Calculations.
+export interface Modifier {
+  id: string;
+  name: string;
+  value: number;
+}
+
+// A named dice roll plus the Modifiers that apply to it, e.g. "Ranged Attack
+// (<30ft)": 1d20 + BAB + Dexterity Modifier + Point-Blank Shot.
+export interface Calculation {
+  id: string;
+  name: string;
+  diceRoll: string; // free text, e.g. "1d20"
+  modifierIds: string[]; // references into Character.modifiers
+}
+
+// A named activity a character can take, e.g. "Alchemist's Bomb", with a
+// description and any number of Calculations relevant to using it.
+export interface CharacterAction {
+  id: string;
+  name: string;
+  description: string;
+  calculationIds: string[]; // references into Character.calculations
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -68,6 +94,9 @@ export interface Character {
   extraSlotPools: ExtraSlotPool[];
   slotFills: Record<string, SlotFill>; // keyed by deterministic slot-instance id
   items: Item[]; // Equipment segment; every owned item, worn or not; persists through rest (see restCharacter)
+  modifiers: Modifier[]; // Actions tab: reusable named bonuses
+  calculations: Calculation[]; // Actions tab: dice rolls built from modifiers
+  actions: CharacterAction[]; // Actions tab: named activities built from calculations
   createdAt: string;
   updatedAt: string;
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal } from '../common/Modal';
+import { NumberInput } from '../common/NumberInput';
 import type { ItemUsePeriod } from '../../state/types';
 import { BODY_SLOT_IDS, BODY_SLOT_LABELS } from '../../data/bodySlots';
 import type { BodySlotId } from '../../data/bodySlots';
@@ -139,12 +140,7 @@ export function AddItemModal({ onAdd, onClose }: AddItemModalProps) {
             {usePeriod !== 'unlimited' && (
               <label>
                 Charges
-                <input
-                  type="number"
-                  min={1}
-                  value={maxUses}
-                  onChange={(e) => setMaxUses(Number(e.target.value))}
-                />
+                <NumberInput min={1} value={maxUses} onChange={setMaxUses} />
               </label>
             )}
           </>

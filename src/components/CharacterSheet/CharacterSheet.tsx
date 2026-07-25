@@ -19,6 +19,9 @@ import { WondrousItemPickerModal } from './WondrousItemPickerModal';
 import { BaseArmorPickerModal } from './BaseArmorPickerModal';
 import { EquippedSlotItemModal } from './EquippedSlotItemModal';
 import { ActionsSection } from './ActionsSection';
+import { AddModifierModal } from './AddModifierModal';
+import { AddCalculationModal } from './AddCalculationModal';
+import { AddActionModal } from './AddActionModal';
 import { getBaseArmorCategoriesForSlot } from '../../data/baseArmor';
 
 // Slots filled from the mundane armor/shield catalog instead of the wondrous
@@ -44,10 +47,19 @@ export function CharacterSheet() {
   const equipNewBaseArmorItem = useCharacterStore((s) => s.equipNewBaseArmorItem);
   const equipItem = useCharacterStore((s) => s.equipItem);
   const unequipItem = useCharacterStore((s) => s.unequipItem);
+  const addModifier = useCharacterStore((s) => s.addModifier);
+  const removeModifier = useCharacterStore((s) => s.removeModifier);
+  const addCalculation = useCharacterStore((s) => s.addCalculation);
+  const removeCalculation = useCharacterStore((s) => s.removeCalculation);
+  const addAction = useCharacterStore((s) => s.addAction);
+  const removeAction = useCharacterStore((s) => s.removeAction);
 
   const [activeTab, setActiveTab] = useState<'actions' | 'spells' | 'items'>('spells');
   const [showAddPool, setShowAddPool] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
+  const [showAddModifier, setShowAddModifier] = useState(false);
+  const [showAddCalculation, setShowAddCalculation] = useState(false);
+  const [showAddAction, setShowAddAction] = useState(false);
   const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
   const [slotPickerTarget, setSlotPickerTarget] = useState<BodySlotId | null>(null);
   const [equippedSlotViewTarget, setEquippedSlotViewTarget] = useState<BodySlotId | null>(null);
@@ -252,7 +264,15 @@ export function CharacterSheet() {
       </div>
 
       {activeTab === 'actions' && (
-        <ActionsSection items={character.items} onUseCharge={(itemId) => consumeItemCharge(character.id, itemId)} />
+        <ActionsSection
+          modifiers={character.modifiers}
+          calculations={character.calculations}
+          actions={character.actions}
+          onAddModifier={() => setShowAddModifier(true)}
+          onAddCalculation={() => setShowAddCalculation(true)}
+          onAddAction={() => setShowAddAction(true)}
+          onRemoveAction={(actionId) => removeAction(character.id, actionId)}
+        />
       )}
 
       {activeTab === 'spells' && (
@@ -343,6 +363,31 @@ export function CharacterSheet() {
 
       {showAddItem && (
         <AddItemModal onAdd={(item) => addItem(character.id, item)} onClose={() => setShowAddItem(false)} />
+      )}
+
+      {showAddModifier && (
+        <AddModifierModal
+          onAdd={(modifier) => addModifier(character.id, modifier)}
+          onClose={() => setShowAddModifier(false)}
+        />
+      )}
+
+      {showAddCalculation && (
+        <AddCalculationModal
+          modifiers={character.modifiers}
+          onAdd={(calculation) => addCalculation(character.id, calculation)}
+          onRemoveModifier={(modifierId) => removeModifier(character.id, modifierId)}
+          onClose={() => setShowAddCalculation(false)}
+        />
+      )}
+
+      {showAddAction && (
+        <AddActionModal
+          calculations={character.calculations}
+          onAdd={(action) => addAction(character.id, action)}
+          onRemoveCalculation={(calculationId) => removeCalculation(character.id, calculationId)}
+          onClose={() => setShowAddAction(false)}
+        />
       )}
 
       {itemViewTarget && (

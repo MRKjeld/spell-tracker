@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
+import { NumberInput } from '../common/NumberInput';
 import type { ClassId } from '../../data/classes';
 import type { ExtraSlotPool, SpellSelection } from '../../state/types';
 import { POOL_COLOR_PRESETS } from '../../data/poolColors';
@@ -81,13 +82,7 @@ export function AddSlotPoolModal({ defaultClassId, existingPools, onAdd, onClose
         {specifyLevel && (
           <label>
             Spell Level
-            <input
-              type="number"
-              min={0}
-              max={9}
-              value={spellLevel}
-              onChange={(e) => setSpellLevel(Number(e.target.value))}
-            />
+            <NumberInput min={0} max={9} value={spellLevel} onChange={setSpellLevel} />
           </label>
         )}
 

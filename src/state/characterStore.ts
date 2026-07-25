@@ -9,10 +9,13 @@ import type { WondrousItemEntry } from '../data/wondrousItems';
 import type { BodySlotId } from '../data/bodySlots';
 import type { BaseArmorCategory } from '../data/baseArmor';
 import type {
+  Calculation,
   Character,
+  CharacterAction,
   ExtraSlotPool,
   Item,
   ItemUsePeriod,
+  Modifier,
   NewCharacterInput,
   SlotFill,
   SpellSelection,
@@ -126,6 +129,12 @@ interface CharacterStoreState {
   equipNewBaseArmorItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
   equipItem(charId: string, itemId: string, slot: BodySlotId): void;
   unequipItem(charId: string, itemId: string): void;
+  addModifier(charId: string, modifier: { name: string; value: number }): void;
+  removeModifier(charId: string, modifierId: string): void;
+  addCalculation(charId: string, calculation: { name: string; diceRoll: string; modifierIds: string[] }): void;
+  removeCalculation(charId: string, calculationId: string): void;
+  addAction(charId: string, action: { name: string; description: string; calculationIds: string[] }): void;
+  removeAction(charId: string, actionId: string): void;
   replaceAllCharacters(chars: Character[]): void;
   addCharacters(chars: Character[]): void;
 }
@@ -156,6 +165,9 @@ function backfillDefaults(character: Character): Character {
     spellFocusSchools: rest.spellFocusSchools ?? [],
     greaterSpellFocusSchools: rest.greaterSpellFocusSchools ?? [],
     items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots).map(reconcileWondrousItemCharges),
+    modifiers: rest.modifiers ?? [],
+    calculations: rest.calculations ?? [],
+    actions: rest.actions ?? [],
   };
 }
 
@@ -196,6 +208,9 @@ export const useCharacterStore = create<CharacterStoreState>()(
           extraSlotPools: [],
           slotFills: {},
           items: [],
+          modifiers: [],
+          calculations: [],
+          actions: [],
           createdAt: now,
           updatedAt: now,
         };
@@ -439,6 +454,87 @@ export const useCharacterStore = create<CharacterStoreState>()(
           if (!existing) return state;
           const items = (existing.items ?? []).map((i) => (i.id === itemId ? { ...i, equippedSlot: null } : i));
           const updated = touch({ ...existing, items });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addModifier(charId, modifier) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newModifier: Modifier = { ...modifier, id: createId() };
+          const updated = touch({ ...existing, modifiers: [...(existing.modifiers ?? []), newModifier] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      removeModifier(charId, modifierId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const updated = touch({
+            ...existing,
+            modifiers: (existing.modifiers ?? []).filter((m) => m.id !== modifierId),
+            // A Calculation referencing a removed Modifier just drops that
+            // reference — it keeps its remaining modifiers instead of vanishing.
+            calculations: (existing.calculations ?? []).map((c) => ({
+              ...c,
+              modifierIds: c.modifierIds.filter((id) => id !== modifierId),
+            })),
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addCalculation(charId, calculation) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newCalculation: Calculation = { ...calculation, id: createId() };
+          const updated = touch({
+            ...existing,
+            calculations: [...(existing.calculations ?? []), newCalculation],
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      removeCalculation(charId, calculationId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const updated = touch({
+            ...existing,
+            calculations: (existing.calculations ?? []).filter((c) => c.id !== calculationId),
+            // Same rationale as removeModifier: an Action just loses that one
+            // Calculation, not itself.
+            actions: (existing.actions ?? []).map((a) => ({
+              ...a,
+              calculationIds: a.calculationIds.filter((id) => id !== calculationId),
+            })),
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addAction(charId, action) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newAction: CharacterAction = { ...action, id: createId() };
+          const updated = touch({ ...existing, actions: [...(existing.actions ?? []), newAction] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      removeAction(charId, actionId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const updated = touch({
+            ...existing,
+            actions: (existing.actions ?? []).filter((a) => a.id !== actionId),
+          });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

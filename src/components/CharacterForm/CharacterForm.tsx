@@ -6,6 +6,7 @@ import { CASTING_ABILITY, CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { AbilityId, ClassId } from '../../data/classes';
 import { SCHOOL_LABELS } from '../../data/spells';
 import { schoolThemeColor, schoolThemeTextColor } from '../../data/schoolThemes';
+import { NumberInput } from '../common/NumberInput';
 
 // Universal has no school proper, so it isn't a valid Spell Focus target.
 const FOCUSABLE_SCHOOLS = Object.keys(SCHOOL_LABELS).filter((school) => school !== 'uni');
@@ -139,13 +140,7 @@ export function CharacterForm({ mode }: CharacterFormProps) {
 
         <label>
           Level
-          <input
-            type="number"
-            min={1}
-            max={20}
-            value={level}
-            onChange={(e) => setLevel(Number(e.target.value))}
-          />
+          <NumberInput min={1} max={20} value={level} onChange={setLevel} />
         </label>
 
         <fieldset>
@@ -153,14 +148,11 @@ export function CharacterForm({ mode }: CharacterFormProps) {
           {ABILITIES.map(({ id, label }) => (
             <label key={id}>
               {label}
-              <input
-                type="number"
+              <NumberInput
                 min={1}
                 max={30}
                 value={abilityScores[id]}
-                onChange={(e) =>
-                  setAbilityScores((prev) => ({ ...prev, [id]: Number(e.target.value) }))
-                }
+                onChange={(next) => setAbilityScores((prev) => ({ ...prev, [id]: next }))}
               />
             </label>
           ))}
@@ -168,12 +160,7 @@ export function CharacterForm({ mode }: CharacterFormProps) {
 
         <label>
           Spellcraft
-          <input
-            type="number"
-            min={0}
-            value={spellcraft}
-            onChange={(e) => setSpellcraft(Number(e.target.value))}
-          />
+          <NumberInput min={0} value={spellcraft} onChange={setSpellcraft} />
         </label>
 
         <div className="school-focus-field">
