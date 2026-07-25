@@ -301,11 +301,26 @@
   min-height: 48px;
   border-radius: 8px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 8px;
   padding: 6px 10px;
-  text-align: center;
+  text-align: left;
+}
+
+.slot-chip-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: currentColor;
+  opacity: 0.85;
+}
+
+.slot-chip-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .slot-chip-empty {
@@ -329,6 +344,9 @@
 .slot-chip-spell {
   font-weight: 600;
   font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .slot-chip-source,
@@ -336,6 +354,9 @@
 .slot-chip-used-label {
   font-size: 11px;
   opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .slot-chip-used-label {
@@ -546,18 +567,21 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 40px 16px;
-  overflow-y: auto;
+  padding: 24px 16px;
 }
 
 .modal {
   background: var(--surface);
   border-radius: 10px;
-  max-width: 520px;
+  max-width: 640px;
   width: 100%;
+  height: min(85vh, 780px);
+  max-height: calc(100vh - 32px);
   padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-themed {
@@ -569,6 +593,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+}
+
+.modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: 8px;
 }
 
 .modal-close {
