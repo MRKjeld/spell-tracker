@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Modal } from '../common/Modal';
+import { ScrollPicker } from '../common/ScrollPicker';
 import type { Modifier } from '../../state/types';
 import { formatModifierValue } from '../../lib/modifiers';
+
+const DICE_COUNTS = Array.from({ length: 40 }, (_, i) => i + 1);
+const DICE_SIDES = [2, 3, 4, 6, 8, 10, 12, 20, 100];
 
 interface AddCalculationModalProps {
   modifiers: Modifier[];
@@ -12,7 +16,8 @@ interface AddCalculationModalProps {
 
 export function AddCalculationModal({ modifiers, onAdd, onRemoveModifier, onClose }: AddCalculationModalProps) {
   const [name, setName] = useState('');
-  const [diceRoll, setDiceRoll] = useState('');
+  const [diceCount, setDiceCount] = useState(1);
+  const [diceSides, setDiceSides] = useState(20);
   const [modifierIds, setModifierIds] = useState<string[]>([]);
 
   function toggleModifier(id: string) {
@@ -22,7 +27,7 @@ export function AddCalculationModal({ modifiers, onAdd, onRemoveModifier, onClos
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd({ name: name.trim(), diceRoll: diceRoll.trim(), modifierIds });
+    onAdd({ name: name.trim(), diceRoll: `${diceCount}d${diceSides}`, modifierIds });
     onClose();
   }
 
@@ -40,38 +45,50 @@ export function AddCalculationModal({ modifiers, onAdd, onRemoveModifier, onClos
           />
         </label>
 
-        <label>
-          Dice Roll
-          <input value={diceRoll} onChange={(e) => setDiceRoll(e.target.value)} placeholder="e.g. 1d20" />
-        </label>
+        <div className="picker-field">
+          <span>Dice Roll</span>
+          <div className="dice-roll-field">
+            <ScrollPicker values={DICE_COUNTS} value={diceCount} onChange={setDiceCount} label="Number of dice" />
+            <span className="dice-roll-separator">d</span>
+            <ScrollPicker values={DICE_SIDES} value={diceSides} onChange={setDiceSides} label="Dice sides" />
+          </div>
+        </div>
 
         <div className="picker-field">
           <span>Modifiers</span>
           {modifiers.length === 0 ? (
             <p className="equipment-empty">No modifiers yet — add one with Add Modifier first.</p>
           ) : (
-            <ul className="picker-checklist">
-              {modifiers.map((modifier) => (
-                <li key={modifier.id}>
-                  <label className="picker-checklist-item">
-                    <input
-                      type="checkbox"
-                      checked={modifierIds.includes(modifier.id)}
-                      onChange={() => toggleModifier(modifier.id)}
-                    />
-                    {modifier.name} ({formatModifierValue(modifier.value)})
-                  </label>
-                  <button
-                    type="button"
-                    className="picker-checklist-remove"
-                    onClick={() => onRemoveModifier(modifier.id)}
-                    title={`Delete ${modifier.name}`}
-                    aria-label={`Delete ${modifier.name}`}
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
+            <ul className="modifier-block-list">
+              {modifiers.map((modifier) => {
+                const isSelected = modifierIds.includes(modifier.id);
+                return (
+                  <li key={modifier.id} className="modifier-block-item">
+                    <button
+                      type="button"
+                      className={`modifier-block${isSelected ? ' modifier-block-selected' : ''}`}
+                      onClick={() => toggleModifier(modifier.id)}
+                      aria-pressed={isSelected}
+                    >
+                      <span className="modifier-block-studs" aria-hidden="true">
+                        <span className="modifier-block-stud" />
+                        <span className="modifier-block-stud" />
+                      </span>
+                      <span className="modifier-block-label">{modifier.name}</span>
+                      <span className="modifier-block-value">{formatModifierValue(modifier.value)}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="picker-checklist-remove"
+                      onClick={() => onRemoveModifier(modifier.id)}
+                      title={`Delete ${modifier.name}`}
+                      aria-label={`Delete ${modifier.name}`}
+                    >
+                      ×
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
