@@ -155,6 +155,11 @@
   gap: 12px;
 }
 
+.bab-badge {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
 .character-sheet-footer {
   position: fixed;
   bottom: 0;

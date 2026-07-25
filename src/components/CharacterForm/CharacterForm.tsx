@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
-import { CASTING_ABILITY, CLASS_IDS, CLASS_LABELS } from '../../data/classes';
+import { CASTING_ABILITY, CLASS_IDS, CLASS_LABELS, isCasterClass } from '../../data/classes';
 import type { AbilityId, ClassId } from '../../data/classes';
 import { SCHOOL_LABELS } from '../../data/spells';
 import { schoolThemeColor, schoolThemeTextColor } from '../../data/schoolThemes';
@@ -42,7 +42,7 @@ export function CharacterForm({ mode }: CharacterFormProps) {
   const [name, setName] = useState(existing?.name ?? '');
   const [classId, setClassId] = useState<ClassId>(existing?.classId ?? 'wizard');
   const [castingAbility, setCastingAbility] = useState<AbilityId>(
-    existing?.castingAbility ?? CASTING_ABILITY[existing?.classId ?? 'wizard'],
+    existing?.castingAbility ?? CASTING_ABILITY[existing?.classId ?? 'wizard'] ?? 'str',
   );
   const [level, setLevel] = useState(existing?.level ?? 1);
   const [abilityScores, setAbilityScores] = useState<Record<AbilityId, number>>(
@@ -58,9 +58,11 @@ export function CharacterForm({ mode }: CharacterFormProps) {
   const [showSpellFocusPicker, setShowSpellFocusPicker] = useState(false);
   const [showGreaterSpellFocusPicker, setShowGreaterSpellFocusPicker] = useState(false);
 
+  const isCaster = isCasterClass(classId);
+
   function handleClassChange(newClassId: ClassId) {
     setClassId(newClassId);
-    setCastingAbility(CASTING_ABILITY[newClassId]);
+    setCastingAbility(CASTING_ABILITY[newClassId] ?? 'str');
   }
 
   function addSpellFocusSchool(school: string) {
@@ -116,7 +118,7 @@ export function CharacterForm({ mode }: CharacterFormProps) {
 
         <div className="form-row">
           <label>
-            Spell Casting Class
+            Class
             <select value={classId} onChange={(e) => handleClassChange(e.target.value as ClassId)}>
               {CLASS_IDS.map((id) => (
                 <option key={id} value={id}>
@@ -126,16 +128,18 @@ export function CharacterForm({ mode }: CharacterFormProps) {
             </select>
           </label>
 
-          <label>
-            Caster Modifier
-            <select value={castingAbility} onChange={(e) => setCastingAbility(e.target.value as AbilityId)}>
-              {CASTING_ABILITIES.map(({ id, label }) => (
-                <option key={id} value={id}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
+          {isCaster && (
+            <label>
+              Caster Modifier
+              <select value={castingAbility} onChange={(e) => setCastingAbility(e.target.value as AbilityId)}>
+                {CASTING_ABILITIES.map(({ id, label }) => (
+                  <option key={id} value={id}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
 
         <label>
@@ -158,96 +162,100 @@ export function CharacterForm({ mode }: CharacterFormProps) {
           ))}
         </fieldset>
 
-        <label>
-          Spellcraft
-          <NumberInput min={0} value={spellcraft} onChange={setSpellcraft} />
-        </label>
+        {isCaster && (
+          <>
+            <label>
+              Spellcraft
+              <NumberInput min={0} value={spellcraft} onChange={setSpellcraft} />
+            </label>
 
-        <div className="school-focus-field">
-          <div className="school-focus-header">
-            <span>Spell Focus</span>
-            {spellFocusSchools.length < FOCUSABLE_SCHOOLS.length && (
-              <button type="button" onClick={() => setShowSpellFocusPicker((v) => !v)}>
-                + Add
-              </button>
-            )}
-          </div>
-          {showSpellFocusPicker && (
-            <ul className="school-focus-options">
-              {FOCUSABLE_SCHOOLS.filter((s) => !spellFocusSchools.includes(s)).map((s) => (
-                <li key={s}>
-                  <button
-                    type="button"
-                    onClick={() => addSpellFocusSchool(s)}
-                    style={{ '--school-color': schoolThemeColor(s) } as CSSProperties}
-                  >
-                    {SCHOOL_LABELS[s]}
+            <div className="school-focus-field">
+              <div className="school-focus-header">
+                <span>Spell Focus</span>
+                {spellFocusSchools.length < FOCUSABLE_SCHOOLS.length && (
+                  <button type="button" onClick={() => setShowSpellFocusPicker((v) => !v)}>
+                    + Add
                   </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {spellFocusSchools.length > 0 && (
-            <ul className="school-focus-list">
-              {spellFocusSchools.map((s) => (
-                <li key={s}>
-                  <button
-                    type="button"
-                    className="school-focus-tag"
-                    onClick={() => removeSpellFocusSchool(s)}
-                    title={`Remove ${SCHOOL_LABELS[s]}`}
-                    style={{ backgroundColor: schoolThemeColor(s), color: schoolThemeTextColor(s) }}
-                  >
-                    {SCHOOL_LABELS[s]} ×
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                )}
+              </div>
+              {showSpellFocusPicker && (
+                <ul className="school-focus-options">
+                  {FOCUSABLE_SCHOOLS.filter((s) => !spellFocusSchools.includes(s)).map((s) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        onClick={() => addSpellFocusSchool(s)}
+                        style={{ '--school-color': schoolThemeColor(s) } as CSSProperties}
+                      >
+                        {SCHOOL_LABELS[s]}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {spellFocusSchools.length > 0 && (
+                <ul className="school-focus-list">
+                  {spellFocusSchools.map((s) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        className="school-focus-tag"
+                        onClick={() => removeSpellFocusSchool(s)}
+                        title={`Remove ${SCHOOL_LABELS[s]}`}
+                        style={{ backgroundColor: schoolThemeColor(s), color: schoolThemeTextColor(s) }}
+                      >
+                        {SCHOOL_LABELS[s]} ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
-        <div className="school-focus-field">
-          <div className="school-focus-header">
-            <span>Greater Spell Focus</span>
-            {greaterSpellFocusSchools.length < FOCUSABLE_SCHOOLS.length && (
-              <button type="button" onClick={() => setShowGreaterSpellFocusPicker((v) => !v)}>
-                + Add
-              </button>
-            )}
-          </div>
-          {showGreaterSpellFocusPicker && (
-            <ul className="school-focus-options">
-              {FOCUSABLE_SCHOOLS.filter((s) => !greaterSpellFocusSchools.includes(s)).map((s) => (
-                <li key={s}>
-                  <button
-                    type="button"
-                    onClick={() => addGreaterSpellFocusSchool(s)}
-                    style={{ '--school-color': schoolThemeColor(s) } as CSSProperties}
-                  >
-                    {SCHOOL_LABELS[s]}
+            <div className="school-focus-field">
+              <div className="school-focus-header">
+                <span>Greater Spell Focus</span>
+                {greaterSpellFocusSchools.length < FOCUSABLE_SCHOOLS.length && (
+                  <button type="button" onClick={() => setShowGreaterSpellFocusPicker((v) => !v)}>
+                    + Add
                   </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {greaterSpellFocusSchools.length > 0 && (
-            <ul className="school-focus-list">
-              {greaterSpellFocusSchools.map((s) => (
-                <li key={s}>
-                  <button
-                    type="button"
-                    className="school-focus-tag"
-                    onClick={() => removeGreaterSpellFocusSchool(s)}
-                    title={`Remove ${SCHOOL_LABELS[s]}`}
-                    style={{ backgroundColor: schoolThemeColor(s), color: schoolThemeTextColor(s) }}
-                  >
-                    {SCHOOL_LABELS[s]} ×
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                )}
+              </div>
+              {showGreaterSpellFocusPicker && (
+                <ul className="school-focus-options">
+                  {FOCUSABLE_SCHOOLS.filter((s) => !greaterSpellFocusSchools.includes(s)).map((s) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        onClick={() => addGreaterSpellFocusSchool(s)}
+                        style={{ '--school-color': schoolThemeColor(s) } as CSSProperties}
+                      >
+                        {SCHOOL_LABELS[s]}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {greaterSpellFocusSchools.length > 0 && (
+                <ul className="school-focus-list">
+                  {greaterSpellFocusSchools.map((s) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        className="school-focus-tag"
+                        onClick={() => removeGreaterSpellFocusSchool(s)}
+                        title={`Remove ${SCHOOL_LABELS[s]}`}
+                        style={{ backgroundColor: schoolThemeColor(s), color: schoolThemeTextColor(s) }}
+                      >
+                        {SCHOOL_LABELS[s]} ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
 
         <div className="form-actions">
           <button type="submit" className="button-primary">

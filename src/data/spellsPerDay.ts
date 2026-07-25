@@ -9,7 +9,7 @@ import type { ClassId } from './classes';
 // here -- it isn't a class-table slot count, it's modeled by the player
 // adding a named "Domain" extra slot pool via the app's own Add Spell
 // feature, same as any other bonus-slot source (e.g. Drow innate casting).
-export const SPELLS_PER_DAY: Record<ClassId, number[][]> = {
+export const SPELLS_PER_DAY: Partial<Record<ClassId, number[][]>> = {
   wizard: [
     [3, 1, 0, 0, 0, 0, 0, 0, 0, 0],
     [4, 2, 0, 0, 0, 0, 0, 0, 0, 0],

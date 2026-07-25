@@ -59,6 +59,7 @@ export async function parseImportFile(file: File): Promise<Character[]> {
     extraSlotPools: c.extraSlotPools ?? [],
     slotFills: c.slotFills ?? {},
     items: c.items ?? [],
+    learnedSpells: c.learnedSpells ?? [],
     createdAt: c.createdAt ?? now,
     updatedAt: now,
   }));

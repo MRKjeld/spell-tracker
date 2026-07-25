@@ -1,4 +1,5 @@
 import type { AbilityId } from '../data/classes';
+import { computeBAB } from '../data/classes';
 import { abilityModifier } from '../data/bonusSpells';
 import type { Character, Modifier } from '../state/types';
 
@@ -23,7 +24,7 @@ export function isSystemModifierId(id: string): boolean {
  * can't be created, edited, or removed, and stay in sync automatically as
  * the sheet changes.
  */
-export function getSystemModifiers(character: Pick<Character, 'level' | 'abilityScores'>): Modifier[] {
+export function getSystemModifiers(character: Pick<Character, 'level' | 'abilityScores' | 'classId'>): Modifier[] {
   const abilityMods = (Object.keys(ABILITY_MOD_LABELS) as AbilityId[]).map((abilityId) => ({
     id: `${SYSTEM_MODIFIER_PREFIX}${abilityId}-mod`,
     name: ABILITY_MOD_LABELS[abilityId],
@@ -33,6 +34,7 @@ export function getSystemModifiers(character: Pick<Character, 'level' | 'ability
   return [
     { id: `${SYSTEM_MODIFIER_PREFIX}level`, name: 'Level', value: character.level },
     { id: `${SYSTEM_MODIFIER_PREFIX}class-level`, name: 'Class Level', value: character.level },
+    { id: `${SYSTEM_MODIFIER_PREFIX}bab`, name: 'BAB', value: computeBAB(character.classId, character.level) },
     ...abilityMods,
   ];
 }

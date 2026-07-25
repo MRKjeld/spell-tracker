@@ -37,7 +37,7 @@ export function SpellViewModal({
   if (spell && hasSavingThrow(spell.savingThrow)) {
     const effectiveClassId = sourceClassId ?? character.classId;
     const effectiveSpellLevel = slotSpellLevel ?? spell.levels[effectiveClassId] ?? 0;
-    const castingAbility: AbilityId = character.castingAbility ?? CASTING_ABILITY[character.classId];
+    const castingAbility: AbilityId = character.castingAbility ?? CASTING_ABILITY[character.classId] ?? 'str';
     const castingAbilityModifier = abilityModifier(character.abilityScores[castingAbility]);
     const hasSpellFocus = character.spellFocusSchools.includes(spell.school);
     const hasGreaterSpellFocus = character.greaterSpellFocusSchools.includes(spell.school);

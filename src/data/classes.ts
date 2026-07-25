@@ -27,33 +27,57 @@ export type ClassId =
   | 'shaman'
   | 'skald'
   | 'spiritualist'
-  | 'warpriest';
+  | 'warpriest'
+  // Non-spellcasting (or purely martial) classes -- these have a Base Attack
+  // Bonus progression like every other class (see BAB_PROGRESSION) but no
+  // entry in any of the spellcasting-only tables below (CASTING_ABILITY,
+  // CASTING_TYPE, CASTER_TYPE, MAX_SPELL_LEVEL, START_LEVEL, SPELLS_PER_DAY).
+  | 'barbarian'
+  | 'brawler'
+  | 'cavalier'
+  | 'fighter'
+  | 'gunslinger'
+  | 'monk'
+  | 'ninja'
+  | 'rogue'
+  | 'samurai'
+  | 'swashbuckler';
 
 export const CLASS_IDS: ClassId[] = [
   'adept',
   'alchemist',
   'antipaladin',
   'arcanist',
+  'barbarian',
   'bard',
   'bloodrager',
+  'brawler',
+  'cavalier',
   'cleric',
   'druid',
+  'fighter',
+  'gunslinger',
   'hunter',
   'inquisitor',
   'investigator',
   'magus',
   'medium',
   'mesmerist',
+  'monk',
+  'ninja',
   'occultist',
   'oracle',
   'paladin',
   'psychic',
   'ranger',
+  'rogue',
+  'samurai',
   'shaman',
   'skald',
   'sorcerer',
   'spiritualist',
   'summoner',
+  'swashbuckler',
   'warpriest',
   'witch',
   'wizard',
@@ -87,11 +111,24 @@ export const CLASS_LABELS: Record<ClassId, string> = {
   skald: 'Skald',
   spiritualist: 'Spiritualist',
   warpriest: 'Warpriest',
+  barbarian: 'Barbarian',
+  brawler: 'Brawler',
+  cavalier: 'Cavalier',
+  fighter: 'Fighter',
+  gunslinger: 'Gunslinger',
+  monk: 'Monk',
+  ninja: 'Ninja',
+  rogue: 'Rogue',
+  samurai: 'Samurai',
+  swashbuckler: 'Swashbuckler',
 };
 
 // Default casting ability per class. A character's actual casting ability
-// (Character.castingAbility) defaults to this but can be overridden.
-export const CASTING_ABILITY: Record<ClassId, AbilityId> = {
+// (Character.castingAbility) defaults to this but can be overridden. Absent
+// for non-caster classes -- fall back to a placeholder ability when reading
+// (see e.g. CharacterForm's handleClassChange) since it's never surfaced in
+// the UI for those classes.
+export const CASTING_ABILITY: Partial<Record<ClassId, AbilityId>> = {
   wizard: 'int',
   cleric: 'wis',
   druid: 'wis',
@@ -123,7 +160,9 @@ export const CASTING_ABILITY: Record<ClassId, AbilityId> = {
 
 export type CastingType = 'prepared' | 'spontaneous';
 
-export const CASTING_TYPE: Record<ClassId, CastingType> = {
+// Present only for classes that cast spells at all -- CASTER_CLASS_IDS is
+// derived from this map's keys, and isCasterClass() checks membership in it.
+export const CASTING_TYPE: Partial<Record<ClassId, CastingType>> = {
   wizard: 'prepared',
   cleric: 'prepared',
   druid: 'prepared',
@@ -154,7 +193,7 @@ export const CASTING_TYPE: Record<ClassId, CastingType> = {
 };
 
 // Highest spell level (0-9) this class's table ever reaches.
-export const MAX_SPELL_LEVEL: Record<ClassId, number> = {
+export const MAX_SPELL_LEVEL: Partial<Record<ClassId, number>> = {
   wizard: 9,
   cleric: 9,
   druid: 9,
@@ -217,7 +256,7 @@ export const CANTRIPS_AT_WILL: Partial<Record<ClassId, true>> = {
 // one level earlier than the Spells Per Day table's first non-zero base
 // allotment -- a bonus spell from a high ability score can apply starting
 // that earlier level even though the base table entry is still 0.
-export const START_LEVEL: Record<ClassId, number> = {
+export const START_LEVEL: Partial<Record<ClassId, number>> = {
   wizard: 1,
   cleric: 1,
   druid: 1,
@@ -246,3 +285,121 @@ export const START_LEVEL: Record<ClassId, number> = {
   spiritualist: 1,
   warpriest: 1,
 };
+
+// Any class with a CASTING_TYPE entry casts spells; every non-caster class
+// (Barbarian, Fighter, Monk, ...) simply has no entry there at all.
+export function isCasterClass(classId: ClassId): boolean {
+  return classId in CASTING_TYPE;
+}
+
+// Classes with any spellcasting at all -- a subset of CLASS_IDS. Use this
+// (rather than CLASS_IDS) anywhere non-casters would just add noise, e.g. a
+// spell-list browser's class filter.
+export const CASTER_CLASS_IDS: ClassId[] = CLASS_IDS.filter(isCasterClass);
+
+// Divine casters prepare each day directly from their entire class spell
+// list -- there's nothing to "learn" first, so the app's Spell Picker already
+// models this correctly by letting any class-list spell fill any slot.
+// Arcane casters (and every "psychic magic" class from the Advanced Class
+// Guide -- Medium/Mesmerist/Occultist/Psychic/Spiritualist -- which behaves
+// the same way here even though it's technically neither arcane nor divine)
+// instead draw from a personal list of spells they've learned (a spellbook,
+// a formula book, or a fixed "spells known" table) and can only prepare/cast
+// from that learned subset -- modeled by the "Learn" button and
+// Character.learnedSpells. Classified from each class's own AoN description
+// text via scripts/scrape-aon-bab.mjs's casterFlavor detector, with two
+// corrections applied by hand: Alchemist/Investigator's page matches
+// "divine spell" only incidentally (a rules aside about extracts having no
+// divine focus requirement, not a description of their own casting) -- their
+// extracts work exactly like a Wizard's spellbook, so they're arcane here.
+export type CasterType = 'divine' | 'arcane';
+
+export const CASTER_TYPE: Partial<Record<ClassId, CasterType>> = {
+  cleric: 'divine',
+  druid: 'divine',
+  paladin: 'divine',
+  ranger: 'divine',
+  antipaladin: 'divine',
+  adept: 'divine',
+  shaman: 'divine',
+  warpriest: 'divine',
+  wizard: 'arcane',
+  sorcerer: 'arcane',
+  bard: 'arcane',
+  inquisitor: 'arcane',
+  magus: 'arcane',
+  oracle: 'arcane',
+  summoner: 'arcane',
+  witch: 'arcane',
+  alchemist: 'arcane',
+  arcanist: 'arcane',
+  bloodrager: 'arcane',
+  hunter: 'arcane',
+  investigator: 'arcane',
+  medium: 'arcane',
+  mesmerist: 'arcane',
+  occultist: 'arcane',
+  psychic: 'arcane',
+  skald: 'arcane',
+  spiritualist: 'arcane',
+};
+
+// Base Attack Bonus progression -- every class has one, caster or not.
+// 'full' = BAB equals level; 'threeQuarter' (aka "medium", e.g. Monk, Cleric)
+// = floor(level * 3/4); 'half' (aka "poor", e.g. Wizard, Sorcerer) =
+// floor(level / 2). Verified for all 37 classes against each class's own AoN
+// table via scripts/scrape-aon-bab.mjs, which parses the actual "Base Attack
+// Bonus" column at every level 1-20 and cross-checks it against the formula
+// rather than trusting a single data point.
+export type BabProgression = 'full' | 'threeQuarter' | 'half';
+
+export const BAB_PROGRESSION: Record<ClassId, BabProgression> = {
+  barbarian: 'full',
+  cavalier: 'full',
+  fighter: 'full',
+  gunslinger: 'full',
+  paladin: 'full',
+  ranger: 'full',
+  samurai: 'full',
+  antipaladin: 'full',
+  bloodrager: 'full',
+  brawler: 'full',
+  swashbuckler: 'full',
+  alchemist: 'threeQuarter',
+  bard: 'threeQuarter',
+  cleric: 'threeQuarter',
+  druid: 'threeQuarter',
+  hunter: 'threeQuarter',
+  investigator: 'threeQuarter',
+  magus: 'threeQuarter',
+  medium: 'threeQuarter',
+  mesmerist: 'threeQuarter',
+  monk: 'threeQuarter',
+  ninja: 'threeQuarter',
+  occultist: 'threeQuarter',
+  oracle: 'threeQuarter',
+  rogue: 'threeQuarter',
+  shaman: 'threeQuarter',
+  skald: 'threeQuarter',
+  spiritualist: 'threeQuarter',
+  summoner: 'threeQuarter',
+  warpriest: 'threeQuarter',
+  inquisitor: 'threeQuarter',
+  adept: 'half',
+  arcanist: 'half',
+  psychic: 'half',
+  sorcerer: 'half',
+  witch: 'half',
+  wizard: 'half',
+};
+
+export function computeBAB(classId: ClassId, level: number): number {
+  switch (BAB_PROGRESSION[classId]) {
+    case 'full':
+      return level;
+    case 'threeQuarter':
+      return Math.floor((level * 3) / 4);
+    case 'half':
+      return Math.floor(level / 2);
+  }
+}

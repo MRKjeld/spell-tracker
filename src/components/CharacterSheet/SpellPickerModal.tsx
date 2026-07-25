@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
-import { CLASS_IDS, CLASS_LABELS } from '../../data/classes';
+import { CASTER_CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { getAllSpellsFor, getSpellsFor, searchSpells, spellMatchesQuery } from '../../data/spells';
 import type { SpellEntry } from '../../data/spells';
@@ -10,6 +10,11 @@ interface SpellPickerModalProps {
   defaultClassId: ClassId;
   spellLevel: number | null;
   poolName?: string;
+  // When set, only these spell ids are selectable -- used to restrict an
+  // Arcane-type caster's slot fill to spells they've actually Learned (see
+  // CASTER_TYPE in data/classes.ts). Omitted entirely for Divine casters,
+  // who prepare freely from their full class list.
+  restrictToSpellIds?: string[];
   onPick: (spellId: string, spellName: string, sourceClassId: ClassId | null) => void;
   onClose: () => void;
 }
@@ -20,7 +25,14 @@ function levelLabelFor(spell: SpellEntry, activeTab: ClassId | 'all', defaultCla
   return level !== undefined ? `Lvl ${level}` : '';
 }
 
-export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick, onClose }: SpellPickerModalProps) {
+export function SpellPickerModal({
+  defaultClassId,
+  spellLevel,
+  poolName,
+  restrictToSpellIds,
+  onPick,
+  onClose,
+}: SpellPickerModalProps) {
   const [activeTab, setActiveTab] = useState<ClassId | 'all'>(spellLevel === null ? 'all' : defaultClassId);
   const [query, setQuery] = useState('');
   const [searchDescriptions, setSearchDescriptions] = useState(false);
@@ -28,16 +40,20 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const spells = useMemo(() => {
-    if (activeTab === 'all') {
-      return searchSpells(query, spellLevel ?? undefined, searchDescriptions);
-    }
-    const list = spellLevel === null ? getAllSpellsFor(activeTab) : getSpellsFor(activeTab, spellLevel);
-    if (!query.trim()) return list;
-    const normalized = query.trim().toLowerCase();
-    return list.filter((s) => spellMatchesQuery(s, normalized, searchDescriptions));
-  }, [activeTab, query, spellLevel, searchDescriptions]);
+    const list =
+      activeTab === 'all'
+        ? searchSpells(query, spellLevel ?? undefined, searchDescriptions)
+        : (() => {
+            const classList = spellLevel === null ? getAllSpellsFor(activeTab) : getSpellsFor(activeTab, spellLevel);
+            if (!query.trim()) return classList;
+            const normalized = query.trim().toLowerCase();
+            return classList.filter((s) => spellMatchesQuery(s, normalized, searchDescriptions));
+          })();
+    return restrictToSpellIds ? list.filter((s) => restrictToSpellIds.includes(s.id)) : list;
+  }, [activeTab, query, spellLevel, searchDescriptions, restrictToSpellIds]);
 
-  const title = spellLevel !== null ? `Fill Slot — Level ${spellLevel}` : `Fill Slot — ${poolName ?? 'No Level'}`;
+  const titlePrefix = restrictToSpellIds ? 'Prepare' : 'Fill Slot';
+  const title = spellLevel !== null ? `${titlePrefix} — Level ${spellLevel}` : `${titlePrefix} — ${poolName ?? 'No Level'}`;
 
   function toggleExpanded(spellId: string) {
     setExpandedIds((prev) => {
@@ -85,7 +101,7 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
           onChange={(e) => setActiveTab(e.target.value as ClassId | 'all')}
         >
           <option value="all">All Classes</option>
-          {CLASS_IDS.map((id) => (
+          {CASTER_CLASS_IDS.map((id) => (
             <option key={id} value={id}>
               {CLASS_LABELS[id]}
             </option>
@@ -94,7 +110,11 @@ export function SpellPickerModal({ defaultClassId, spellLevel, poolName, onPick,
       </label>
 
       <ul className="spell-picker-list">
-        {spells.length === 0 && <li className="spell-picker-empty">No spells found.</li>}
+        {spells.length === 0 && (
+          <li className="spell-picker-empty">
+            {restrictToSpellIds ? 'No known spells match — try Learn first.' : 'No spells found.'}
+          </li>
+        )}
         {spells.map((spell) => {
           const expanded = expandedIds.has(spell.id);
           return (

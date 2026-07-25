@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getBaseSlots, getBonusSlots, computeSlots, pruneOrphanedFills } from './slotMath';
-import { CLASS_IDS, MAX_SPELL_LEVEL, START_LEVEL } from '../data/classes';
+import { CASTER_CLASS_IDS, MAX_SPELL_LEVEL, START_LEVEL } from '../data/classes';
 
 const NEUTRAL_SCORES = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
 
@@ -121,7 +121,9 @@ describe('computeSlots', () => {
   });
 
   it('invariant sweep: base counts are monotonic non-decreasing per spell level as character level increases, and respect MAX_SPELL_LEVEL / START_LEVEL', () => {
-    for (const classId of CLASS_IDS) {
+    for (const classId of CASTER_CLASS_IDS) {
+      const maxSpellLevel = MAX_SPELL_LEVEL[classId]!;
+      const startLevel = START_LEVEL[classId]!;
       let prevRow = new Array(10).fill(0);
       for (let level = 1; level <= 20; level++) {
         const row = getBaseSlots(classId, level);
@@ -130,15 +132,21 @@ describe('computeSlots', () => {
         for (let spellLevel = 0; spellLevel < 10; spellLevel++) {
           expect(row[spellLevel]).toBeGreaterThanOrEqual(prevRow[spellLevel]);
 
-          if (spellLevel > MAX_SPELL_LEVEL[classId]) {
+          if (spellLevel > maxSpellLevel) {
             expect(row[spellLevel]).toBe(0);
           }
-          if (level < START_LEVEL[classId]) {
+          if (level < startLevel) {
             expect(row[spellLevel]).toBe(0);
           }
         }
         prevRow = row;
       }
+    }
+  });
+
+  it('non-caster classes have no spell slots at any level', () => {
+    for (const classId of ['barbarian', 'fighter', 'monk', 'rogue', 'cavalier', 'gunslinger', 'ninja', 'samurai', 'brawler', 'swashbuckler'] as const) {
+      expect(getBaseSlots(classId, 20)).toEqual(new Array(10).fill(0));
     }
   });
 });

@@ -1,17 +1,18 @@
 import type { AbilityId, ClassId } from '../data/classes';
-import { START_LEVEL } from '../data/classes';
+import { isCasterClass, START_LEVEL } from '../data/classes';
 import { SPELLS_PER_DAY } from '../data/spellsPerDay';
 import { abilityModifier, bonusSpellsForLevel } from '../data/bonusSpells';
 import type { ExtraSlotPool } from '../state/types';
 import type { PoolColorId } from '../data/poolColors';
 
 const SPELL_LEVEL_COUNT = 10; // spell levels 0-9
+const NO_SLOTS = new Array(SPELL_LEVEL_COUNT).fill(0);
 
 export function getBaseSlots(classId: ClassId, level: number): number[] {
-  if (level < START_LEVEL[classId]) {
-    return new Array(SPELL_LEVEL_COUNT).fill(0);
+  if (!isCasterClass(classId) || level < START_LEVEL[classId]!) {
+    return NO_SLOTS;
   }
-  const table = SPELLS_PER_DAY[classId];
+  const table = SPELLS_PER_DAY[classId]!;
   const row = table[level - 1];
   if (!row) {
     throw new Error(`No spells-per-day row for ${classId} at level ${level}`);

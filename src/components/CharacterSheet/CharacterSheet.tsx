@@ -1,9 +1,18 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
-import { CANTRIPS_AT_WILL, CASTING_ABILITY, CLASS_LABELS } from '../../data/classes';
+import {
+  CANTRIPS_AT_WILL,
+  CASTER_TYPE,
+  CASTING_ABILITY,
+  CLASS_LABELS,
+  computeBAB,
+  isCasterClass,
+} from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { computeSlots } from '../../lib/slotMath';
+import { formatModifier } from '../../lib/casterStats';
+import { getSpellById } from '../../data/spells';
 import type { Item, SlotFill } from '../../state/types';
 import type { BodySlotId } from '../../data/bodySlots';
 import { SlotGrid } from './SlotGrid';
@@ -11,6 +20,7 @@ import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
 import { SpellViewModal } from './SpellViewModal';
 import { CasterStatsModal } from './CasterStatsModal';
+import { KnownSpellsSection } from './KnownSpellsSection';
 import { AddItemModal } from './AddItemModal';
 import { ItemPickerModal } from './ItemPickerModal';
 import { ItemViewModal } from './ItemViewModal';
@@ -57,14 +67,20 @@ export function CharacterSheet() {
   const removeCalculation = useCharacterStore((s) => s.removeCalculation);
   const addAction = useCharacterStore((s) => s.addAction);
   const removeAction = useCharacterStore((s) => s.removeAction);
+  const learnSpell = useCharacterStore((s) => s.learnSpell);
+  const unlearnSpell = useCharacterStore((s) => s.unlearnSpell);
 
-  const [activeTab, setActiveTab] = useState<'actions' | 'spells' | 'items'>('spells');
+  const isCaster = character ? isCasterClass(character.classId) : false;
+  const casterType = character ? CASTER_TYPE[character.classId] : undefined;
+
+  const [activeTab, setActiveTab] = useState<'actions' | 'spells' | 'items'>(isCaster ? 'spells' : 'actions');
   const [showAddPool, setShowAddPool] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [showItemPicker, setShowItemPicker] = useState(false);
   const [showAddModifier, setShowAddModifier] = useState(false);
   const [showAddCalculation, setShowAddCalculation] = useState(false);
   const [showAddAction, setShowAddAction] = useState(false);
+  const [showLearnPicker, setShowLearnPicker] = useState(false);
   const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
   const [slotPickerTarget, setSlotPickerTarget] = useState<BodySlotId | null>(null);
   const [equippedSlotViewTarget, setEquippedSlotViewTarget] = useState<BodySlotId | null>(null);
@@ -147,6 +163,14 @@ export function CharacterSheet() {
       });
     }
     setPickerTarget(null);
+  }
+
+  function handleLearn(spellId: string, spellName: string, sourceClassId: ClassId | null) {
+    const spell = getSpellById(spellId);
+    const effectiveClassId = sourceClassId ?? character!.classId;
+    const spellLevel = spell?.levels[effectiveClassId] ?? 0;
+    learnSpell(character!.id, { spellId, spellName, spellLevel, sourceClassId });
+    setShowLearnPicker(false);
   }
 
   function handleRest() {
@@ -264,9 +288,16 @@ export function CharacterSheet() {
       <div className="character-sheet-header">
         <div>
           <h1>{character.name}</h1>
-          <button type="button" className="class-level-trigger" onClick={() => setShowCasterStats(true)}>
-            {CLASS_LABELS[character.classId]} {character.level}
-          </button>
+          {isCaster ? (
+            <button type="button" className="class-level-trigger" onClick={() => setShowCasterStats(true)}>
+              {CLASS_LABELS[character.classId]} {character.level}
+            </button>
+          ) : (
+            <span>
+              {CLASS_LABELS[character.classId]} {character.level}
+            </span>
+          )}
+          <span className="bab-badge"> · BAB {formatModifier(computeBAB(character.classId, character.level))}</span>
         </div>
         <div className="character-sheet-header-actions">
           <Link to={`/${character.id}/edit`}>Edit Character</Link>
@@ -284,15 +315,17 @@ export function CharacterSheet() {
         >
           Actions
         </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'spells'}
-          className={`character-sheet-tab${activeTab === 'spells' ? ' character-sheet-tab-active' : ''}`}
-          onClick={() => setActiveTab('spells')}
-        >
-          Spells
-        </button>
+        {isCaster && (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'spells'}
+            className={`character-sheet-tab${activeTab === 'spells' ? ' character-sheet-tab-active' : ''}`}
+            onClick={() => setActiveTab('spells')}
+          >
+            Spells
+          </button>
+        )}
         <button
           type="button"
           role="tab"
@@ -324,9 +357,23 @@ export function CharacterSheet() {
             </p>
           )}
 
-          <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
-            + Spell
-          </button>
+          <div className="actions-toolbar">
+            <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
+              + Spell
+            </button>
+            {casterType === 'arcane' && (
+              <button type="button" onClick={() => setShowLearnPicker(true)}>
+                + Learn
+              </button>
+            )}
+          </div>
+
+          {casterType === 'arcane' && (
+            <KnownSpellsSection
+              learnedSpells={character.learnedSpells}
+              onUnlearn={(learnedSpellId) => unlearnSpell(character.id, learnedSpellId)}
+            />
+          )}
 
           <SlotGrid
             character={character}
@@ -377,9 +424,20 @@ export function CharacterSheet() {
           defaultClassId={character.classId}
           spellLevel={pickerTarget.spellLevel}
           poolName={pickerTarget.poolName}
+          restrictToSpellIds={
+            casterType === 'arcane'
+              ? character.learnedSpells
+                  .filter((s) => pickerTarget.spellLevel === null || s.spellLevel === pickerTarget.spellLevel)
+                  .map((s) => s.spellId)
+              : undefined
+          }
           onPick={handlePick}
           onClose={() => setPickerTarget(null)}
         />
+      )}
+
+      {showLearnPicker && (
+        <SpellPickerModal defaultClassId={character.classId} spellLevel={null} onPick={handleLearn} onClose={() => setShowLearnPicker(false)} />
       )}
 
       {viewTarget && (

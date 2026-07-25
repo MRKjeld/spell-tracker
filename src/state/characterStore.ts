@@ -4,6 +4,7 @@ import { createId } from '../lib/id';
 import { computeSlots, pruneOrphanedFills } from '../lib/slotMath';
 import { defaultUsesRemaining, recoverItemsOnRest } from '../lib/itemRecovery';
 import { CASTING_ABILITY } from '../data/classes';
+import type { ClassId } from '../data/classes';
 import { getWondrousItemById } from '../data/wondrousItems';
 import type { WondrousItemEntry } from '../data/wondrousItems';
 import type { BodySlotId } from '../data/bodySlots';
@@ -15,6 +16,7 @@ import type {
   ExtraSlotPool,
   Item,
   ItemUsePeriod,
+  LearnedSpell,
   Modifier,
   NewCharacterInput,
   SlotFill,
@@ -131,6 +133,11 @@ interface CharacterStoreState {
   addBaseArmorItem(charId: string, item: { itemId: string; itemName: string }): void;
   equipItem(charId: string, itemId: string, slot: BodySlotId): void;
   unequipItem(charId: string, itemId: string): void;
+  learnSpell(
+    charId: string,
+    spell: { spellId: string; spellName: string; spellLevel: number; sourceClassId: ClassId | null },
+  ): void;
+  unlearnSpell(charId: string, learnedSpellId: string): void;
   addModifier(charId: string, modifier: { name: string; value: number }): void;
   removeModifier(charId: string, modifierId: string): void;
   addCalculation(charId: string, calculation: { name: string; diceRoll: string; modifierIds: string[] }): void;
@@ -162,7 +169,7 @@ function backfillDefaults(character: Character): Character {
   }));
   return {
     ...rest,
-    castingAbility: rest.castingAbility ?? CASTING_ABILITY[rest.classId],
+    castingAbility: rest.castingAbility ?? CASTING_ABILITY[rest.classId] ?? 'str',
     spellcraft: rest.spellcraft ?? 0,
     spellFocusSchools: rest.spellFocusSchools ?? [],
     greaterSpellFocusSchools: rest.greaterSpellFocusSchools ?? [],
@@ -170,6 +177,7 @@ function backfillDefaults(character: Character): Character {
     modifiers: rest.modifiers ?? [],
     calculations: rest.calculations ?? [],
     actions: rest.actions ?? [],
+    learnedSpells: rest.learnedSpells ?? [],
   };
 }
 
@@ -203,7 +211,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           classId: input.classId,
           level: input.level,
           abilityScores: input.abilityScores,
-          castingAbility: input.castingAbility ?? CASTING_ABILITY[input.classId],
+          castingAbility: input.castingAbility ?? CASTING_ABILITY[input.classId] ?? 'str',
           spellcraft: input.spellcraft,
           spellFocusSchools: input.spellFocusSchools,
           greaterSpellFocusSchools: input.greaterSpellFocusSchools,
@@ -213,6 +221,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           modifiers: [],
           calculations: [],
           actions: [],
+          learnedSpells: [],
           createdAt: now,
           updatedAt: now,
         };
@@ -504,6 +513,31 @@ export const useCharacterStore = create<CharacterStoreState>()(
           if (!existing) return state;
           const items = (existing.items ?? []).map((i) => (i.id === itemId ? { ...i, equippedSlot: null } : i));
           const updated = touch({ ...existing, items });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      learnSpell(charId, spell) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newLearnedSpell: LearnedSpell = { ...spell, id: createId() };
+          const updated = touch({
+            ...existing,
+            learnedSpells: [...(existing.learnedSpells ?? []), newLearnedSpell],
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      unlearnSpell(charId, learnedSpellId) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const updated = touch({
+            ...existing,
+            learnedSpells: (existing.learnedSpells ?? []).filter((s) => s.id !== learnedSpellId),
+          });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

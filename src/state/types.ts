@@ -27,6 +27,20 @@ export interface SpellSelection {
   sourceClassId: ClassId | null;
 }
 
+// A spell an Arcane-type caster (see CASTER_TYPE in data/classes.ts) has
+// added to their personal spellbook/formula book/known-spells list via the
+// "Learn" button. Divine casters have no equivalent -- they prepare directly
+// from their full class list, so nothing needs to be learned first. Slots
+// can only be filled from a class's learnedSpells at the matching spellLevel
+// (see SpellPickerModal's restrictToSpellIds).
+export interface LearnedSpell {
+  id: string;
+  spellId: string;
+  spellName: string;
+  spellLevel: number;
+  sourceClassId: ClassId | null;
+}
+
 // How an item's uses/charges recover. 'rest' and 'day' both recover whenever
 // the character rests (this tracker only has one rest action); 'week' and
 // 'month' recover automatically once real-world time has elapsed; 'manual'
@@ -93,6 +107,7 @@ export interface Character {
   greaterSpellFocusSchools: string[]; // subset of spellFocusSchools, each at most once
   extraSlotPools: ExtraSlotPool[];
   slotFills: Record<string, SlotFill>; // keyed by deterministic slot-instance id
+  learnedSpells: LearnedSpell[]; // Arcane-type casters only (see CASTER_TYPE); always [] for Divine/non-casters
   items: Item[]; // Equipment segment; every owned item, worn or not; persists through rest (see restCharacter)
   modifiers: Modifier[]; // Actions tab: reusable named bonuses
   calculations: Calculation[]; // Actions tab: dice rolls built from modifiers
