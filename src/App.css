@@ -381,8 +381,6 @@
   font-weight: 600;
   font-size: 13px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .slot-chip-source,
