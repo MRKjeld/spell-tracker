@@ -23,6 +23,7 @@ import { AddModifierModal } from './AddModifierModal';
 import { AddCalculationModal } from './AddCalculationModal';
 import { AddActionModal } from './AddActionModal';
 import { getBaseArmorCategoriesForSlot } from '../../data/baseArmor';
+import { getSystemModifiers, isSystemModifierId } from '../../lib/systemModifiers';
 
 // Slots filled from the mundane armor/shield catalog instead of the wondrous
 // item catalog: 'armor' takes worn armor, 'mainHand'/'offhand' take shields.
@@ -86,6 +87,11 @@ export function CharacterSheet() {
       character.extraSlotPools,
       castingAbility,
     );
+  }, [character]);
+
+  const systemModifiers = useMemo(() => {
+    if (!character) return [];
+    return getSystemModifiers(character);
   }, [character]);
 
   if (!character) {
@@ -180,6 +186,7 @@ export function CharacterSheet() {
   }
 
   function handleRemoveModifier(modifierId: string) {
+    if (isSystemModifierId(modifierId)) return; // system modifiers can't be removed
     const modifier = character!.modifiers.find((m) => m.id === modifierId);
     if (confirm(`Delete ${modifier?.name ?? 'this modifier'}? This cannot be undone.`)) {
       removeModifier(character!.id, modifierId);
@@ -286,7 +293,7 @@ export function CharacterSheet() {
 
       {activeTab === 'actions' && (
         <ActionsSection
-          modifiers={character.modifiers}
+          modifiers={[...character.modifiers, ...systemModifiers]}
           calculations={character.calculations}
           actions={character.actions}
           onAddModifier={() => setShowAddModifier(true)}
@@ -396,6 +403,7 @@ export function CharacterSheet() {
       {showAddCalculation && (
         <AddCalculationModal
           modifiers={character.modifiers}
+          systemModifiers={systemModifiers}
           onAdd={(calculation) => addCalculation(character.id, calculation)}
           onRemoveModifier={handleRemoveModifier}
           onClose={() => setShowAddCalculation(false)}
