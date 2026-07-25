@@ -1145,7 +1145,7 @@
   text-align: left;
 }
 
-.spell-picker-pick-selected {
+.spell-picker-pick.spell-picker-pick-selected {
   background: var(--accent);
   color: white;
   border-radius: 4px;
