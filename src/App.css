@@ -88,6 +88,11 @@
   gap: 8px;
 }
 
+.modal-body .form-actions {
+  justify-content: center;
+  margin-top: 8px;
+}
+
 /* Spell Focus / Greater Spell Focus school pickers */
 .school-focus-field {
   display: flex;
@@ -492,11 +497,18 @@
 .action-card-remove {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--danger);
   font-size: 18px;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
   padding: 0 4px;
+}
+
+.action-card-remove:hover {
+  color: white;
+  background: var(--danger);
+  border-radius: 4px;
 }
 
 .action-card-body {
@@ -574,6 +586,14 @@
   color: var(--text-muted);
 }
 
+.picker-search {
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  margin-top: 4px;
+}
+
 .picker-checklist {
   list-style: none;
   padding: 0;
@@ -604,11 +624,18 @@
 .picker-checklist-remove {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--danger);
   font-size: 16px;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
   padding: 0 4px;
+}
+
+.picker-checklist-remove:hover {
+  color: white;
+  background: var(--danger);
+  border-radius: 4px;
 }
 
 /* Dice roll scroll pickers (Add Calculation) */

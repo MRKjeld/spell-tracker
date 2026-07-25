@@ -13,10 +13,16 @@ export function AddActionModal({ calculations, onAdd, onRemoveCalculation, onClo
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [calculationIds, setCalculationIds] = useState<string[]>([]);
+  const [calculationSearch, setCalculationSearch] = useState('');
 
   function toggleCalculation(id: string) {
     setCalculationIds((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
   }
+
+  const sortedCalculations = [...calculations].sort((a, b) => a.name.localeCompare(b.name));
+  const visibleCalculations = sortedCalculations.filter((calculation) =>
+    calculation.name.toLowerCase().includes(calculationSearch.trim().toLowerCase()),
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -54,30 +60,44 @@ export function AddActionModal({ calculations, onAdd, onRemoveCalculation, onClo
           {calculations.length === 0 ? (
             <p className="equipment-empty">No calculations yet — add one with Add Calculation first.</p>
           ) : (
-            <ul className="picker-checklist">
-              {calculations.map((calculation) => (
-                <li key={calculation.id}>
-                  <label className="picker-checklist-item">
-                    <input
-                      type="checkbox"
-                      checked={calculationIds.includes(calculation.id)}
-                      onChange={() => toggleCalculation(calculation.id)}
-                    />
-                    {calculation.name}
-                    {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
-                  </label>
-                  <button
-                    type="button"
-                    className="picker-checklist-remove"
-                    onClick={() => onRemoveCalculation(calculation.id)}
-                    title={`Delete ${calculation.name}`}
-                    aria-label={`Delete ${calculation.name}`}
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <>
+              <input
+                type="search"
+                value={calculationSearch}
+                onChange={(e) => setCalculationSearch(e.target.value)}
+                placeholder="Search calculations…"
+                aria-label="Search calculations"
+                className="picker-search"
+              />
+              {visibleCalculations.length === 0 ? (
+                <p className="equipment-empty">No calculations match "{calculationSearch}".</p>
+              ) : (
+                <ul className="picker-checklist">
+                  {visibleCalculations.map((calculation) => (
+                    <li key={calculation.id}>
+                      <label className="picker-checklist-item">
+                        <input
+                          type="checkbox"
+                          checked={calculationIds.includes(calculation.id)}
+                          onChange={() => toggleCalculation(calculation.id)}
+                        />
+                        {calculation.name}
+                        {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
+                      </label>
+                      <button
+                        type="button"
+                        className="picker-checklist-remove"
+                        onClick={() => onRemoveCalculation(calculation.id)}
+                        title={`Delete ${calculation.name}`}
+                        aria-label={`Delete ${calculation.name}`}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </div>
 

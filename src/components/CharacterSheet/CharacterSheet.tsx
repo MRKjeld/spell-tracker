@@ -165,6 +165,27 @@ export function CharacterSheet() {
     }
   }
 
+  function handleRemoveAction(actionId: string) {
+    const action = character!.actions.find((a) => a.id === actionId);
+    if (confirm(`Delete ${action?.name ?? 'this action'}? This cannot be undone.`)) {
+      removeAction(character!.id, actionId);
+    }
+  }
+
+  function handleRemoveCalculation(calculationId: string) {
+    const calculation = character!.calculations.find((c) => c.id === calculationId);
+    if (confirm(`Delete ${calculation?.name ?? 'this calculation'}? This cannot be undone.`)) {
+      removeCalculation(character!.id, calculationId);
+    }
+  }
+
+  function handleRemoveModifier(modifierId: string) {
+    const modifier = character!.modifiers.find((m) => m.id === modifierId);
+    if (confirm(`Delete ${modifier?.name ?? 'this modifier'}? This cannot be undone.`)) {
+      removeModifier(character!.id, modifierId);
+    }
+  }
+
   function handleEquipmentSlotClick(slot: BodySlotId) {
     const equipped = character!.items.some((i) => i.equippedSlot === slot);
     if (equipped) {
@@ -271,7 +292,7 @@ export function CharacterSheet() {
           onAddModifier={() => setShowAddModifier(true)}
           onAddCalculation={() => setShowAddCalculation(true)}
           onAddAction={() => setShowAddAction(true)}
-          onRemoveAction={(actionId) => removeAction(character.id, actionId)}
+          onRemoveAction={handleRemoveAction}
         />
       )}
 
@@ -376,7 +397,7 @@ export function CharacterSheet() {
         <AddCalculationModal
           modifiers={character.modifiers}
           onAdd={(calculation) => addCalculation(character.id, calculation)}
-          onRemoveModifier={(modifierId) => removeModifier(character.id, modifierId)}
+          onRemoveModifier={handleRemoveModifier}
           onClose={() => setShowAddCalculation(false)}
         />
       )}
@@ -385,7 +406,7 @@ export function CharacterSheet() {
         <AddActionModal
           calculations={character.calculations}
           onAdd={(action) => addAction(character.id, action)}
-          onRemoveCalculation={(calculationId) => removeCalculation(character.id, calculationId)}
+          onRemoveCalculation={handleRemoveCalculation}
           onClose={() => setShowAddAction(false)}
         />
       )}
