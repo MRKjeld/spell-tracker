@@ -12,6 +12,7 @@ import { SpellPickerModal } from './SpellPickerModal';
 import { SpellViewModal } from './SpellViewModal';
 import { CasterStatsModal } from './CasterStatsModal';
 import { AddItemModal } from './AddItemModal';
+import { ItemPickerModal } from './ItemPickerModal';
 import { ItemViewModal } from './ItemViewModal';
 import { EquipmentSlotsGrid } from './EquipmentSlotsGrid';
 import { EquipmentSection } from './EquipmentSection';
@@ -41,6 +42,8 @@ export function CharacterSheet() {
   const setSlotUsed = useCharacterStore((s) => s.setSlotUsed);
   const restCharacter = useCharacterStore((s) => s.restCharacter);
   const addItem = useCharacterStore((s) => s.addItem);
+  const addWondrousItem = useCharacterStore((s) => s.addWondrousItem);
+  const addBaseArmorItem = useCharacterStore((s) => s.addBaseArmorItem);
   const removeItem = useCharacterStore((s) => s.removeItem);
   const consumeItemCharge = useCharacterStore((s) => s.consumeItemCharge);
   const rechargeItem = useCharacterStore((s) => s.rechargeItem);
@@ -58,6 +61,7 @@ export function CharacterSheet() {
   const [activeTab, setActiveTab] = useState<'actions' | 'spells' | 'items'>('spells');
   const [showAddPool, setShowAddPool] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
+  const [showItemPicker, setShowItemPicker] = useState(false);
   const [showAddModifier, setShowAddModifier] = useState(false);
   const [showAddCalculation, setShowAddCalculation] = useState(false);
   const [showAddAction, setShowAddAction] = useState(false);
@@ -161,6 +165,15 @@ export function CharacterSheet() {
     if (!itemViewTarget) return;
     rechargeItem(character!.id, itemViewTarget.id);
     setItemViewTarget(null);
+  }
+
+  function handlePickCatalogItem(pick: { kind: 'wondrous' | 'baseArmor'; itemId: string; itemName: string }) {
+    if (pick.kind === 'wondrous') {
+      addWondrousItem(character!.id, { itemId: pick.itemId, itemName: pick.itemName });
+    } else {
+      addBaseArmorItem(character!.id, { itemId: pick.itemId, itemName: pick.itemName });
+    }
+    setShowItemPicker(false);
   }
 
   function handleRemoveItem() {
@@ -312,7 +325,7 @@ export function CharacterSheet() {
           )}
 
           <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
-            + Add Spell
+            + Spell
           </button>
 
           <SlotGrid
@@ -327,9 +340,14 @@ export function CharacterSheet() {
 
       {activeTab === 'items' && (
         <>
-          <button type="button" onClick={() => setShowAddItem(true)} className="button-primary">
-            + Add Item
-          </button>
+          <div className="actions-toolbar">
+            <button type="button" onClick={() => setShowItemPicker(true)} className="button-primary">
+              + Item
+            </button>
+            <button type="button" onClick={() => setShowAddItem(true)}>
+              + Custom
+            </button>
+          </div>
 
           <EquipmentSlotsGrid items={character.items} onSlotClick={handleEquipmentSlotClick} />
 
@@ -391,6 +409,10 @@ export function CharacterSheet() {
 
       {showAddItem && (
         <AddItemModal onAdd={(item) => addItem(character.id, item)} onClose={() => setShowAddItem(false)} />
+      )}
+
+      {showItemPicker && (
+        <ItemPickerModal onPick={handlePickCatalogItem} onClose={() => setShowItemPicker(false)} />
       )}
 
       {showAddModifier && (

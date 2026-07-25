@@ -68,6 +68,15 @@ export function getBaseArmorCategoriesForSlot(slot: BodySlotId): BaseArmorCatego
   return SLOT_CATEGORIES[slot] ?? [];
 }
 
+// Inverse of getBaseArmorCategoriesForSlot: which body slot a catalog item of
+// this category would occupy once equipped. 'extra'/'mod' entries (armor
+// special abilities, not wearable items) have no slot of their own.
+export function defaultSlotForBaseArmorCategory(category: BaseArmorCategory): BodySlotId | null {
+  if (category === 'light' || category === 'medium' || category === 'heavy') return 'armor';
+  if (category === 'shield') return 'mainHand';
+  return null;
+}
+
 export function getBaseArmorItemsForSlot(slot: BodySlotId): BaseArmorItemEntry[] {
   const categories = getBaseArmorCategoriesForSlot(slot);
   if (categories.length === 0) return [];

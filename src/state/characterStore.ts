@@ -127,6 +127,8 @@ interface CharacterStoreState {
   rechargeItem(charId: string, itemId: string): void;
   equipNewWondrousItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
   equipNewBaseArmorItem(charId: string, slot: BodySlotId, item: { itemId: string; itemName: string }): void;
+  addWondrousItem(charId: string, item: { itemId: string; itemName: string }): void;
+  addBaseArmorItem(charId: string, item: { itemId: string; itemName: string }): void;
   equipItem(charId: string, itemId: string, slot: BodySlotId): void;
   unequipItem(charId: string, itemId: string): void;
   addModifier(charId: string, modifier: { name: string; value: number }): void;
@@ -435,6 +437,54 @@ export const useCharacterStore = create<CharacterStoreState>()(
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
           const updated = touch({ ...existing, items: [...clearedItems, newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addWondrousItem(charId, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            description: '',
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: item.itemId,
+            baseArmorId: null,
+            slot: null,
+            category: null,
+            equippedSlot: null,
+          };
+          const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      addBaseArmorItem(charId, item) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const newItem: Item = {
+            id: createId(),
+            name: item.itemName,
+            description: '',
+            activation: '',
+            usePeriod: 'unlimited',
+            maxUses: 0,
+            usesRemaining: 0,
+            lastReset: new Date().toISOString(),
+            wondrousItemId: null,
+            baseArmorId: item.itemId,
+            slot: null,
+            category: null,
+            equippedSlot: null,
+          };
+          const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

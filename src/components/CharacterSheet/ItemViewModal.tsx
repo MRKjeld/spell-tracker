@@ -4,6 +4,7 @@ import type { Item } from '../../state/types';
 import { BODY_SLOT_IDS, BODY_SLOT_LABELS } from '../../data/bodySlots';
 import type { BodySlotId } from '../../data/bodySlots';
 import { getWondrousItemById, normalizeSlot } from '../../data/wondrousItems';
+import { defaultSlotForBaseArmorCategory, getBaseArmorItemById } from '../../data/baseArmor';
 
 interface ItemViewModalProps {
   item: Item;
@@ -28,7 +29,12 @@ export function ItemViewModal({ item, onUseCharge, onRecharge, onRemove, onEquip
   const isUnlimited = item.usePeriod === 'unlimited';
   const depleted = !isUnlimited && item.usesRemaining <= 0;
   const catalogEntry = item.wondrousItemId ? getWondrousItemById(item.wondrousItemId) : undefined;
-  const defaultSlot = catalogEntry ? normalizeSlot(catalogEntry.slot) : item.slot;
+  const baseArmorEntry = item.baseArmorId ? getBaseArmorItemById(item.baseArmorId) : undefined;
+  const defaultSlot = catalogEntry
+    ? normalizeSlot(catalogEntry.slot)
+    : baseArmorEntry
+      ? defaultSlotForBaseArmorCategory(baseArmorEntry.category)
+      : item.slot;
   const [equipSlot, setEquipSlot] = useState<BodySlotId>(defaultSlot ?? BODY_SLOT_IDS[0]);
 
   return (

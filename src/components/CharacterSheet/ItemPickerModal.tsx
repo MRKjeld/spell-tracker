@@ -1,0 +1,141 @@
+import { useMemo, useState } from 'react';
+import { Modal } from '../common/Modal';
+import type { BodySlotId } from '../../data/bodySlots';
+import { BODY_SLOT_IDS, BODY_SLOT_LABELS } from '../../data/bodySlots';
+import { searchWondrousItems, searchWondrousItemsForSlot } from '../../data/wondrousItems';
+import type { WondrousItemEntry } from '../../data/wondrousItems';
+import {
+  getBaseArmorCategoriesForSlot,
+  searchBaseArmorItems,
+  searchBaseArmorItemsForSlot,
+} from '../../data/baseArmor';
+import type { BaseArmorItemEntry } from '../../data/baseArmor';
+import { WondrousItemDetails } from './WondrousItemDetails';
+import { BaseArmorDetails } from './BaseArmorDetails';
+
+type CatalogEntry =
+  | { kind: 'wondrous'; item: WondrousItemEntry }
+  | { kind: 'baseArmor'; item: BaseArmorItemEntry };
+
+interface ItemPickerModalProps {
+  onPick: (pick: { kind: 'wondrous' | 'baseArmor'; itemId: string; itemName: string }) => void;
+  onClose: () => void;
+}
+
+export function ItemPickerModal({ onPick, onClose }: ItemPickerModalProps) {
+  const [query, setQuery] = useState('');
+  const [slot, setSlot] = useState<BodySlotId | 'all'>('all');
+  const [searchDescriptions, setSearchDescriptions] = useState(false);
+  const [showAllDescriptions, setShowAllDescriptions] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  const results = useMemo<CatalogEntry[]>(() => {
+    const wondrous =
+      slot === 'all' ? searchWondrousItems(query, searchDescriptions) : searchWondrousItemsForSlot(slot, query, searchDescriptions);
+    const baseArmor =
+      slot === 'all'
+        ? searchBaseArmorItems(query, searchDescriptions)
+        : getBaseArmorCategoriesForSlot(slot).length > 0
+          ? searchBaseArmorItemsForSlot(slot, query, searchDescriptions)
+          : [];
+    return [
+      ...wondrous.map((item): CatalogEntry => ({ kind: 'wondrous', item })),
+      ...baseArmor.map((item): CatalogEntry => ({ kind: 'baseArmor', item })),
+    ];
+  }, [slot, query, searchDescriptions]);
+
+  function toggleExpanded(itemId: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      return next;
+    });
+  }
+
+  return (
+    <Modal title="Add Item" onClose={onClose}>
+      <input
+        type="search"
+        placeholder="Search items..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="spell-picker-search"
+        autoFocus
+      />
+
+      <div className="spell-picker-options">
+        <label className="spell-picker-description-toggle">
+          <input
+            type="checkbox"
+            checked={searchDescriptions}
+            onChange={(e) => setSearchDescriptions(e.target.checked)}
+          />
+          Also search descriptions
+        </label>
+        <button
+          type="button"
+          className="spell-picker-show-all"
+          aria-pressed={showAllDescriptions}
+          onClick={() => setShowAllDescriptions((v) => !v)}
+        >
+          {showAllDescriptions ? 'Hide descriptions' : 'Show descriptions'}
+        </button>
+      </div>
+
+      <label className="spell-picker-class-filter">
+        Slot
+        <select value={slot} onChange={(e) => setSlot(e.target.value as BodySlotId | 'all')}>
+          <option value="all">All Slots</option>
+          {BODY_SLOT_IDS.map((id) => (
+            <option key={id} value={id}>
+              {BODY_SLOT_LABELS[id]}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <ul className="spell-picker-list">
+        {results.length === 0 && <li className="spell-picker-empty">No items found.</li>}
+        {results.map((result) => {
+          const { kind, item } = result;
+          const expanded = expandedIds.has(item.id);
+          const price = kind === 'wondrous' ? item.price : item.costRaw || 'no cost';
+          return (
+            <li key={`${kind}-${item.id}`}>
+              <div className="spell-picker-row">
+                <button
+                  type="button"
+                  className="spell-picker-pick"
+                  onClick={() => onPick({ kind, itemId: item.id, itemName: item.name })}
+                >
+                  {item.name}
+                  <span className="spell-picker-school"> — {price}</span>
+                </button>
+                <button
+                  type="button"
+                  className="spell-picker-toggle"
+                  aria-expanded={expanded}
+                  onClick={() => toggleExpanded(item.id)}
+                >
+                  {expanded ? 'Show less' : 'Show more'}
+                </button>
+              </div>
+              {expanded ? (
+                kind === 'wondrous' ? (
+                  <WondrousItemDetails item={item} />
+                ) : (
+                  <BaseArmorDetails item={item} />
+                )
+              ) : (
+                showAllDescriptions && (
+                  <p className="spell-picker-description">{item.description || 'No description available.'}</p>
+                )
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </Modal>
+  );
+}

@@ -51,9 +51,26 @@ export function getWondrousItemsForSlot(slot: BodySlotId): WondrousItemEntry[] {
   return bySlot.get(slot) ?? [];
 }
 
+// Every wondrous item that has a slot the app can equip it into — i.e. every
+// item findable via getWondrousItemsForSlot, just not restricted to one slot.
+export function getAllWondrousItems(): WondrousItemEntry[] {
+  return Array.from(bySlot.values()).flat();
+}
+
 export function searchWondrousItemsForSlot(slot: BodySlotId, query: string, includeDescription = false): WondrousItemEntry[] {
   const normalized = query.trim().toLowerCase();
   const list = getWondrousItemsForSlot(slot);
+  if (!normalized) return list;
+  return list.filter(
+    (item) =>
+      item.name.toLowerCase().includes(normalized) ||
+      (includeDescription && item.description.toLowerCase().includes(normalized)),
+  );
+}
+
+export function searchWondrousItems(query: string, includeDescription = false): WondrousItemEntry[] {
+  const normalized = query.trim().toLowerCase();
+  const list = getAllWondrousItems();
   if (!normalized) return list;
   return list.filter(
     (item) =>
