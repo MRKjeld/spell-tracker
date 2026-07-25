@@ -28,11 +28,12 @@ export function ItemViewModal({ item, onUseCharge, onRecharge, onRemove, onEquip
   const isUnlimited = item.usePeriod === 'unlimited';
   const depleted = !isUnlimited && item.usesRemaining <= 0;
   const catalogEntry = item.wondrousItemId ? getWondrousItemById(item.wondrousItemId) : undefined;
-  const defaultSlot = catalogEntry ? normalizeSlot(catalogEntry.slot) : null;
+  const defaultSlot = catalogEntry ? normalizeSlot(catalogEntry.slot) : item.slot;
   const [equipSlot, setEquipSlot] = useState<BodySlotId>(defaultSlot ?? BODY_SLOT_IDS[0]);
 
   return (
     <Modal title={item.name} onClose={onClose}>
+      {item.description && <p className="item-view-description">{item.description}</p>}
       {item.activation && <p className="item-view-activation">{item.activation}</p>}
 
       <p className="item-view-uses">

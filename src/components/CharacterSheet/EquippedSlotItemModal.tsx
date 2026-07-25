@@ -35,7 +35,12 @@ export function EquippedSlotItemModal({ slot, item, onUseCharge, onRecharge, onU
     <Modal title={`${BODY_SLOT_LABELS[slot]} — ${item.name}`} onClose={onClose}>
       {catalogEntry && <WondrousItemDetails item={catalogEntry} />}
       {baseArmorEntry && <BaseArmorDetails item={baseArmorEntry} />}
-      {!catalogEntry && !baseArmorEntry && item.activation && <p>{item.activation}</p>}
+      {!catalogEntry && !baseArmorEntry && (
+        <>
+          {item.description && <p className="item-view-description">{item.description}</p>}
+          {item.activation && <p>{item.activation}</p>}
+        </>
+      )}
 
       {!isUnlimited && (
         <p className="item-view-uses">

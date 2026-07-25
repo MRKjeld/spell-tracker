@@ -6,6 +6,7 @@ function makeItem(overrides: Partial<Item>): Item {
   return {
     id: 'item-1',
     name: 'Test Item',
+    description: '',
     activation: 'Activate for an effect.',
     usePeriod: 'day',
     maxUses: 1,
@@ -13,6 +14,8 @@ function makeItem(overrides: Partial<Item>): Item {
     lastReset: '2026-01-01T00:00:00.000Z',
     wondrousItemId: null,
     baseArmorId: null,
+    slot: null,
+    category: null,
     equippedSlot: null,
     ...overrides,
   };

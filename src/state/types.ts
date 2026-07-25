@@ -1,6 +1,7 @@
 import type { AbilityId, ClassId } from '../data/classes';
 import type { PoolColorId } from '../data/poolColors';
 import type { BodySlotId } from '../data/bodySlots';
+import type { BaseArmorCategory } from '../data/baseArmor';
 
 export interface ExtraSlotPool {
   id: string;
@@ -37,6 +38,7 @@ export type ItemUsePeriod = 'unlimited' | 'rest' | 'day' | 'week' | 'month' | 'm
 export interface Item {
   id: string;
   name: string;
+  description: string; // free text flavor/rules text, set on custom (non-catalog) items
   activation: string; // free text describing what activating the item does
   usePeriod: ItemUsePeriod;
   maxUses: number; // ignored when usePeriod is 'unlimited'
@@ -44,6 +46,12 @@ export interface Item {
   lastReset: string; // ISO timestamp of the last time uses were recovered
   wondrousItemId: string | null; // catalog id (see data/wondrousItems.ts), if picked from it
   baseArmorId: string | null; // catalog id (see data/baseArmor.ts), if picked from it
+  // For custom items only (no wondrousItemId/baseArmorId): which body slot this
+  // item is meant to fill, and, when that slot is 'armor'/'mainHand'/'offhand',
+  // its base-armor category — mirrors how catalog items imply a slot/category.
+  // Null slot means an unslotted, inventory-only item (e.g. a potion or wand).
+  slot: BodySlotId | null;
+  category: BaseArmorCategory | null;
   equippedSlot: BodySlotId | null; // the body slot this item currently occupies, if worn
 }
 

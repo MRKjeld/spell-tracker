@@ -7,6 +7,7 @@ import { CASTING_ABILITY } from '../data/classes';
 import { getWondrousItemById } from '../data/wondrousItems';
 import type { WondrousItemEntry } from '../data/wondrousItems';
 import type { BodySlotId } from '../data/bodySlots';
+import type { BaseArmorCategory } from '../data/baseArmor';
 import type {
   Character,
   ExtraSlotPool,
@@ -37,6 +38,7 @@ function migrateLegacyEquipmentSlots(
     migrated.push({
       id: createId(),
       name: slotItem.itemName,
+      description: '',
       activation: '',
       usePeriod: 'unlimited',
       maxUses: 0,
@@ -44,6 +46,8 @@ function migrateLegacyEquipmentSlots(
       lastReset: now,
       wondrousItemId: slotItem.itemId,
       baseArmorId: null,
+      slot: null,
+      category: null,
       equippedSlot: slot,
     });
   }
@@ -103,7 +107,18 @@ interface CharacterStoreState {
   clearSlot(charId: string, slotInstanceId: string): void;
   setSlotUsed(charId: string, slotInstanceId: string, used: boolean): void;
   restCharacter(charId: string): void;
-  addItem(charId: string, item: { name: string; activation: string; usePeriod: ItemUsePeriod; maxUses: number }): void;
+  addItem(
+    charId: string,
+    item: {
+      name: string;
+      description: string;
+      slot: BodySlotId | null;
+      category: BaseArmorCategory | null;
+      activation: string;
+      usePeriod: ItemUsePeriod;
+      maxUses: number;
+    },
+  ): void;
   removeItem(charId: string, itemId: string): void;
   consumeItemCharge(charId: string, itemId: string): void;
   rechargeItem(charId: string, itemId: string): void;
@@ -127,8 +142,11 @@ function backfillDefaults(character: Character): Character {
   };
   const items = (rest.items ?? []).map((i) => ({
     ...i,
+    description: i.description ?? '',
     wondrousItemId: i.wondrousItemId ?? null,
     baseArmorId: i.baseArmorId ?? null,
+    slot: i.slot ?? null,
+    category: i.category ?? null,
     equippedSlot: i.equippedSlot ?? null,
   }));
   return {
@@ -301,6 +319,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           const newItem: Item = {
             id: createId(),
             name: item.name,
+            description: item.description,
             activation: item.activation,
             usePeriod: item.usePeriod,
             maxUses: item.maxUses,
@@ -308,6 +327,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: null,
             baseArmorId: null,
+            slot: item.slot,
+            category: item.category,
             equippedSlot: null,
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
@@ -360,6 +381,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           const newItem: Item = {
             id: createId(),
             name: item.itemName,
+            description: '',
             activation: '',
             usePeriod: 'unlimited',
             maxUses: 0,
@@ -367,6 +389,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: item.itemId,
             baseArmorId: null,
+            slot: null,
+            category: null,
             equippedSlot: slot,
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
@@ -382,6 +406,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           const newItem: Item = {
             id: createId(),
             name: item.itemName,
+            description: '',
             activation: '',
             usePeriod: 'unlimited',
             maxUses: 0,
@@ -389,6 +414,8 @@ export const useCharacterStore = create<CharacterStoreState>()(
             lastReset: new Date().toISOString(),
             wondrousItemId: null,
             baseArmorId: item.itemId,
+            slot: null,
+            category: null,
             equippedSlot: slot,
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
