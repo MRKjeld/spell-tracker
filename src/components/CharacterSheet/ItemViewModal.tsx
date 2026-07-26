@@ -91,7 +91,7 @@ export function ItemViewModal({ item, onUseCharge, onRecharge, onRemove, onEquip
 
       <div className="item-view-equip">
         {item.equippedSlot ? (
-          <p className="item-view-worn">Worn — {BODY_SLOT_LABELS[item.equippedSlot]}</p>
+          <p className="item-view-worn">Worn: {BODY_SLOT_LABELS[item.equippedSlot]}</p>
         ) : (
           <label className="item-view-equip-picker">
             Equip to

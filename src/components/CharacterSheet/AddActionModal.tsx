@@ -59,7 +59,7 @@ export function AddActionModal({ calculations, onAdd, onRemoveCalculation, onClo
         <div className="picker-field">
           <span>Calculations</span>
           {calculations.length === 0 ? (
-            <p className="equipment-empty">No calculations yet — add one with Add Calculation first.</p>
+            <p className="equipment-empty">No calculations yet. Add one with Add Calculation first.</p>
           ) : (
             <>
               <input

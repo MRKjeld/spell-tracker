@@ -137,7 +137,7 @@ export function ItemPickerModal({ onPick, onClose }: ItemPickerModalProps) {
                   onClick={() => setSelectedKey(isSelected ? null : key)}
                 >
                   {item.name}
-                  <span className="spell-picker-school"> — {price}</span>
+                  <span className="spell-picker-school"> · {price}</span>
                 </button>
                 <button
                   type="button"

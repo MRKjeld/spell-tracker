@@ -37,14 +37,14 @@ export function CastSpellModal({ learnedSpells, onCast, onClose }: CastSpellModa
 
       <ul className="spell-picker-list">
         {spells.length === 0 && (
-          <li className="spell-picker-empty">No known spells match — try Learn first.</li>
+          <li className="spell-picker-empty">No known spells match. Try Learn first.</li>
         )}
         {spells.map((spell) => (
           <li key={spell.id}>
             <div className="spell-picker-row">
               <button type="button" className="spell-picker-pick" onClick={() => onCast(spell)}>
                 {spell.spellName}
-                <span className="spell-picker-school"> — Lvl {spell.spellLevel}</span>
+                <span className="spell-picker-school"> · Lvl {spell.spellLevel}</span>
               </button>
             </div>
           </li>

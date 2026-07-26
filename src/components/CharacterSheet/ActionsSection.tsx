@@ -52,7 +52,7 @@ export function ActionsSection({
 
       {actions.length === 0 ? (
         <p className="equipment-empty">
-          No actions yet — build one up with Add Modifier, then Add Calculation, then Add Action.
+          No actions yet. Build one up with Add Modifier, then Add Calculation, then Add Action.
         </p>
       ) : (
         <div className="action-card-list">

@@ -32,7 +32,7 @@ export function CasterStatsModal({
   const stats = computeCasterStats(level, abilityScores, castingAbility, spellcraft);
 
   return (
-    <Modal title={`${CLASS_LABELS[classId]} ${level} — Caster Stats`} onClose={onClose}>
+    <Modal title={`${CLASS_LABELS[classId]} ${level} Caster Stats`} onClose={onClose}>
       <div className="caster-stats">
         <p>
           <strong>Caster Level:</strong> {stats.casterLevel}

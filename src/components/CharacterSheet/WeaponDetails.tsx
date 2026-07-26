@@ -12,11 +12,11 @@ export function WeaponDetails({ item }: { item: WeaponItemEntry }) {
   return (
     <div className="spell-picker-details">
       <p>
-        <strong>Cost:</strong> {item.costRaw || '—'} <strong>Weight:</strong> {item.weightRaw || '—'}
+        <strong>Cost:</strong> {item.costRaw || 'N/A'} <strong>Weight:</strong> {item.weightRaw || 'N/A'}
       </p>
       <p>
-        <strong>Category:</strong> {item.category.join(', ') || '—'}
-        {isTwoHandedWeapon(item) && ' (occupies both hands)'} <strong>Proficiency:</strong> {item.proficiency || '—'}
+        <strong>Category:</strong> {item.category.join(', ') || 'N/A'}
+        {isTwoHandedWeapon(item) && ' (occupies both hands)'} <strong>Proficiency:</strong> {item.proficiency || 'N/A'}
       </p>
       {damage && (
         <p>

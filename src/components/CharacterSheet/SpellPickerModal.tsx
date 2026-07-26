@@ -53,7 +53,7 @@ export function SpellPickerModal({
   }, [activeTab, query, spellLevel, searchDescriptions, restrictToSpellIds]);
 
   const titlePrefix = restrictToSpellIds ? 'Prepare' : 'Fill Slot';
-  const title = spellLevel !== null ? `${titlePrefix} — Level ${spellLevel}` : `${titlePrefix} — ${poolName ?? 'No Level'}`;
+  const title = spellLevel !== null ? `${titlePrefix}: Level ${spellLevel}` : `${titlePrefix}: ${poolName ?? 'No Level'}`;
 
   function toggleExpanded(spellId: string) {
     setExpandedIds((prev) => {
@@ -112,7 +112,7 @@ export function SpellPickerModal({
       <ul className="spell-picker-list">
         {spells.length === 0 && (
           <li className="spell-picker-empty">
-            {restrictToSpellIds ? 'No known spells match — try Learn first.' : 'No spells found.'}
+            {restrictToSpellIds ? 'No known spells match. Try Learn first.' : 'No spells found.'}
           </li>
         )}
         {spells.map((spell) => {
@@ -131,7 +131,7 @@ export function SpellPickerModal({
                   {spell.name}
                   <span className="spell-picker-school">
                     {' '}
-                    — {spell.school}
+                    · {spell.school}
                     {spellLevel === null && ` · ${levelLabelFor(spell, activeTab, defaultClassId)}`}
                   </span>
                 </button>

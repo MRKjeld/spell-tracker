@@ -23,12 +23,12 @@ export function KnownSpellsSection({ learnedSpells, onUnlearn }: KnownSpellsSect
       </div>
 
       {sorted.length === 0 ? (
-        <p className="equipment-empty">No spells learned yet — Learn adds a spell to this list so it can be prepared.</p>
+        <p className="equipment-empty">No spells learned yet. Learn adds a spell to this list so it can be prepared.</p>
       ) : (
         <div className="slot-grid-chips">
           {sorted.map((spell) => (
             <span key={spell.id} className="slot-grid-pool-tag">
-              Lvl {spell.spellLevel} — {spell.spellName}
+              Lvl {spell.spellLevel} · {spell.spellName}
               <button type="button" onClick={() => onUnlearn(spell.id)} title={`Unlearn ${spell.spellName}`}>
                 ×
               </button>

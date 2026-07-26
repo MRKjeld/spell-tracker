@@ -52,7 +52,7 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
   }
 
   return (
-    <Modal title={`Fill Slot — ${BODY_SLOT_LABELS[slot]}`} onClose={onClose}>
+    <Modal title={`Fill Slot: ${BODY_SLOT_LABELS[slot]}`} onClose={onClose}>
       <input
         type="search"
         placeholder="Search items..."
@@ -100,7 +100,7 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
                 >
                   {item.name}
                   {twoHanded && <span className="spell-picker-school"> (two-handed)</span>}
-                  <span className="spell-picker-school"> — {price}</span>
+                  <span className="spell-picker-school"> · {price}</span>
                 </button>
                 <button
                   type="button"

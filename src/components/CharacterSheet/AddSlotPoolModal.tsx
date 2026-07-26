@@ -112,7 +112,7 @@ export function AddSlotPoolModal({ defaultClassId, existingPools, onAdd, onClose
 
         <div className="add-slot-pool-spells">
           <div className="add-slot-pool-spells-header">
-            <span>Spell (optional — added as a persisted fill)</span>
+            <span>Spell (optional, added as a persisted fill)</span>
             {!spell && (
               <button type="button" onClick={() => setShowSpellPicker(true)}>
                 + Specify Spell

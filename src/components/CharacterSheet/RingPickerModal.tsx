@@ -37,7 +37,7 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
   }
 
   return (
-    <Modal title={`Fill Slot — ${BODY_SLOT_LABELS[slot]}`} onClose={onClose}>
+    <Modal title={`Fill Slot: ${BODY_SLOT_LABELS[slot]}`} onClose={onClose}>
       <input
         type="search"
         placeholder="Search items..."
@@ -81,7 +81,7 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
                   onClick={() => setSelectedId(isSelected ? null : item.id)}
                 >
                   {item.name}
-                  <span className="spell-picker-school"> — {item.price}</span>
+                  <span className="spell-picker-school"> · {item.price}</span>
                 </button>
                 <button
                   type="button"

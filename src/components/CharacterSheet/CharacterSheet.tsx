@@ -485,7 +485,7 @@ export function CharacterSheet() {
         <>
           {CANTRIPS_AT_WILL[resolvedSpellClassId] && (
             <p className="cantrips-at-will-note">
-              0-level spells are cast at will (unlimited) for {CLASS_LABELS[resolvedSpellClassId]}s — no slots to
+              0-level spells are cast at will (unlimited) for {CLASS_LABELS[resolvedSpellClassId]}s. No slots to
               track.
             </p>
           )}

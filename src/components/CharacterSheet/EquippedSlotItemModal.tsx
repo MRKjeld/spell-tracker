@@ -37,7 +37,7 @@ export function EquippedSlotItemModal({ slot, item, onUseCharge, onRecharge, onU
   const depleted = !isUnlimited && item.usesRemaining <= 0;
 
   return (
-    <Modal title={`${BODY_SLOT_LABELS[slot]} — ${item.name}`} onClose={onClose}>
+    <Modal title={`${BODY_SLOT_LABELS[slot]}: ${item.name}`} onClose={onClose}>
       {catalogEntry && <WondrousItemDetails item={catalogEntry} />}
       {ringEntry && <WondrousItemDetails item={ringEntry} />}
       {baseArmorEntry && <BaseArmorDetails item={baseArmorEntry} />}

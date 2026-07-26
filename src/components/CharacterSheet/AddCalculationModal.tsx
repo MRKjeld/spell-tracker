@@ -110,7 +110,7 @@ export function AddCalculationModal({
         <div className="picker-field">
           <span>Modifiers</span>
           {allModifiers.length === 0 ? (
-            <p className="equipment-empty">No modifiers yet — add one with Add Modifier first.</p>
+            <p className="equipment-empty">No modifiers yet. Add one with Add Modifier first.</p>
           ) : (
             <>
               <input

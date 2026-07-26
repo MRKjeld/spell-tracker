@@ -50,7 +50,7 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
   }
 
   return (
-    <Modal title={`Learn — ${CLASS_LABELS[classId]} Spells`} onClose={onClose}>
+    <Modal title={`Learn: ${CLASS_LABELS[classId]} Spells`} onClose={onClose}>
       <input
         type="search"
         placeholder="Search spells..."
@@ -77,7 +77,7 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
                   {spell.name}
                   <span className="spell-picker-school">
                     {' '}
-                    — {spell.school} · Lvl {spell.levels[classId]}
+                    · {spell.school} · Lvl {spell.levels[classId]}
                   </span>
                 </button>
                 <button

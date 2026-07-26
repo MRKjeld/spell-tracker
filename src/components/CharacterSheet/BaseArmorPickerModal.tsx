@@ -40,7 +40,7 @@ export function BaseArmorPickerModal({ slot, onPick, onClose }: BaseArmorPickerM
   }
 
   return (
-    <Modal title={`Fill Slot — ${BODY_SLOT_LABELS[slot]}`} onClose={onClose}>
+    <Modal title={`Fill Slot: ${BODY_SLOT_LABELS[slot]}`} onClose={onClose}>
       <input
         type="search"
         placeholder="Search items..."
@@ -84,7 +84,7 @@ export function BaseArmorPickerModal({ slot, onPick, onClose }: BaseArmorPickerM
                   onClick={() => setSelectedId(isSelected ? null : item.id)}
                 >
                   {item.name}
-                  <span className="spell-picker-school"> — {item.costRaw || 'no cost'}</span>
+                  <span className="spell-picker-school"> · {item.costRaw || 'no cost'}</span>
                 </button>
                 <button
                   type="button"
