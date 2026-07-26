@@ -24,6 +24,7 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
   const [searchDescriptions, setSearchDescriptions] = useState(false);
   const [showAllDescriptions, setShowAllDescriptions] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
   const results = useMemo<HandCatalogEntry[]>(() => {
     const shields = searchBaseArmorItemsForSlot(slot, query, searchDescriptions);
@@ -41,6 +42,13 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
       else next.add(itemId);
       return next;
     });
+  }
+
+  const selectedEntry = results.find((r) => `${r.kind}-${r.item.id}` === selectedKey);
+
+  function handleConfirm() {
+    if (!selectedEntry) return;
+    onPick({ kind: selectedEntry.kind, itemId: selectedEntry.item.id, itemName: selectedEntry.item.name });
   }
 
   return (
@@ -76,16 +84,19 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
       <ul className="spell-picker-list">
         {results.length === 0 && <li className="spell-picker-empty">No items found.</li>}
         {results.map(({ kind, item }) => {
+          const key = `${kind}-${item.id}`;
           const expanded = expandedIds.has(item.id);
+          const isSelected = selectedKey === key;
           const price = kind === 'shield' ? item.costRaw || 'no cost' : item.costRaw || 'no cost';
           const twoHanded = kind === 'weapon' && isTwoHandedWeapon(item);
           return (
-            <li key={`${kind}-${item.id}`}>
+            <li key={key}>
               <div className="spell-picker-row">
                 <button
                   type="button"
-                  className="spell-picker-pick"
-                  onClick={() => onPick({ kind, itemId: item.id, itemName: item.name })}
+                  className={`spell-picker-pick${isSelected ? ' spell-picker-pick-selected' : ''}`}
+                  aria-pressed={isSelected}
+                  onClick={() => setSelectedKey(isSelected ? null : key)}
                 >
                   {item.name}
                   {twoHanded && <span className="spell-picker-school"> (two-handed)</span>}
@@ -111,6 +122,15 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
           );
         })}
       </ul>
+
+      <div className="form-actions">
+        <button type="button" className="button-primary" onClick={handleConfirm} disabled={!selectedEntry}>
+          Confirm
+        </button>
+        <button type="button" onClick={onClose}>
+          Cancel
+        </button>
+      </div>
     </Modal>
   );
 }

@@ -16,6 +16,7 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
   const [searchDescriptions, setSearchDescriptions] = useState(false);
   const [showAllDescriptions, setShowAllDescriptions] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const items = useMemo(() => searchRingItems(query, searchDescriptions), [query, searchDescriptions]);
 
@@ -26,6 +27,13 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
       else next.add(itemId);
       return next;
     });
+  }
+
+  const selectedItem = items.find((i) => i.id === selectedId);
+
+  function handleConfirm() {
+    if (!selectedItem) return;
+    onPick(selectedItem.id, selectedItem.name);
   }
 
   return (
@@ -62,10 +70,16 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
         {items.length === 0 && <li className="spell-picker-empty">No items found.</li>}
         {items.map((item) => {
           const expanded = expandedIds.has(item.id);
+          const isSelected = selectedId === item.id;
           return (
             <li key={item.id}>
               <div className="spell-picker-row">
-                <button type="button" className="spell-picker-pick" onClick={() => onPick(item.id, item.name)}>
+                <button
+                  type="button"
+                  className={`spell-picker-pick${isSelected ? ' spell-picker-pick-selected' : ''}`}
+                  aria-pressed={isSelected}
+                  onClick={() => setSelectedId(isSelected ? null : item.id)}
+                >
                   {item.name}
                   <span className="spell-picker-school"> — {item.price}</span>
                 </button>
@@ -89,6 +103,15 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
           );
         })}
       </ul>
+
+      <div className="form-actions">
+        <button type="button" className="button-primary" onClick={handleConfirm} disabled={!selectedItem}>
+          Confirm
+        </button>
+        <button type="button" onClick={onClose}>
+          Cancel
+        </button>
+      </div>
     </Modal>
   );
 }
