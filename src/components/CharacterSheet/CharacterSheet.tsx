@@ -17,6 +17,7 @@ import { LearnSpellsModal } from './LearnSpellsModal';
 import { SpellViewModal } from './SpellViewModal';
 import { CasterStatsModal } from './CasterStatsModal';
 import { KnownSpellsSection } from './KnownSpellsSection';
+import { SpellFocusSection } from './SpellFocusSection';
 import { AddItemModal } from './AddItemModal';
 import { ItemPickerModal } from './ItemPickerModal';
 import { ItemViewModal } from './ItemViewModal';
@@ -55,6 +56,7 @@ function spellsTabId(classId: ClassId): TabId {
 export function CharacterSheet() {
   const { id } = useParams();
   const character = useCharacterStore((s) => (id ? s.characters[id] : undefined));
+  const updateCharacter = useCharacterStore((s) => s.updateCharacter);
   const addExtraPool = useCharacterStore((s) => s.addExtraPool);
   const removeExtraPool = useCharacterStore((s) => s.removeExtraPool);
   const fillSlot = useCharacterStore((s) => s.fillSlot);
@@ -97,6 +99,7 @@ export function CharacterSheet() {
   const [showAddCalculation, setShowAddCalculation] = useState(false);
   const [showAddAction, setShowAddAction] = useState(false);
   const [showLearnPicker, setShowLearnPicker] = useState(false);
+  const [showSpellFocus, setShowSpellFocus] = useState(false);
   const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
   const [slotPickerTarget, setSlotPickerTarget] = useState<BodySlotId | null>(null);
   const [equippedSlotViewTarget, setEquippedSlotViewTarget] = useState<BodySlotId | null>(null);
@@ -464,7 +467,18 @@ export function CharacterSheet() {
                 + Learn
               </button>
             )}
+            <button type="button" onClick={() => setShowSpellFocus((v) => !v)} aria-pressed={showSpellFocus}>
+              Spell Focus
+            </button>
           </div>
+
+          {showSpellFocus && (
+            <SpellFocusSection
+              spellFocusSchools={character.spellFocusSchools}
+              greaterSpellFocusSchools={character.greaterSpellFocusSchools}
+              onChange={(next) => updateCharacter(character.id, next)}
+            />
+          )}
 
           <SlotGrid
             character={character}
