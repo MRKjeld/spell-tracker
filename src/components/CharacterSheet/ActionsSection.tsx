@@ -39,13 +39,13 @@ export function ActionsSection({
       </div>
 
       <div className="actions-toolbar">
-        <button type="button" className="button-primary" onClick={onAddAction}>
+        <button type="button" className="button-primary button-theme-action" onClick={onAddAction}>
           + Action
         </button>
-        <button type="button" onClick={onAddCalculation}>
+        <button type="button" className="button-theme-calculation" onClick={onAddCalculation}>
           + Calculation
         </button>
-        <button type="button" onClick={onAddModifier}>
+        <button type="button" className="button-theme-modifier" onClick={onAddModifier}>
           + Modifier
         </button>
       </div>

@@ -491,20 +491,25 @@ export function CharacterSheet() {
           )}
 
           <div className="actions-toolbar">
-            <button type="button" onClick={() => setShowAddPool(true)} className="button-primary">
+            <button type="button" onClick={() => setShowAddPool(true)} className="button-primary button-theme-spell">
               + Spell
             </button>
             {activeCasterType === 'arcane' && (
-              <button type="button" onClick={() => setShowLearnPicker(true)}>
+              <button type="button" className="button-theme-spell" onClick={() => setShowLearnPicker(true)}>
                 + Learn
               </button>
             )}
             {resolvedSpellClassId && CASTING_TYPE[resolvedSpellClassId] === 'spontaneous' && (
-              <button type="button" onClick={() => setShowCastPicker(true)}>
+              <button type="button" className="button-theme-spell" onClick={() => setShowCastPicker(true)}>
                 Cast
               </button>
             )}
-            <button type="button" onClick={() => setShowSpellFocus((v) => !v)} aria-pressed={showSpellFocus}>
+            <button
+              type="button"
+              className="button-theme-spell"
+              onClick={() => setShowSpellFocus((v) => !v)}
+              aria-pressed={showSpellFocus}
+            >
               Spell Focus
             </button>
           </div>
@@ -540,10 +545,10 @@ export function CharacterSheet() {
       {resolvedTab === 'items' && (
         <>
           <div className="actions-toolbar">
-            <button type="button" onClick={() => setShowItemPicker(true)} className="button-primary">
+            <button type="button" onClick={() => setShowItemPicker(true)} className="button-primary button-theme-item">
               + Item
             </button>
-            <button type="button" onClick={() => setShowAddItem(true)}>
+            <button type="button" className="button-theme-item" onClick={() => setShowAddItem(true)}>
               + Custom
             </button>
           </div>
