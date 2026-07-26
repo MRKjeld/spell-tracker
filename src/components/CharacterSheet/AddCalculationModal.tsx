@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { ScrollPicker } from '../common/ScrollPicker';
 import type { Calculation, Modifier } from '../../state/types';
@@ -14,6 +14,18 @@ const DICE_SIDES = [2, 3, 4, 6, 8, 10, 12, 20, 100];
 function parseDiceRoll(diceRoll: string): { diceCount: number; diceSides: number } {
   const match = /^(\d+)d(\d+)$/.exec(diceRoll);
   return match ? { diceCount: Number(match[1]), diceSides: Number(match[2]) } : { diceCount: 1, diceSides: 20 };
+}
+
+// Ranks how well a clone candidate matches what's typed in Name so far --
+// exact match first, then starts-with, then contains, then everything else --
+// so the closest suggestions surface as the player types.
+function cloneMatchRank(calculationName: string, typedName: string): number {
+  const name = calculationName.toLowerCase();
+  const typed = typedName.toLowerCase();
+  if (name === typed) return 0;
+  if (name.startsWith(typed)) return 1;
+  if (name.includes(typed)) return 2;
+  return 3;
 }
 
 interface AddCalculationModalProps {
@@ -54,6 +66,14 @@ export function AddCalculationModal({
     setModifierIds((prev) => (prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]));
   }
 
+  const cloneSuggestions = useMemo(() => {
+    const typed = name.trim();
+    if (!typed) return existingCalculations;
+    return [...existingCalculations].sort(
+      (a, b) => cloneMatchRank(a.name, typed) - cloneMatchRank(b.name, typed),
+    );
+  }, [existingCalculations, name]);
+
   // System modifiers are concatenated after the user's own, so they stay
   // pinned to the bottom of the list even once the search filter is applied.
   const allModifiers = [...modifiers, ...systemModifiers];
@@ -71,22 +91,6 @@ export function AddCalculationModal({
   return (
     <Modal title="Add Calculation" onClose={onClose}>
       <form onSubmit={handleSubmit} className="add-item-form">
-        {existingCalculations.length > 0 && (
-          <div className="picker-field">
-            <span>Clone Existing (optional)</span>
-            <ul className="clone-calculation-list">
-              {existingCalculations.map((calculation) => (
-                <li key={calculation.id}>
-                  <button type="button" onClick={() => cloneCalculation(calculation)}>
-                    {calculation.name}
-                    {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         <label>
           Name
           <input
@@ -97,6 +101,22 @@ export function AddCalculationModal({
             required
           />
         </label>
+
+        {existingCalculations.length > 0 && (
+          <div className="picker-field">
+            <span>Clone Existing (optional)</span>
+            <ul className="clone-calculation-list">
+              {cloneSuggestions.map((calculation) => (
+                <li key={calculation.id}>
+                  <button type="button" onClick={() => cloneCalculation(calculation)}>
+                    {calculation.name}
+                    {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="picker-field">
           <span>Dice Roll</span>
