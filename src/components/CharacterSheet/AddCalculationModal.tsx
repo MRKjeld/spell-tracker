@@ -1,16 +1,25 @@
 import { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { ScrollPicker } from '../common/ScrollPicker';
-import type { Modifier } from '../../state/types';
+import type { Calculation, Modifier } from '../../state/types';
 import { formatModifierValue } from '../../lib/modifiers';
 import { isSystemModifierId } from '../../lib/systemModifiers';
 
 const DICE_COUNTS = Array.from({ length: 40 }, (_, i) => i + 1);
 const DICE_SIDES = [2, 3, 4, 6, 8, 10, 12, 20, 100];
 
+// Parses a diceRoll string like "2d6" back into its count/sides, falling
+// back to 1d20 if it doesn't match (shouldn't happen -- every Calculation's
+// diceRoll is built from these same scroll pickers).
+function parseDiceRoll(diceRoll: string): { diceCount: number; diceSides: number } {
+  const match = /^(\d+)d(\d+)$/.exec(diceRoll);
+  return match ? { diceCount: Number(match[1]), diceSides: Number(match[2]) } : { diceCount: 1, diceSides: 20 };
+}
+
 interface AddCalculationModalProps {
   modifiers: Modifier[];
   systemModifiers: Modifier[];
+  existingCalculations: Calculation[];
   onAdd: (calculation: { name: string; diceRoll: string; modifierIds: string[] }) => void;
   onRemoveModifier: (modifierId: string) => void;
   onClose: () => void;
@@ -19,6 +28,7 @@ interface AddCalculationModalProps {
 export function AddCalculationModal({
   modifiers,
   systemModifiers,
+  existingCalculations,
   onAdd,
   onRemoveModifier,
   onClose,
@@ -28,6 +38,17 @@ export function AddCalculationModal({
   const [diceSides, setDiceSides] = useState(20);
   const [modifierIds, setModifierIds] = useState<string[]>([]);
   const [modifierSearch, setModifierSearch] = useState('');
+
+  // Cloning an existing Calculation just pre-fills this form with its name,
+  // dice roll, and modifiers -- submitting still creates a brand new
+  // Calculation (see onAdd), so the source is left untouched.
+  function cloneCalculation(source: Calculation) {
+    setName(source.name);
+    const { diceCount: sourceDiceCount, diceSides: sourceDiceSides } = parseDiceRoll(source.diceRoll);
+    setDiceCount(sourceDiceCount);
+    setDiceSides(sourceDiceSides);
+    setModifierIds([...source.modifierIds]);
+  }
 
   function toggleModifier(id: string) {
     setModifierIds((prev) => (prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]));
@@ -50,6 +71,22 @@ export function AddCalculationModal({
   return (
     <Modal title="Add Calculation" onClose={onClose}>
       <form onSubmit={handleSubmit} className="add-item-form">
+        {existingCalculations.length > 0 && (
+          <div className="picker-field">
+            <span>Clone Existing (optional)</span>
+            <ul className="clone-calculation-list">
+              {existingCalculations.map((calculation) => (
+                <li key={calculation.id}>
+                  <button type="button" onClick={() => cloneCalculation(calculation)}>
+                    {calculation.name}
+                    {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <label>
           Name
           <input

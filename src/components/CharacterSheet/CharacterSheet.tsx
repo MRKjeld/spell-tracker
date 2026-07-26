@@ -35,6 +35,7 @@ import { AddCalculationModal } from './AddCalculationModal';
 import { AddActionModal } from './AddActionModal';
 import { findItemForSlot } from '../../lib/equipmentSlots';
 import { getSystemModifiers, isSystemModifierId } from '../../lib/systemModifiers';
+import { getSystemCalculations, isSystemCalculationId } from '../../lib/systemCalculations';
 
 // Which catalog/picker a given body slot is filled from: 'armor' takes worn
 // armor, 'mainHand'/'offhand' take shields and hand-eligible weapons,
@@ -155,6 +156,8 @@ export function CharacterSheet() {
     if (!character) return [];
     return getSystemModifiers(character);
   }, [character]);
+
+  const systemCalculations = useMemo(() => getSystemCalculations(), []);
 
   if (!character) {
     return (
@@ -320,6 +323,7 @@ export function CharacterSheet() {
   }
 
   function handleRemoveCalculation(calculationId: string) {
+    if (isSystemCalculationId(calculationId)) return; // system calculations can't be removed
     const calculation = character!.calculations.find((c) => c.id === calculationId);
     if (confirm(`Delete ${calculation?.name ?? 'this calculation'}? This cannot be undone.`)) {
       removeCalculation(character!.id, calculationId);
@@ -468,7 +472,7 @@ export function CharacterSheet() {
       {resolvedTab === 'actions' && (
         <ActionsSection
           modifiers={[...character.modifiers, ...systemModifiers]}
-          calculations={character.calculations}
+          calculations={[...character.calculations, ...systemCalculations]}
           actions={character.actions}
           onAddModifier={() => setShowAddModifier(true)}
           onAddCalculation={() => setShowAddCalculation(true)}
@@ -652,6 +656,7 @@ export function CharacterSheet() {
         <AddCalculationModal
           modifiers={character.modifiers}
           systemModifiers={systemModifiers}
+          existingCalculations={[...character.calculations, ...systemCalculations]}
           onAdd={(calculation) => addCalculation(character.id, calculation)}
           onRemoveModifier={handleRemoveModifier}
           onClose={() => setShowAddCalculation(false)}
@@ -660,7 +665,7 @@ export function CharacterSheet() {
 
       {showAddAction && (
         <AddActionModal
-          calculations={character.calculations}
+          calculations={[...character.calculations, ...systemCalculations]}
           onAdd={(action) => addAction(character.id, action)}
           onRemoveCalculation={handleRemoveCalculation}
           onClose={() => setShowAddAction(false)}

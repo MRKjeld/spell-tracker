@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal } from '../common/Modal';
 import type { Calculation } from '../../state/types';
+import { isSystemCalculationId } from '../../lib/systemCalculations';
 
 interface AddActionModalProps {
   calculations: Calculation[];
@@ -73,28 +74,37 @@ export function AddActionModal({ calculations, onAdd, onRemoveCalculation, onClo
                 <p className="equipment-empty">No calculations match "{calculationSearch}".</p>
               ) : (
                 <ul className="picker-checklist">
-                  {visibleCalculations.map((calculation) => (
-                    <li key={calculation.id}>
-                      <label className="picker-checklist-item">
-                        <input
-                          type="checkbox"
-                          checked={calculationIds.includes(calculation.id)}
-                          onChange={() => toggleCalculation(calculation.id)}
-                        />
-                        {calculation.name}
-                        {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
-                      </label>
-                      <button
-                        type="button"
-                        className="picker-checklist-remove"
-                        onClick={() => onRemoveCalculation(calculation.id)}
-                        title={`Delete ${calculation.name}`}
-                        aria-label={`Delete ${calculation.name}`}
-                      >
-                        ×
-                      </button>
-                    </li>
-                  ))}
+                  {visibleCalculations.map((calculation) => {
+                    const isSystem = isSystemCalculationId(calculation.id);
+                    return (
+                      <li key={calculation.id}>
+                        <label className="picker-checklist-item">
+                          <input
+                            type="checkbox"
+                            checked={calculationIds.includes(calculation.id)}
+                            onChange={() => toggleCalculation(calculation.id)}
+                          />
+                          {calculation.name}
+                          {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
+                        </label>
+                        {isSystem ? (
+                          <span className="modifier-block-system-tag" title="Always available; can't be removed">
+                            System
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="picker-checklist-remove"
+                            onClick={() => onRemoveCalculation(calculation.id)}
+                            title={`Delete ${calculation.name}`}
+                            aria-label={`Delete ${calculation.name}`}
+                          >
+                            ×
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </>
