@@ -52,8 +52,8 @@ export const BODY_SLOT_LABELS: Record<BodySlotId, string> = {
   feet: 'Feet',
   mainHand: 'Main Hand',
   offhand: 'Offhand',
-  ring1: 'Ring 1',
-  ring2: 'Ring 2',
+  ring1: 'Ring (Left)',
+  ring2: 'Ring (Right)',
   leg: 'Leg',
 };
 
@@ -70,8 +70,7 @@ export const WORN_ITEMS_LAYOUT: (BodySlotId | null)[] = [
   'shoulders', 'neck', 'shoulders',
   'wrists', 'chest', 'wrists',
   'hands', 'body', 'hands',
-  null, 'armor', null,
-  'ring1', 'belt', 'ring2',
-  'leg', null, 'leg',
+  'ring1', 'armor', 'ring2',
+  'leg', 'belt', 'leg',
   'feet', null, 'feet',
 ];
