@@ -146,12 +146,12 @@
 }
 
 .school-focus-options button:hover {
-  background: var(--school-color, var(--accent));
+  background: var(--school-color, var(--accent-spell));
   color: white;
 }
 
 .school-focus-tag {
-  background: var(--accent);
+  background: var(--accent-spell);
   color: white;
   border: none;
   border-radius: 999px;
@@ -222,8 +222,8 @@
 }
 
 .character-sheet-tab-active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: var(--accent-spell);
+  border-bottom-color: var(--accent-spell);
 }
 
 .cantrips-at-will-note {
@@ -239,7 +239,7 @@
   padding: 0;
   margin: 0;
   font: inherit;
-  color: var(--accent);
+  color: var(--accent-spell);
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -366,9 +366,9 @@
 }
 
 .slot-chip-filled {
-  background: var(--accent);
+  background: var(--accent-item);
   color: white;
-  border-color: var(--accent);
+  border-color: var(--accent-item);
 }
 
 .slot-chip-used {
@@ -478,7 +478,7 @@
 
 .item-view-worn {
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-item);
 }
 
 .item-view-equip-picker {
@@ -569,7 +569,7 @@
 }
 
 .action-calculation-roll {
-  color: var(--accent);
+  color: var(--accent-calculation);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -597,7 +597,7 @@
   top: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent);
+  background: var(--accent-modifier);
   color: #fff;
   padding: 3px 8px;
   border-radius: 4px;
@@ -807,16 +807,16 @@
 }
 
 .modifier-block-selected {
-  background: var(--accent);
+  background: var(--accent-modifier);
   color: white;
   box-shadow:
-    0 1px 0 var(--accent-hover),
+    0 1px 0 var(--accent-modifier-hover),
     inset 0 2px 4px rgba(0, 0, 0, 0.25);
   transform: translateY(2px);
 }
 
 .modifier-block-selected .modifier-block-stud {
-  background: var(--accent-hover);
+  background: var(--accent-modifier-hover);
 }
 
 .modifier-block-system {
@@ -824,7 +824,7 @@
 }
 
 .modifier-block-system.modifier-block-selected {
-  background: var(--accent);
+  background: var(--accent-modifier);
 }
 
 .modifier-block-system-tag {
@@ -1023,8 +1023,8 @@
 }
 
 .add-slot-pool-color-swatch.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent);
+  border-color: var(--accent-spell);
+  box-shadow: 0 0 0 2px var(--accent-spell);
 }
 
 .add-slot-pool-color-none {
@@ -1051,7 +1051,7 @@
 }
 
 .add-slot-pool-name-suggestions button:hover {
-  background: var(--accent);
+  background: var(--accent-spell);
   color: white;
 }
 
@@ -1061,7 +1061,10 @@
   margin: 0;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   gap: 6px;
+  max-height: 48px;
+  overflow-y: auto;
 }
 
 .clone-calculation-list button {
@@ -1074,8 +1077,8 @@
 }
 
 .clone-calculation-list button:hover {
-  background: var(--accent);
-  color: white;
+  background: var(--accent-calculation);
+  color: var(--accent-calculation-text);
 }
 
 .add-slot-pool-spells {
@@ -1135,9 +1138,9 @@
 }
 
 .spell-picker-show-all[aria-pressed='true'] {
-  background: var(--accent);
+  background: var(--accent-spell);
   color: white;
-  border-color: var(--accent);
+  border-color: var(--accent-spell);
 }
 
 .spell-picker-class-filter {
@@ -1191,7 +1194,7 @@
 }
 
 .spell-picker-pick.spell-picker-pick-selected {
-  background: var(--accent);
+  background: var(--accent-spell);
   color: white;
   border-radius: 4px;
 }

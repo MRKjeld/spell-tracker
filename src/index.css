@@ -4,8 +4,23 @@
   --bg: #fdfcfb;
   --surface: #ffffff;
   --border: #e5e4e7;
-  --accent: #7a3ff2;
-  --accent-hover: #6329d6;
+
+  --accent-action: #45fe5b;
+  --accent-action-hover: #37cd49;
+  
+  --accent-spell: #7a3ff2;
+  --accent-spell-hover: #6329d6;
+
+  --accent-item: #7e939c;
+  --accent-item-hover: #66767d;
+
+  --accent-modifier: #ef4444;
+  --accent-modifier-hover: #dc2626;
+
+  --accent-calculation: #eab308;
+  --accent-calculation-hover: #ca8a04;
+  --accent-calculation-text: #18181b;
+
   --danger: #c0392b;
   --item-chip-worn: #a1a1aa;
   --item-chip-unworn: #71717a;
@@ -21,8 +36,23 @@
     --bg: #16171d;
     --surface: #1f2028;
     --border: #2e303a;
-    --accent: #c084fc;
-    --accent-hover: #d6a8ff;
+  
+    --accent-action: #45fe5b;
+    --accent-action-hover: #37cd49;
+    
+    --accent-spell: #7a3ff2;
+    --accent-spell-hover: #6329d6;
+
+    --accent-item: #7e939c;
+    --accent-item-hover: #66767d;
+
+    --accent-modifier: #ef4444;
+    --accent-modifier-hover: #dc2626;
+
+    --accent-calculation: #eab308;
+    --accent-calculation-hover: #ca8a04;
+    --accent-calculation-text: #18181b;
+
     --item-chip-worn: #52525b;
     --item-chip-unworn: #3f3f46;
   }
@@ -54,7 +84,7 @@ select {
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-spell);
 }
 
 button {
@@ -66,13 +96,13 @@ button {
 }
 
 button:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-spell);
 }
 
 .button-primary {
-  background: var(--accent);
+  background: var(--accent-spell);
   color: white;
-  border-color: var(--accent);
+  border-color: var(--accent-spell);
   text-decoration: none;
   display: inline-block;
   border-radius: 8px;
@@ -80,7 +110,7 @@ button:hover {
 }
 
 .button-primary:hover {
-  background: var(--accent-hover);
+  background: var(--accent-spell-hover);
 }
 
 .button-secondary {
@@ -100,4 +130,63 @@ button:hover {
 .button-danger:hover {
   background: var(--danger);
   color: white;
+}
+
+/* Tab/concept button theming -- each tab (and Modifiers/Calculations within
+   the Actions tab) gets its own background so buttons are visually grouped
+   by what they belong to. Restyle by editing the --accent-* variables above,
+   or these rules directly. */
+.button-theme-action {
+  background: var(--accent-action);
+  border-color: var(--accent-action);
+  color: white;
+}
+
+.button-theme-action:hover {
+  background: var(--accent-action-hover);
+  border-color: var(--accent-action-hover);
+}
+
+.button-theme-item {
+  background: var(--accent-item);
+  border-color: var(--accent-item);
+  color: white;
+}
+
+.button-theme-item:hover {
+  background: var(--accent-item-hover);
+  border-color: var(--accent-item-hover);
+}
+
+.button-theme-spell {
+  background: var(--accent-spell);
+  border-color: var(--accent-spell);
+  color: white;
+}
+
+.button-theme-spell:hover {
+  background: var(--accent-spell-hover);
+  border-color: var(--accent-spell-hover);
+}
+
+.button-theme-modifier {
+  background: var(--accent-modifier);
+  border-color: var(--accent-modifier);
+  color: white;
+}
+
+.button-theme-modifier:hover {
+  background: var(--accent-modifier-hover);
+  border-color: var(--accent-modifier-hover);
+}
+
+.button-theme-calculation {
+  background: var(--accent-calculation);
+  border-color: var(--accent-calculation);
+  color: var(--accent-calculation-text);
+}
+
+.button-theme-calculation:hover {
+  background: var(--accent-calculation-hover);
+  border-color: var(--accent-calculation-hover);
 }
