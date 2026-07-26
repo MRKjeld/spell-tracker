@@ -19,6 +19,11 @@ function makeItem(overrides: Partial<Item>): Item {
     slot: null,
     category: null,
     equippedSlot: null,
+    price: '',
+    aura: '',
+    cl: '',
+    weight: '',
+    construction: '',
     ...overrides,
   };
 }
