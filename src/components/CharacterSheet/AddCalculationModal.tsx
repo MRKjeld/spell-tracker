@@ -136,17 +136,11 @@ export function AddCalculationModal({
                           onClick={() => toggleModifier(modifier.id)}
                           aria-pressed={isSelected}
                         >
-                          <span className="modifier-block-studs" aria-hidden="true">
-                            <span className="modifier-block-stud" />
-                            <span className="modifier-block-stud" />
-                          </span>
                           <span className="modifier-block-label">{modifier.name}</span>
                           <span className="modifier-block-value">{formatModifierValue(modifier.value)}</span>
                         </button>
                         {isSystem ? (
-                          <span className="modifier-block-system-tag" title="Always available; can't be removed">
-                            System
-                          </span>
+                          <span className="modifier-block-system-tag" title="Always available; can't be removed"/>
                         ) : (
                           <button
                             type="button"

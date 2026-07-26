@@ -88,9 +88,7 @@ export function AddActionModal({ calculations, onAdd, onRemoveCalculation, onClo
                           {calculation.diceRoll ? ` (${calculation.diceRoll})` : ''}
                         </label>
                         {isSystem ? (
-                          <span className="modifier-block-system-tag" title="Always available; can't be removed">
-                            System
-                          </span>
+                          <span className="modifier-block-system-tag" title="Always available; can't be removed"/>
                         ) : (
                           <button
                             type="button"
