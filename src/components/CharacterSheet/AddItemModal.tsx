@@ -15,6 +15,11 @@ interface AddItemModalProps {
     activation: string;
     usePeriod: ItemUsePeriod;
     maxUses: number;
+    price: string;
+    aura: string;
+    cl: string;
+    weight: string;
+    construction: string;
   }) => void;
   onClose: () => void;
 }
@@ -42,6 +47,11 @@ export function AddItemModal({ onAdd, onClose }: AddItemModalProps) {
   const [activation, setActivation] = useState('');
   const [usePeriod, setUsePeriod] = useState<ItemUsePeriod>('day');
   const [maxUses, setMaxUses] = useState(1);
+  const [price, setPrice] = useState('');
+  const [aura, setAura] = useState('');
+  const [cl, setCl] = useState('');
+  const [weight, setWeight] = useState('');
+  const [construction, setConstruction] = useState('');
 
   // Armor and shields are mundane gear in this app's catalog (no activation);
   // every other slot — plus unslotted inventory items — behaves like a
@@ -61,6 +71,11 @@ export function AddItemModal({ onAdd, onClose }: AddItemModalProps) {
       activation: showActionFields ? activation.trim() : '',
       usePeriod: showActionFields ? usePeriod : 'unlimited',
       maxUses: showActionFields && usePeriod !== 'unlimited' ? Math.max(1, maxUses) : 0,
+      price: price.trim(),
+      aura: aura.trim(),
+      cl: cl.trim(),
+      weight: weight.trim(),
+      construction: construction.trim(),
     });
     onClose();
   }
@@ -145,6 +160,35 @@ export function AddItemModal({ onAdd, onClose }: AddItemModalProps) {
             )}
           </>
         )}
+
+        <fieldset className="add-item-optional-fields">
+          <legend>Optional Details</legend>
+          <label>
+            Price
+            <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 500 gp" />
+          </label>
+          <label>
+            Aura
+            <input value={aura} onChange={(e) => setAura(e.target.value)} placeholder="e.g. Faint transmutation" />
+          </label>
+          <label>
+            CL
+            <input value={cl} onChange={(e) => setCl(e.target.value)} placeholder="e.g. 5th" />
+          </label>
+          <label>
+            Weight
+            <input value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="e.g. 1 lb." />
+          </label>
+          <label>
+            Construction
+            <textarea
+              value={construction}
+              onChange={(e) => setConstruction(e.target.value)}
+              placeholder="Requirements and cost to craft"
+              rows={2}
+            />
+          </label>
+        </fieldset>
 
         <div className="form-actions">
           <button type="submit" className="button-primary">

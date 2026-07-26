@@ -60,6 +60,11 @@ function migrateLegacyEquipmentSlots(
       slot: null,
       category: null,
       equippedSlot: slot,
+      price: '',
+      aura: '',
+      cl: '',
+      weight: '',
+      construction: '',
     });
   }
   return migrated.length ? [...items, ...migrated] : items;
@@ -147,6 +152,11 @@ interface CharacterStoreState {
       activation: string;
       usePeriod: ItemUsePeriod;
       maxUses: number;
+      price: string;
+      aura: string;
+      cl: string;
+      weight: string;
+      construction: string;
     },
   ): void;
   removeItem(charId: string, itemId: string): void;
@@ -200,6 +210,11 @@ function backfillDefaults(character: Character): Character {
     slot: i.slot ?? null,
     category: i.category ?? null,
     equippedSlot: i.equippedSlot ?? null,
+    price: i.price ?? '',
+    aura: i.aura ?? '',
+    cl: i.cl ?? '',
+    weight: i.weight ?? '',
+    construction: i.construction ?? '',
   }));
   const classLevels = migrateLegacyClassLevels(character) ?? rest.classLevels ?? [];
   const primaryClassId = classLevels[0]?.classId;
@@ -400,6 +415,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: item.slot,
             category: item.category,
             equippedSlot: null,
+            price: item.price,
+            aura: item.aura,
+            cl: item.cl,
+            weight: item.weight,
+            construction: item.construction,
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
           return { characters: { ...state.characters, [charId]: updated } };
@@ -464,6 +484,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: slot,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
           const updated = touch({ ...existing, items: [...clearedItems, newItem] });
@@ -491,6 +516,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: slot,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
           const updated = touch({ ...existing, items: [...clearedItems, newItem] });
@@ -519,6 +549,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: slot,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot, twoHanded);
           const updated = touch({ ...existing, items: [...clearedItems, newItem] });
@@ -546,6 +581,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: slot,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const clearedItems = setEquippedSlot(existing.items ?? [], newItem.id, slot);
           const updated = touch({ ...existing, items: [...clearedItems, newItem] });
@@ -573,6 +613,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: null,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
           return { characters: { ...state.characters, [charId]: updated } };
@@ -599,6 +644,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: null,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
           return { characters: { ...state.characters, [charId]: updated } };
@@ -625,6 +675,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: null,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
           return { characters: { ...state.characters, [charId]: updated } };
@@ -651,6 +706,11 @@ export const useCharacterStore = create<CharacterStoreState>()(
             slot: null,
             category: null,
             equippedSlot: null,
+            price: '',
+            aura: '',
+            cl: '',
+            weight: '',
+            construction: '',
           };
           const updated = touch({ ...existing, items: [...(existing.items ?? []), newItem] });
           return { characters: { ...state.characters, [charId]: updated } };

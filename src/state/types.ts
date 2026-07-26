@@ -75,6 +75,13 @@ export interface Item {
   // is always anchored here at 'mainHand' and also fills 'offhand' — see
   // lib/equipmentSlots.ts's occupiedSlots for the item's full occupied set.
   equippedSlot: BodySlotId | null;
+  // Free-text flavor fields, set on custom items only (mirrors the shape of
+  // catalog entries like WondrousItemEntry) — all optional, '' when unset.
+  price: string;
+  aura: string;
+  cl: string;
+  weight: string;
+  construction: string;
 }
 
 // A single named bonus/penalty, e.g. "Strength" +4 or "Point-Blank Shot" +1.

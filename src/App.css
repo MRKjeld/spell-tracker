@@ -862,6 +862,21 @@
   color: inherit;
 }
 
+.add-item-optional-fields {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.add-item-optional-fields legend {
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
 /* Update toast */
 .update-toast {
   position: fixed;

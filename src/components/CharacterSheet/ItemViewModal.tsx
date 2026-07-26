@@ -28,6 +28,7 @@ const USE_PERIOD_LABELS: Record<Item['usePeriod'], string> = {
 };
 
 export function ItemViewModal({ item, onUseCharge, onRecharge, onRemove, onEquip, onUnequip, onClose }: ItemViewModalProps) {
+  const hasOptionalDetails = item.price || item.aura || item.cl || item.weight || item.construction;
   const isUnlimited = item.usePeriod === 'unlimited';
   const depleted = !isUnlimited && item.usesRemaining <= 0;
   const catalogEntry = item.wondrousItemId ? getWondrousItemById(item.wondrousItemId) : undefined;
@@ -49,6 +50,40 @@ export function ItemViewModal({ item, onUseCharge, onRecharge, onRemove, onEquip
     <Modal title={item.name} onClose={onClose}>
       {item.description && <p className="item-view-description">{item.description}</p>}
       {item.activation && <p className="item-view-activation">{item.activation}</p>}
+
+      {hasOptionalDetails && (
+        <div className="spell-picker-details">
+          {item.price && (
+            <p>
+              <strong>Price:</strong> {item.price}
+            </p>
+          )}
+          {(item.aura || item.cl) && (
+            <p>
+              {item.aura && (
+                <>
+                  <strong>Aura:</strong> {item.aura}{' '}
+                </>
+              )}
+              {item.cl && (
+                <>
+                  <strong>CL:</strong> {item.cl}
+                </>
+              )}
+            </p>
+          )}
+          {item.weight && (
+            <p>
+              <strong>Weight:</strong> {item.weight}
+            </p>
+          )}
+          {item.construction && (
+            <p>
+              <strong>Construction:</strong> {item.construction}
+            </p>
+          )}
+        </div>
+      )}
 
       <p className="item-view-uses">
         {isUnlimited ? USE_PERIOD_LABELS.unlimited : `${item.usesRemaining} / ${item.maxUses} ${USE_PERIOD_LABELS[item.usePeriod]}`}
