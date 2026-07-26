@@ -1,19 +1,20 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterStore';
-import { CANTRIPS_AT_WILL, CASTER_TYPE, CLASS_LABELS, isCasterClass } from '../../data/classes';
+import { CANTRIPS_AT_WILL, CASTER_TYPE, CASTING_TYPE, CLASS_LABELS, isCasterClass } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { computeSlots } from '../../lib/slotMath';
 import type { ComputedSlots } from '../../lib/slotMath';
 import { formatModifier } from '../../lib/casterStats';
 import { getSpellById } from '../../data/spells';
 import { getCasterClassLevels, getTotalBAB } from '../../lib/classLevels';
-import type { Item, SlotFill } from '../../state/types';
+import type { Item, LearnedSpell, SlotFill } from '../../state/types';
 import type { BodySlotId } from '../../data/bodySlots';
 import { SlotGrid } from './SlotGrid';
 import { AddSlotPoolModal } from './AddSlotPoolModal';
 import { SpellPickerModal } from './SpellPickerModal';
 import { LearnSpellsModal } from './LearnSpellsModal';
+import { CastSpellModal } from './CastSpellModal';
 import { SpellViewModal } from './SpellViewModal';
 import { CasterStatsModal } from './CasterStatsModal';
 import { KnownSpellsSection } from './KnownSpellsSection';
@@ -99,6 +100,7 @@ export function CharacterSheet() {
   const [showAddCalculation, setShowAddCalculation] = useState(false);
   const [showAddAction, setShowAddAction] = useState(false);
   const [showLearnPicker, setShowLearnPicker] = useState(false);
+  const [showCastPicker, setShowCastPicker] = useState(false);
   const [showSpellFocus, setShowSpellFocus] = useState(false);
   const [itemViewTarget, setItemViewTarget] = useState<Item | null>(null);
   const [slotPickerTarget, setSlotPickerTarget] = useState<BodySlotId | null>(null);
@@ -238,6 +240,32 @@ export function CharacterSheet() {
       });
     }
     setShowLearnPicker(false);
+  }
+
+  // Spontaneous casters (see CASTING_TYPE) cast straight from their known
+  // spells instead of prepping a specific spell into a specific slot ahead of
+  // time, so Cast picks the spell first and fills the first open slot at its
+  // level automatically, already marked used.
+  function handleCast(learned: LearnedSpell) {
+    if (!resolvedSpellClassId) return;
+    if (CANTRIPS_AT_WILL[resolvedSpellClassId] && learned.spellLevel === 0) {
+      setShowCastPicker(false);
+      return;
+    }
+    const levelSlots = activeComputed.levelSlots.find((ls) => ls.spellLevel === learned.spellLevel);
+    const openInstance = levelSlots?.instances.find((inst) => !character!.slotFills[inst.id]);
+    if (!openInstance) {
+      alert(`No level ${learned.spellLevel} slots remaining to cast ${learned.spellName}.`);
+      return;
+    }
+    fillSlot(character!.id, openInstance.id, {
+      spellId: learned.spellId,
+      spellName: learned.spellName,
+      sourceClassId: learned.sourceClassId,
+      used: true,
+      persistAfterRest: false,
+    });
+    setShowCastPicker(false);
   }
 
   function handleRest() {
@@ -467,6 +495,11 @@ export function CharacterSheet() {
                 + Learn
               </button>
             )}
+            {resolvedSpellClassId && CASTING_TYPE[resolvedSpellClassId] === 'spontaneous' && (
+              <button type="button" onClick={() => setShowCastPicker(true)}>
+                Cast
+              </button>
+            )}
             <button type="button" onClick={() => setShowSpellFocus((v) => !v)} aria-pressed={showSpellFocus}>
               Spell Focus
             </button>
@@ -558,6 +591,14 @@ export function CharacterSheet() {
           learnedSpellIds={activeLearnedSpells.map((s) => s.spellId)}
           onConfirm={handleLearnConfirm}
           onClose={() => setShowLearnPicker(false)}
+        />
+      )}
+
+      {showCastPicker && (
+        <CastSpellModal
+          learnedSpells={activeLearnedSpells}
+          onCast={handleCast}
+          onClose={() => setShowCastPicker(false)}
         />
       )}
 
