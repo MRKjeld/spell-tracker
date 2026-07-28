@@ -3,18 +3,19 @@ import { Modal } from '../common/Modal';
 import { NumberInput } from '../common/NumberInput';
 
 interface AddModifierModalProps {
-  onAdd: (modifier: { name: string; value: number }) => void;
+  onAdd: (modifier: { name: string; value: number; circumstantial: boolean }) => void;
   onClose: () => void;
 }
 
 export function AddModifierModal({ onAdd, onClose }: AddModifierModalProps) {
   const [name, setName] = useState('');
   const [value, setValue] = useState(0);
+  const [circumstantial, setCircumstantial] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd({ name: name.trim(), value });
+    onAdd({ name: name.trim(), value, circumstantial });
     onClose();
   }
 
@@ -35,6 +36,15 @@ export function AddModifierModal({ onAdd, onClose }: AddModifierModalProps) {
         <label>
           Value
           <NumberInput value={value} onChange={setValue} />
+        </label>
+
+        <label className="picker-checklist-item">
+          <input
+            type="checkbox"
+            checked={circumstantial}
+            onChange={(e) => setCircumstantial(e.target.checked)}
+          />
+          Circumstantial
         </label>
 
         <div className="form-actions">

@@ -4,6 +4,7 @@
   --bg: #fdfcfb;
   --surface: #ffffff;
   --border: #e5e4e7;
+  --text-dark-bg: #fff;
 
   --accent-action: #1d6225;
   --accent-action-hover: #207229;
@@ -16,6 +17,9 @@
 
   --accent-modifier: #ef4444;
   --accent-modifier-hover: #dc2626;
+
+  --accent-circumstance-selected-bg: #000;
+  --accent-circumstance-selected-text: #fff;
 
   --accent-calculation: #eab308;
   --accent-calculation-hover: #ca8a04;

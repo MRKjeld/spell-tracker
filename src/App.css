@@ -815,6 +815,11 @@
   transform: translateY(2px);
 }
 
+.modifier-chip-circumstantial-selected {
+  background: var(--accent-circumstance-selected-bg);
+  color: var(--accent-circumstance-selected-text);
+}
+
 .modifier-block-selected .modifier-block-stud {
   background: var(--accent-modifier-hover);
 }

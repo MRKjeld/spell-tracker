@@ -177,10 +177,18 @@ interface CharacterStoreState {
     spell: { classId: ClassId; spellId: string; spellName: string; spellLevel: number; sourceClassId: ClassId | null },
   ): void;
   unlearnSpell(charId: string, learnedSpellId: string): void;
-  addModifier(charId: string, modifier: { name: string; value: number }): void;
+  addModifier(charId: string, modifier: { name: string; value: number; circumstantial?: boolean }): void;
   removeModifier(charId: string, modifierId: string): void;
-  addCalculation(charId: string, calculation: { name: string; diceRoll: string; modifierIds: string[] }): void;
+  addCalculation(
+    charId: string,
+    calculation: { name: string; diceRoll: string; modifierIds: string[]; selectedCircumstantialIds?: string[] },
+  ): void;
   removeCalculation(charId: string, calculationId: string): void;
+  setCalculationSelectedCircumstantials(
+    charId: string,
+    calculationId: string,
+    selectedModifierIds: string[],
+  ): void;
   addAction(charId: string, action: { name: string; description: string; calculationIds: string[] }): void;
   removeAction(charId: string, actionId: string): void;
   replaceAllCharacters(chars: Character[]): void;
@@ -218,6 +226,19 @@ function backfillDefaults(character: Character): Character {
   }));
   const classLevels = migrateLegacyClassLevels(character) ?? rest.classLevels ?? [];
   const primaryClassId = classLevels[0]?.classId;
+  const modifiers = (rest.modifiers ?? []).map((m) => ({
+    ...m,
+    circumstantial: m.circumstantial ?? false,
+  }));
+  const modifierById = new Map(modifiers.map((m) => [m.id, m]));
+  const calculations = (rest.calculations ?? []).map((c) => {
+    const validIds = new Set(c.modifierIds);
+    const selectedCircumstantialIds = (c.selectedCircumstantialIds ?? []).filter((id) => {
+      if (!validIds.has(id)) return false;
+      return modifierById.get(id)?.circumstantial ?? false;
+    });
+    return { ...c, selectedCircumstantialIds };
+  });
   return {
     ...rest,
     classLevels,
@@ -227,8 +248,8 @@ function backfillDefaults(character: Character): Character {
     items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots)
       .map(reconcileWondrousItemCharges)
       .map(reconcileRingItemCharges),
-    modifiers: rest.modifiers ?? [],
-    calculations: rest.calculations ?? [],
+    modifiers,
+    calculations,
     actions: rest.actions ?? [],
     extraSlotPools: (rest.extraSlotPools ?? []).map((p) => ({ ...p, classId: p.classId ?? primaryClassId })),
     learnedSpells: (rest.learnedSpells ?? []).map((s) => ({ ...s, classId: s.classId ?? s.sourceClassId ?? primaryClassId })),
@@ -770,7 +791,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
         set((state) => {
           const existing = state.characters[charId];
           if (!existing) return state;
-          const newModifier: Modifier = { ...modifier, id: createId() };
+          const newModifier: Modifier = { ...modifier, id: createId(), circumstantial: modifier.circumstantial ?? false };
           const updated = touch({ ...existing, modifiers: [...(existing.modifiers ?? []), newModifier] });
           return { characters: { ...state.characters, [charId]: updated } };
         });
@@ -788,6 +809,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
             calculations: (existing.calculations ?? []).map((c) => ({
               ...c,
               modifierIds: c.modifierIds.filter((id) => id !== modifierId),
+              selectedCircumstantialIds: (c.selectedCircumstantialIds ?? []).filter((id) => id !== modifierId),
             })),
           });
           return { characters: { ...state.characters, [charId]: updated } };
@@ -798,7 +820,17 @@ export const useCharacterStore = create<CharacterStoreState>()(
         set((state) => {
           const existing = state.characters[charId];
           if (!existing) return state;
-          const newCalculation: Calculation = { ...calculation, id: createId() };
+          const selectedSet = new Set(calculation.selectedCircumstantialIds ?? []);
+          const modifierById = new Map((existing.modifiers ?? []).map((m) => [m.id, m]));
+          const selectedCircumstantialIds = calculation.modifierIds.filter((id) => {
+            if (!selectedSet.has(id)) return false;
+            return modifierById.get(id)?.circumstantial ?? false;
+          });
+          const newCalculation: Calculation = {
+            ...calculation,
+            id: createId(),
+            selectedCircumstantialIds,
+          };
           const updated = touch({
             ...existing,
             calculations: [...(existing.calculations ?? []), newCalculation],
@@ -820,6 +852,27 @@ export const useCharacterStore = create<CharacterStoreState>()(
               ...a,
               calculationIds: a.calculationIds.filter((id) => id !== calculationId),
             })),
+          });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      setCalculationSelectedCircumstantials(charId, calculationId, selectedModifierIds) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const modifierById = new Map((existing.modifiers ?? []).map((m) => [m.id, m]));
+          const selectedSet = new Set(selectedModifierIds);
+          const updated = touch({
+            ...existing,
+            calculations: (existing.calculations ?? []).map((c) => {
+              if (c.id !== calculationId) return c;
+              const validIds = c.modifierIds.filter((id) => {
+                if (!selectedSet.has(id)) return false;
+                return modifierById.get(id)?.circumstantial ?? false;
+              });
+              return { ...c, selectedCircumstantialIds: validIds };
+            }),
           });
           return { characters: { ...state.characters, [charId]: updated } };
         });

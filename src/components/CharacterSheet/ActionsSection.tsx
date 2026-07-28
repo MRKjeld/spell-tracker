@@ -9,6 +9,7 @@ interface ActionsSectionProps {
   onAddModifier: () => void;
   onAddCalculation: () => void;
   onAddAction: () => void;
+  onSetCalculationSelectedCircumstantials: (calculationId: string, selectedModifierIds: string[]) => void;
   onRemoveAction: (actionId: string) => void;
 }
 
@@ -19,6 +20,7 @@ export function ActionsSection({
   onAddModifier,
   onAddCalculation,
   onAddAction,
+  onSetCalculationSelectedCircumstantials,
   onRemoveAction,
 }: ActionsSectionProps) {
   // Which modifier chip currently has its name revealed, keyed by
@@ -81,19 +83,41 @@ export function ActionsSection({
                     const calcModifiers = calculation.modifierIds
                       .map((id) => modifierById.get(id))
                       .filter((m): m is Modifier => m !== undefined);
-                    const total = calcModifiers.reduce((sum, m) => sum + m.value, 0);
+                    const baseModifiers = calcModifiers.filter((m) => !m.circumstantial);
+                    const circumstantialModifiers = calcModifiers.filter((m) => m.circumstantial);
+                    const selectedCircumstantialIdList = calculation.selectedCircumstantialIds ?? [];
+                    const selectedCircumstantialIds = new Set(selectedCircumstantialIdList);
+                    const selectedCircumstantialModifiers = circumstantialModifiers.filter((m) =>
+                      selectedCircumstantialIds.has(m.id),
+                    );
+                    const appliedModifiers = [...baseModifiers, ...selectedCircumstantialModifiers];
+                    const total = appliedModifiers.reduce(
+                      (sum, m) => sum + m.value,
+                      0,
+                    );
+
+                    function toggleCircumstantial(modifierId: string) {
+                      const nextSelected = new Set(selectedCircumstantialIdList);
+                      if (nextSelected.has(modifierId)) {
+                        nextSelected.delete(modifierId);
+                      } else {
+                        nextSelected.add(modifierId);
+                      }
+                      onSetCalculationSelectedCircumstantials(calcId, [...nextSelected]);
+                    }
+
                     return (
                       <div key={calcId} className="action-calculation">
                         <div className="action-calculation-header">
                           <span className="action-calculation-name">{calculation.name}</span>
                           <span className="action-calculation-roll">
                             {calculation.diceRoll}
-                            {calcModifiers.length > 0 ? ` ${formatModifierValue(total)}` : ''}
+                            {appliedModifiers.length > 0 ? ` ${formatModifierValue(total)}` : ''}
                           </span>
                         </div>
                         {calcModifiers.length > 0 && (
                           <div className="action-calculation-modifiers">
-                            {calcModifiers.map((modifier) => {
+                            {baseModifiers.map((modifier) => {
                               const chipKey = `${calcId}-${modifier.id}`;
                               const isRevealed = revealedChip === chipKey;
                               return (
@@ -108,6 +132,25 @@ export function ActionsSection({
                                 </button>
                               );
                             })}
+                            {circumstantialModifiers.length > 0 && (
+                              <div className="action-calculation-circumstantial-modifiers">
+                                {circumstantialModifiers.map((modifier) => {
+                                  const isSelected = selectedCircumstantialIds.has(modifier.id);
+                                  return (
+                                    <button
+                                      key={modifier.id}
+                                      type="button"
+                                      className={`modifier-chip modifier-chip-circumstantial${isSelected ? ' modifier-chip-circumstantial-selected' : ''}`}
+                                      onClick={() => toggleCircumstantial(modifier.id)}
+                                      title={modifier.name}
+                                      aria-pressed={isSelected}
+                                    >
+                                      {isSelected ? modifier.name + " " + formatModifierValue(modifier.value) : modifier.name}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

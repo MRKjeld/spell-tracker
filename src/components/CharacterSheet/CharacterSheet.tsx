@@ -83,6 +83,7 @@ export function CharacterSheet() {
   const removeModifier = useCharacterStore((s) => s.removeModifier);
   const addCalculation = useCharacterStore((s) => s.addCalculation);
   const removeCalculation = useCharacterStore((s) => s.removeCalculation);
+  const setCalculationSelectedCircumstantials = useCharacterStore((s) => s.setCalculationSelectedCircumstantials);
   const addAction = useCharacterStore((s) => s.addAction);
   const removeAction = useCharacterStore((s) => s.removeAction);
   const learnSpell = useCharacterStore((s) => s.learnSpell);
@@ -477,6 +478,9 @@ export function CharacterSheet() {
           onAddModifier={() => setShowAddModifier(true)}
           onAddCalculation={() => setShowAddCalculation(true)}
           onAddAction={() => setShowAddAction(true)}
+          onSetCalculationSelectedCircumstantials={(calculationId, selectedModifierIds) =>
+            setCalculationSelectedCircumstantials(character.id, calculationId, selectedModifierIds)
+          }
           onRemoveAction={handleRemoveAction}
         />
       )}

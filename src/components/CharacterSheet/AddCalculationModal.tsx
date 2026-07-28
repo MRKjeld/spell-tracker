@@ -152,7 +152,7 @@ export function AddCalculationModal({
                       <li key={modifier.id} className="modifier-block-item">
                         <button
                           type="button"
-                          className={`modifier-block${isSelected ? ' modifier-block-selected' : ''}${isSystem ? ' modifier-block-system' : ''}`}
+                          className={`modifier-block${isSelected ? ' modifier-block-selected' : ''}${isSystem ? ' modifier-block-system' : ''}${modifier.circumstantial ? ' modifier-block-circumstantial' : ''}`}
                           onClick={() => toggleModifier(modifier.id)}
                           aria-pressed={isSelected}
                         >
@@ -164,7 +164,7 @@ export function AddCalculationModal({
                         ) : (
                           <button
                             type="button"
-                            className="picker-checklist-remove"
+                            className={`picker-checklist-remove${modifier.circumstantial ? ' picker-checklist-remove-circumstantial' : ''}`}
                             onClick={() => onRemoveModifier(modifier.id)}
                             title={`Delete ${modifier.name}`}
                             aria-label={`Delete ${modifier.name}`}

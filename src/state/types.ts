@@ -90,6 +90,7 @@ export interface Modifier {
   id: string;
   name: string;
   value: number;
+  circumstantial: boolean;
 }
 
 // A named dice roll plus the Modifiers that apply to it, e.g. "Ranged Attack
@@ -99,6 +100,7 @@ export interface Calculation {
   name: string;
   diceRoll: string; // free text, e.g. "1d20"
   modifierIds: string[]; // references into Character.modifiers
+  selectedCircumstantialIds?: string[]; // subset of modifierIds toggled on in Actions tab
 }
 
 // A named activity a character can take, e.g. "Alchemist's Bomb", with a

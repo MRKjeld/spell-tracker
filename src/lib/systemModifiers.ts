@@ -30,6 +30,7 @@ export function getSystemModifiers(character: Pick<Character, 'classLevels' | 'a
     id: `${SYSTEM_MODIFIER_PREFIX}${abilityId}-mod`,
     name: ABILITY_MOD_LABELS[abilityId],
     value: abilityModifier(character.abilityScores[abilityId]),
+    circumstantial: false,
   }));
 
   const totalLevel = getTotalLevel(character.classLevels);
@@ -40,12 +41,13 @@ export function getSystemModifiers(character: Pick<Character, 'classLevels' | 'a
     id: `${SYSTEM_MODIFIER_PREFIX}level-${cl.classId}`,
     name: `${CLASS_LABELS[cl.classId]} Level`,
     value: cl.level,
+    circumstantial: false,
   }));
 
   return [
-    { id: `${SYSTEM_MODIFIER_PREFIX}level`, name: 'Level', value: totalLevel },
-    { id: `${SYSTEM_MODIFIER_PREFIX}class-level`, name: 'Class Level', value: totalLevel },
-    { id: `${SYSTEM_MODIFIER_PREFIX}bab`, name: 'BAB', value: getTotalBAB(character.classLevels) },
+    { id: `${SYSTEM_MODIFIER_PREFIX}level`, name: 'Level', value: totalLevel, circumstantial: false },
+    { id: `${SYSTEM_MODIFIER_PREFIX}class-level`, name: 'Class Level', value: totalLevel, circumstantial: false },
+    { id: `${SYSTEM_MODIFIER_PREFIX}bab`, name: 'BAB', value: getTotalBAB(character.classLevels), circumstantial: false },
     ...perClassLevelMods,
     ...abilityMods,
   ];
