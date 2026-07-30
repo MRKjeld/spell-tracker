@@ -6,8 +6,10 @@
   --border: #e5e4e7;
   --text-dark-bg: #fff;
 
-  --accent-action: #1d6225;
-  --accent-action-hover: #207229;
+  --surface-action: #f3f3f3;
+
+  --accent-action: #14471a;
+  --accent-action-hover: #18551f;
   
   --accent-spell: #7a3ff2;
   --accent-spell-hover: #6329d6;
