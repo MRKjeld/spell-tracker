@@ -147,12 +147,19 @@ export function AddCalculationModal({
                 <ul className="modifier-block-list">
                   {visibleModifiers.map((modifier) => {
                     const isSelected = modifierIds.includes(modifier.id);
+                    const isCircumstantial = modifier.circumstantial;
                     const isSystem = isSystemModifierId(modifier.id);
+                    const classNames = "modifier-block"
+                            + (isSelected ? ' modifier-block-selected' : '')
+                            + (isSystem ? ' modifier-block-system' : '')
+                            + (isCircumstantial && isSelected ? ' modifier-block-circumstantial-selected' : ''); 
+
                     return (
                       <li key={modifier.id} className="modifier-block-item">
                         <button
                           type="button"
-                          className={`modifier-block${isSelected ? ' modifier-block-selected' : ''}${isSystem ? ' modifier-block-system' : ''}${modifier.circumstantial ? ' modifier-block-circumstantial' : ''}`}
+                          className={classNames}
+                          //className={`modifier-block${isSelected ? ' modifier-block-selected' : ''}${isSystem ? ' modifier-block-system' : ''}${modifier.circumstantial ? ' modifier-block-circumstantial' : ''}`}
                           onClick={() => toggleModifier(modifier.id)}
                           aria-pressed={isSelected}
                         >

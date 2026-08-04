@@ -25,7 +25,7 @@
 
   --accent-calculation: #eab308;
   --accent-calculation-hover: #ca8a04;
-  --accent-calculation-text: #18181b;
+  --accent-calculation-text: #ffffff;
 
   --danger: #c0392b;
   --item-chip-worn: #a1a1aa;
@@ -57,7 +57,6 @@
 
     --accent-calculation: #eab308;
     --accent-calculation-hover: #ca8a04;
-    --accent-calculation-text: #18181b;
 
     --item-chip-worn: #52525b;
     --item-chip-unworn: #3f3f46;
