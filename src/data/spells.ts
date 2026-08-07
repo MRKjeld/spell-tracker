@@ -1,3 +1,4 @@
+import type { LearnedSpell } from '../state/types';
 import type { ClassId } from './classes';
 import rawSpells from './spells.generated.json';
 
@@ -37,7 +38,7 @@ export function humanizeTag(tag: string): string {
 
 const SPELLS = rawSpells as SpellEntry[];
 
-const byId = new Map<string, SpellEntry>();
+const byName = new Map<string, SpellEntry>();
 const byClassLevel = new Map<string, SpellEntry[]>();
 const byClass = new Map<ClassId, SpellEntry[]>();
 
@@ -46,7 +47,7 @@ function classLevelKey(classId: ClassId, spellLevel: number): string {
 }
 
 for (const spell of SPELLS) {
-  byId.set(spell.id, spell);
+  byName.set(spell.id, spell);
   for (const [classId, spellLevel] of Object.entries(spell.levels)) {
     const key = classLevelKey(classId as ClassId, spellLevel as number);
     const list = byClassLevel.get(key);
@@ -60,7 +61,7 @@ for (const spell of SPELLS) {
 }
 
 export function getSpellById(id: string): SpellEntry | undefined {
-  return byId.get(id);
+  return byName.get(id);
 }
 
 export function getSpellsFor(classId: ClassId, spellLevel: number): SpellEntry[] {
@@ -70,6 +71,10 @@ export function getSpellsFor(classId: ClassId, spellLevel: number): SpellEntry[]
 // All spells on a class's list, across every spell level -- for pickers with no level constraint.
 export function getAllSpellsFor(classId: ClassId): SpellEntry[] {
   return byClass.get(classId) ?? [];
+}
+
+export function getAllLearnedSpellsFor(learnedSpells: LearnedSpell[]): SpellEntry[] {
+  return learnedSpells.map((ls) => byName.get(ls.spellId)).filter((s): s is SpellEntry => !!s);
 }
 
 export function spellMatchesQuery(spell: SpellEntry, normalizedQuery: string, includeDescription: boolean): boolean {

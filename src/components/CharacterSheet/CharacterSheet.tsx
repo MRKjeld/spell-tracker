@@ -609,6 +609,7 @@ export function CharacterSheet() {
 
       {showCastPicker && (
         <CastSpellModal
+          classId={resolvedSpellClassId!}
           learnedSpells={activeLearnedSpells}
           onCast={handleCast}
           onClose={() => setShowCastPicker(false)}
