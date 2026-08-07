@@ -242,7 +242,6 @@ function backfillDefaults(character: Character): Character {
   return {
     ...rest,
     classLevels,
-    spellcraft: rest.spellcraft ?? 0,
     spellFocusSchools: rest.spellFocusSchools ?? [],
     greaterSpellFocusSchools: rest.greaterSpellFocusSchools ?? [],
     items: migrateLegacyEquipmentSlots(items, legacyEquipmentSlots)
@@ -290,7 +289,6 @@ export const useCharacterStore = create<CharacterStoreState>()(
           name: input.name,
           classLevels: input.classLevels,
           abilityScores: input.abilityScores,
-          spellcraft: input.spellcraft,
           spellFocusSchools: input.spellFocusSchools,
           greaterSpellFocusSchools: input.greaterSpellFocusSchools,
           extraSlotPools: [],

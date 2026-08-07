@@ -128,7 +128,6 @@ export interface Character {
   name: string;
   classLevels: ClassLevelEntry[];
   abilityScores: Record<AbilityId, number>;
-  spellcraft: number;
   spellFocusSchools: string[]; // spell school keys (see SCHOOL_LABELS), each at most once
   greaterSpellFocusSchools: string[]; // subset of spellFocusSchools, each at most once
   extraSlotPools: ExtraSlotPool[];
@@ -147,7 +146,6 @@ export type NewCharacterInput = Pick<
   | 'name'
   | 'classLevels'
   | 'abilityScores'
-  | 'spellcraft'
   | 'spellFocusSchools'
   | 'greaterSpellFocusSchools'
 >;

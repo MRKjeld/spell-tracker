@@ -640,7 +640,6 @@ export function CharacterSheet() {
               level={cl.level}
               abilityScores={character.abilityScores}
               castingAbility={cl.castingAbility}
-              spellcraft={character.spellcraft}
               onClose={() => setCasterStatsClassId(null)}
             />
           );

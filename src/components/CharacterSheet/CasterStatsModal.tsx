@@ -17,7 +17,6 @@ interface CasterStatsModalProps {
   level: number;
   abilityScores: Record<AbilityId, number>;
   castingAbility: AbilityId;
-  spellcraft: number;
   onClose: () => void;
 }
 
@@ -26,10 +25,9 @@ export function CasterStatsModal({
   level,
   abilityScores,
   castingAbility,
-  spellcraft,
   onClose,
 }: CasterStatsModalProps) {
-  const stats = computeCasterStats(level, abilityScores, castingAbility, spellcraft);
+  const stats = computeCasterStats(level, abilityScores, castingAbility);
 
   return (
     <Modal title={`${CLASS_LABELS[classId]} ${level} Caster Stats`} onClose={onClose}>
@@ -44,10 +42,6 @@ export function CasterStatsModal({
         <p>
           <strong>Concentration Check:</strong> {formatModifier(stats.concentrationCheck)}
         </p>
-        <p>
-          <strong>Spellcraft Check:</strong> {formatModifier(stats.spellcraftCheck)}
-        </p>
-
         <p>
           <strong>Spell Save DC:</strong> {stats.baseSpellDC} + Spell Level
         </p>

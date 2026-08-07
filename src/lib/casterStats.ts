@@ -5,7 +5,6 @@ export interface CasterStats {
   casterLevel: number;
   castingAbilityModifier: number;
   concentrationCheck: number;
-  spellcraftCheck: number;
   baseSpellDC: number;
   rangeCloseFt: number;
   rangeMediumFt: number;
@@ -33,7 +32,6 @@ export function computeCasterStats(
   level: number,
   abilityScores: Record<AbilityId, number>,
   castingAbility: AbilityId,
-  spellcraft: number,
 ): CasterStats {
   const casterLevel = level;
   const castingAbilityModifier = abilityModifier(abilityScores[castingAbility]);
@@ -42,7 +40,6 @@ export function computeCasterStats(
     casterLevel,
     castingAbilityModifier,
     concentrationCheck: casterLevel + castingAbilityModifier,
-    spellcraftCheck: spellcraft,
     baseSpellDC: 10 + castingAbilityModifier,
     rangeCloseFt: closeRangeFt(casterLevel),
     rangeMediumFt: mediumRangeFt(casterLevel),

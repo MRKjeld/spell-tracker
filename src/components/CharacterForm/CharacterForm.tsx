@@ -71,7 +71,6 @@ export function CharacterForm({ mode }: CharacterFormProps) {
         name,
         classLevels,
         abilityScores,
-        spellcraft: 0,
         spellFocusSchools: [],
         greaterSpellFocusSchools: [],
       });
