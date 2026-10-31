@@ -378,14 +378,6 @@
   opacity: 0.6;
 }
 
-.slot-chip-spell-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-width: 0;
-}
-
 .slot-chip-spell {
   font-weight: 600;
   font-size: 13px;
