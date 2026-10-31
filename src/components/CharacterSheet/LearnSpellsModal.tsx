@@ -1,43 +1,69 @@
 import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
-import { CLASS_LABELS } from '../../data/classes';
+import { CASTER_CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
-import { getAllSpellsFor } from '../../data/spells';
+import { getAllSpellsFor, SCHOOL_LABELS, searchSpells } from '../../data/spells';
+import type { SpellEntry } from '../../data/spells';
+import { schoolThemeColor, schoolThemeTextColor } from '../../data/schoolThemes';
+import { SchoolBadge } from './SchoolBadge';
 import { SpellDetails } from './SpellDetails';
 
 interface LearnSpellsModalProps {
   classId: ClassId;
   learnedSpellIds: string[];
-  onConfirm: (selectedSpellIds: string[]) => void;
+  // `levelBySpellId` holds the spell level shown in the picker for every
+  // spell selected during this session, so spells browsed from another
+  // class's list are stored at the level they were listed at.
+  onConfirm: (selectedSpellIds: string[], levelBySpellId: Record<string, number>) => void;
   onClose: () => void;
 }
 
+const SCHOOL_KEYS = Object.keys(SCHOOL_LABELS);
+const SPELL_LEVELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 // Multi-select variant of the spell picker used by the "+ Learn" button:
-// the list is locked to `classId` (no cross-class browsing), opens with
-// already-learned spells pre-selected/highlighted, and tapping toggles
-// selection in place rather than picking-and-closing. Confirming diffs the
-// selection against learnedSpellIds so both newly picked and deselected
-// spells are applied in one action.
+// opens with already-learned spells pre-selected/highlighted, and tapping
+// toggles selection in place rather than picking-and-closing. Confirming
+// diffs the selection against learnedSpellIds so both newly picked and
+// deselected spells are applied in one action. The class filter starts on
+// `classId` (the tab's own class) but can be widened to browse other lists.
 export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose }: LearnSpellsModalProps) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(learnedSpellIds));
+  const [levelBySpellId, setLevelBySpellId] = useState<Record<string, number>>({});
   const [query, setQuery] = useState('');
+  const [classFilter, setClassFilter] = useState<ClassId | 'all'>(classId);
+  const [schoolFilter, setSchoolFilter] = useState<string | null>(null);
+  const [levelFilter, setLevelFilter] = useState<number | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const spells = useMemo(() => {
-    const sorted = [...getAllSpellsFor(classId)].sort(
-      (a, b) => (a.levels[classId] ?? 0) - (b.levels[classId] ?? 0) || a.name.localeCompare(b.name),
-    );
-    const normalized = query.trim().toLowerCase();
-    return normalized ? sorted.filter((s) => s.name.toLowerCase().includes(normalized)) : sorted;
-  }, [classId, query]);
+  // Level shown for a spell: in the filtered class, else the tab's class,
+  // else the first class that lists it (only reachable under "All Classes").
+  function levelFor(spell: SpellEntry): number {
+    if (classFilter !== 'all') return spell.levels[classFilter] ?? 0;
+    return spell.levels[classId] ?? Object.values(spell.levels)[0] ?? 0;
+  }
 
-  function toggleSelected(spellId: string) {
+  const spells = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const base = classFilter === 'all' ? searchSpells(normalized) : getAllSpellsFor(classFilter);
+    const level = (spell: SpellEntry) =>
+      classFilter !== 'all' ? (spell.levels[classFilter] ?? 0) : (spell.levels[classId] ?? Object.values(spell.levels)[0] ?? 0);
+    return base
+      .filter((s) => (normalized ? s.name.toLowerCase().includes(normalized) : true))
+      .filter((s) => (schoolFilter ? s.school === schoolFilter : true))
+      .filter((s) => (levelFilter === null ? true : level(s) === levelFilter))
+      .sort((a, b) => level(a) - level(b) || a.name.localeCompare(b.name));
+  }, [classId, classFilter, query, schoolFilter, levelFilter]);
+
+  function toggleSelected(spell: SpellEntry) {
+    const isSelecting = !selected.has(spell.id);
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(spellId)) next.delete(spellId);
-      else next.add(spellId);
+      if (next.has(spell.id)) next.delete(spell.id);
+      else next.add(spell.id);
       return next;
     });
+    if (isSelecting) setLevelBySpellId((prev) => ({ ...prev, [spell.id]: levelFor(spell) }));
   }
 
   function toggleExpanded(spellId: string) {
@@ -60,6 +86,53 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
         autoFocus
       />
 
+      <div className="spell-picker-filters">
+        <label className="spell-picker-class-filter">
+          Class
+          <select value={classFilter} onChange={(e) => setClassFilter(e.target.value as ClassId | 'all')}>
+            <option value="all">All Classes</option>
+            {CASTER_CLASS_IDS.map((id) => (
+              <option key={id} value={id}>
+                {CLASS_LABELS[id]}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="spell-picker-class-filter">
+          Level
+          <select
+            value={levelFilter ?? ''}
+            onChange={(e) => setLevelFilter(e.target.value === '' ? null : Number(e.target.value))}
+          >
+            <option value="">All Levels</option>
+            {SPELL_LEVELS.map((lvl) => (
+              <option key={lvl} value={lvl}>
+                {lvl}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="school-filter" role="group" aria-label="Filter by school">
+        {SCHOOL_KEYS.map((school) => {
+          const active = schoolFilter === school;
+          return (
+            <button
+              key={school}
+              type="button"
+              className={`school-badge school-badge-button${active ? ' school-badge-active' : ''}`}
+              aria-pressed={active}
+              style={{ backgroundColor: schoolThemeColor(school), color: schoolThemeTextColor(school) }}
+              onClick={() => setSchoolFilter(active ? null : school)}
+            >
+              {SCHOOL_LABELS[school]}
+            </button>
+          );
+        })}
+      </div>
+
       <ul className="spell-picker-list">
         {spells.length === 0 && <li className="spell-picker-empty">No spells found.</li>}
         {spells.map((spell) => {
@@ -72,13 +145,11 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
                   type="button"
                   className={`spell-picker-pick${isSelected ? ' spell-picker-pick-selected' : ''}`}
                   aria-pressed={isSelected}
-                  onClick={() => toggleSelected(spell.id)}
+                  onClick={() => toggleSelected(spell)}
                 >
-                  {spell.name}
-                  <span className="spell-picker-school">
-                    {' '}
-                    · {spell.school} · Lvl {spell.levels[classId]}
-                  </span>
+                  {spell.name}{' '}
+                  <SchoolBadge school={spell.school} />
+                  <span className="spell-picker-school"> · Lvl {levelFor(spell)}</span>
                 </button>
                 <button
                   type="button"
@@ -96,7 +167,11 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
       </ul>
 
       <div className="form-actions">
-        <button type="button" className="button-primary" onClick={() => onConfirm(Array.from(selected))}>
+        <button
+          type="button"
+          className="button-primary"
+          onClick={() => onConfirm(Array.from(selected), levelBySpellId)}
+        >
           Confirm ({selected.size})
         </button>
         <button type="button" onClick={onClose}>

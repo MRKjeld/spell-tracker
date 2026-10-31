@@ -1240,6 +1240,46 @@
   background: var(--bg);
 }
 
+.spell-picker-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  flex-shrink: 0;
+}
+
+.school-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.school-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.school-badge-button {
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.school-badge-button:hover {
+  border-color: var(--text);
+}
+
+.school-badge-button.school-badge-active {
+  opacity: 1;
+  border-color: var(--text);
+}
+
 .spell-picker-list {
   list-style: none;
   padding: 0;

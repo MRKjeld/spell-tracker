@@ -224,7 +224,7 @@ export function CharacterSheet() {
     setPickerTarget(null);
   }
 
-  function handleLearnConfirm(selectedSpellIds: string[]) {
+  function handleLearnConfirm(selectedSpellIds: string[], levelBySpellId: Record<string, number>) {
     if (!resolvedSpellClassId) return;
     const selectedSet = new Set(selectedSpellIds);
     const currentIds = new Set(activeLearnedSpells.map((s) => s.spellId));
@@ -235,7 +235,7 @@ export function CharacterSheet() {
     for (const spellId of selectedSpellIds) {
       if (currentIds.has(spellId)) continue;
       const spell = getSpellById(spellId);
-      const spellLevel = spell?.levels[resolvedSpellClassId] ?? 0;
+      const spellLevel = spell?.levels[resolvedSpellClassId] ?? levelBySpellId[spellId] ?? 0;
       learnSpell(character!.id, {
         classId: resolvedSpellClassId,
         spellId,
