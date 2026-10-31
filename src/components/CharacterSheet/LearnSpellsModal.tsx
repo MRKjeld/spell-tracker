@@ -2,9 +2,8 @@ import { useMemo, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { CASTER_CLASS_IDS, CLASS_LABELS } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
-import { getAllSpellsFor, SCHOOL_LABELS, searchSpells } from '../../data/spells';
+import { getAllSpellsFor, SCHOOL_LABELS, searchSpells, spellMatchesQuery } from '../../data/spells';
 import type { SpellEntry } from '../../data/spells';
-import { schoolThemeColor, schoolThemeTextColor } from '../../data/schoolThemes';
 import { SchoolBadge } from './SchoolBadge';
 import { SpellDetails } from './SpellDetails';
 
@@ -45,14 +44,25 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
 
   const spells = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    const base = classFilter === 'all' ? searchSpells(normalized) : getAllSpellsFor(classFilter);
+    const base = classFilter === 'all' ? searchSpells('') : getAllSpellsFor(classFilter);
     const level = (spell: SpellEntry) =>
       classFilter !== 'all' ? (spell.levels[classFilter] ?? 0) : (spell.levels[classId] ?? Object.values(spell.levels)[0] ?? 0);
-    return base
-      .filter((s) => (normalized ? s.name.toLowerCase().includes(normalized) : true))
+    const bySchoolAndLevel = base
       .filter((s) => (schoolFilter ? s.school === schoolFilter : true))
-      .filter((s) => (levelFilter === null ? true : level(s) === levelFilter))
-      .sort((a, b) => level(a) - level(b) || a.name.localeCompare(b.name));
+      .filter((s) => (levelFilter === null ? true : level(s) === levelFilter));
+    const byLevelThenName = (a: SpellEntry, b: SpellEntry) =>
+      level(a) - level(b) || a.name.localeCompare(b.name);
+
+    if (!normalized) return bySchoolAndLevel.sort(byLevelThenName);
+
+    // Two passes: spells with the query in their name come first, then spells
+    // that only mention it in the description (never listed twice).
+    const nameMatches = bySchoolAndLevel.filter((s) => spellMatchesQuery(s, normalized, false));
+    const nameMatchIds = new Set(nameMatches.map((s) => s.id));
+    const descriptionMatches = bySchoolAndLevel.filter(
+      (s) => !nameMatchIds.has(s.id) && spellMatchesQuery(s, normalized, true),
+    );
+    return [...nameMatches.sort(byLevelThenName), ...descriptionMatches.sort(byLevelThenName)];
   }, [classId, classFilter, query, schoolFilter, levelFilter]);
 
   function toggleSelected(spell: SpellEntry) {
@@ -79,7 +89,7 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
     <Modal title={`Learn: ${CLASS_LABELS[classId]} Spells`} onClose={onClose}>
       <input
         type="search"
-        placeholder="Search spells..."
+        placeholder="Search names, then descriptions..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="spell-picker-search"
@@ -113,24 +123,18 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
             ))}
           </select>
         </label>
-      </div>
 
-      <div className="school-filter" role="group" aria-label="Filter by school">
-        {SCHOOL_KEYS.map((school) => {
-          const active = schoolFilter === school;
-          return (
-            <button
-              key={school}
-              type="button"
-              className={`school-badge school-badge-button${active ? ' school-badge-active' : ''}`}
-              aria-pressed={active}
-              style={{ backgroundColor: schoolThemeColor(school), color: schoolThemeTextColor(school) }}
-              onClick={() => setSchoolFilter(active ? null : school)}
-            >
-              {SCHOOL_LABELS[school]}
-            </button>
-          );
-        })}
+        <label className="spell-picker-class-filter">
+          School
+          <select value={schoolFilter ?? ''} onChange={(e) => setSchoolFilter(e.target.value || null)}>
+            <option value="">All Schools</option>
+            {SCHOOL_KEYS.map((school) => (
+              <option key={school} value={school}>
+                {SCHOOL_LABELS[school]}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       <ul className="spell-picker-list">
