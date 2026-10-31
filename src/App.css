@@ -1020,6 +1020,8 @@
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: 6px;
+  background: var(--surface);
+  color: inherit;
 }
 
 .add-slot-pool-form .add-slot-pool-checkbox {

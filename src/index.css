@@ -27,9 +27,12 @@
   --accent-calculation-hover: #ca8a04;
   --accent-calculation-text: #ffffff;
 
+  --link: #6329d6;
+
   --danger: #c0392b;
   --item-chip-worn: #a1a1aa;
   --item-chip-unworn: #71717a;
+  color-scheme: light dark;
   font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -42,7 +45,14 @@
     --bg: #16171d;
     --surface: #1f2028;
     --border: #2e303a;
-  
+
+    --link: #b69bff;
+    --surface-action: #2a2c36;
+
+    --accent-circumstance-selected-bg: #e7e5ea;
+    --accent-circumstance-selected-text: #16171d;
+    --accent-calculation-text: #1a1400;
+
     --accent-action: #45fe5b;
     --accent-action-hover: #37cd49;
     
@@ -89,7 +99,12 @@ select {
 }
 
 a {
-  color: var(--accent-spell);
+  color: var(--link);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
 }
 
 button {
