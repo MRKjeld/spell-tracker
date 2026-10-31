@@ -11,6 +11,7 @@ interface ActionsSectionProps {
   onAddAction: () => void;
   onSetCalculationSelectedCircumstantials: (calculationId: string, selectedModifierIds: string[]) => void;
   onRemoveAction: (actionId: string) => void;
+  onMoveAction: (actionId: string, toIndex: number) => void;
 }
 
 export function ActionsSection({
@@ -22,11 +23,25 @@ export function ActionsSection({
   onAddAction,
   onSetCalculationSelectedCircumstantials,
   onRemoveAction,
+  onMoveAction,
 }: ActionsSectionProps) {
   // Which modifier chip currently has its name revealed, keyed by
   // `${calculationId}-${modifierId}` since the same modifier can appear
   // under more than one calculation on the page at once.
   const [revealedChip, setRevealedChip] = useState<string | null>(null);
+
+  // Pointer-based drag (mouse and touch): while the handle is held, move the
+  // dragged action to whichever action card is under the pointer.
+  function handleDragMove(e: React.PointerEvent<HTMLElement>, actionId: string) {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    const card = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>('[data-action-id]');
+    const overId = card?.dataset.actionId;
+    if (!overId || overId === actionId) return;
+    onMoveAction(
+      actionId,
+      actions.findIndex((a) => a.id === overId),
+    );
+  }
 
   const modifierById = new Map(modifiers.map((m) => [m.id, m]));
   const calculationById = new Map(calculations.map((c) => [c.id, c]));
@@ -58,9 +73,28 @@ export function ActionsSection({
         </p>
       ) : (
         <div className="action-card-list">
-          {actions.map((action) => (
-            <div key={action.id} className="action-card">
+          {actions.map((action, index) => (
+            <div key={action.id} data-action-id={action.id} className="action-card">
               <div className="action-card-header">
+                <span
+                  className="action-card-handle"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Reorder ${action.name}. Use arrow keys or drag.`}
+                  onPointerDown={(e) => e.currentTarget.setPointerCapture(e.pointerId)}
+                  onPointerMove={(e) => handleDragMove(e, action.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      onMoveAction(action.id, index - 1);
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      onMoveAction(action.id, index + 1);
+                    }
+                  }}
+                >
+                  ⋮⋮
+                </span>
                 <span className="action-card-name">{action.name}</span>
                 <button
                   type="button"

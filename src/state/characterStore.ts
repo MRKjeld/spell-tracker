@@ -190,6 +190,7 @@ interface CharacterStoreState {
     selectedModifierIds: string[],
   ): void;
   addAction(charId: string, action: { name: string; description: string; calculationIds: string[] }): void;
+  moveAction(charId: string, actionId: string, toIndex: number): void;
   removeAction(charId: string, actionId: string): void;
   replaceAllCharacters(chars: Character[]): void;
   addCharacters(chars: Character[]): void;
@@ -882,6 +883,20 @@ export const useCharacterStore = create<CharacterStoreState>()(
           if (!existing) return state;
           const newAction: CharacterAction = { ...action, id: createId() };
           const updated = touch({ ...existing, actions: [...(existing.actions ?? []), newAction] });
+          return { characters: { ...state.characters, [charId]: updated } };
+        });
+      },
+
+      moveAction(charId, actionId, toIndex) {
+        set((state) => {
+          const existing = state.characters[charId];
+          if (!existing) return state;
+          const actions = [...(existing.actions ?? [])];
+          const from = actions.findIndex((a) => a.id === actionId);
+          if (from === -1 || toIndex < 0 || toIndex >= actions.length || from === toIndex) return state;
+          const [moved] = actions.splice(from, 1);
+          actions.splice(toIndex, 0, moved);
+          const updated = touch({ ...existing, actions });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },

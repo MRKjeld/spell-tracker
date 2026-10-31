@@ -520,8 +520,22 @@
 }
 
 .action-card-name {
+  flex: 1;
   font-weight: 600;
   font-size: 16px;
+}
+
+.action-card-handle {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  color: var(--text-muted);
+  padding: 4px 6px;
+  letter-spacing: -2px;
+}
+
+.action-card-handle:active {
+  cursor: grabbing;
 }
 
 .action-card-remove {
@@ -660,6 +674,43 @@
   gap: 8px;
   font-size: 14px;
   color: var(--text);
+}
+
+.selected-calculations {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.selected-calculation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 14px;
+}
+
+.selected-calculation-name {
+  flex: 1;
+}
+
+.selected-calculation-handle {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  color: var(--text-muted);
+  padding: 4px 6px;
+  letter-spacing: -2px;
+}
+
+.selected-calculation-handle:active {
+  cursor: grabbing;
 }
 
 .picker-checklist-remove {
