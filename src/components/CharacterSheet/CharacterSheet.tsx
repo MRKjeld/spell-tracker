@@ -36,6 +36,7 @@ import { AddActionModal } from './AddActionModal';
 import { findItemForSlot } from '../../lib/equipmentSlots';
 import { getSystemModifiers, isSystemModifierId } from '../../lib/systemModifiers';
 import { getSystemCalculations, isSystemCalculationId } from '../../lib/systemCalculations';
+import { deriveItemActions, isItemActionId, orderActions } from '../../lib/itemActions';
 
 // Which catalog/picker a given body slot is filled from: 'armor' takes worn
 // armor, 'mainHand'/'offhand' take shields and hand-eligible weapons,
@@ -160,6 +161,11 @@ export function CharacterSheet() {
   }, [character]);
 
   const systemCalculations = useMemo(() => getSystemCalculations(), []);
+  // One action per usage form of every equipped item -- a thrown dagger, each
+  // end of a double weapon, a shield bash, a wand's charge. Rebuilt from the
+  // equipment rather than stored, so they appear on equip and vanish on
+  // unequip without anything to keep in sync.
+  const itemActions = useMemo(() => deriveItemActions(character?.items ?? []), [character?.items]);
 
   if (!character) {
     return (
@@ -474,8 +480,8 @@ export function CharacterSheet() {
       {resolvedTab === 'actions' && (
         <ActionsSection
           modifiers={[...character.modifiers, ...systemModifiers]}
-          calculations={[...character.calculations, ...systemCalculations]}
-          actions={character.actions}
+          calculations={[...character.calculations, ...systemCalculations, ...itemActions.calculations]}
+          actions={orderActions([...character.actions, ...itemActions.actions], character.actionOrder)}
           onAddModifier={() => setShowAddModifier(true)}
           onAddCalculation={() => setShowAddCalculation(true)}
           onAddAction={() => setShowAddAction(true)}
@@ -483,6 +489,7 @@ export function CharacterSheet() {
             setCalculationSelectedCircumstantials(character.id, calculationId, selectedModifierIds)
           }
           onRemoveAction={handleRemoveAction}
+          isDerivedAction={isItemActionId}
           onMoveAction={(actionId, toIndex) => moveAction(character.id, actionId, toIndex)}
         />
       )}

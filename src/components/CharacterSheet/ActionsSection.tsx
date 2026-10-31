@@ -12,6 +12,9 @@ interface ActionsSectionProps {
   onSetCalculationSelectedCircumstantials: (calculationId: string, selectedModifierIds: string[]) => void;
   onRemoveAction: (actionId: string) => void;
   onMoveAction: (actionId: string, toIndex: number) => void;
+  // True for actions derived from an equipped item: they can be reordered
+  // like any other, but not deleted -- unequipping the item removes them.
+  isDerivedAction: (actionId: string) => boolean;
 }
 
 export function ActionsSection({
@@ -24,6 +27,7 @@ export function ActionsSection({
   onSetCalculationSelectedCircumstantials,
   onRemoveAction,
   onMoveAction,
+  isDerivedAction,
 }: ActionsSectionProps) {
   // Which modifier chip currently has its name revealed, keyed by
   // `${calculationId}-${modifierId}` since the same modifier can appear
@@ -96,15 +100,21 @@ export function ActionsSection({
                   ⋮⋮
                 </span>
                 <span className="action-card-name">{action.name}</span>
-                <button
-                  type="button"
-                  className="action-card-remove"
-                  onClick={() => onRemoveAction(action.id)}
-                  title={`Delete ${action.name}`}
-                  aria-label={`Delete ${action.name}`}
-                >
-                  ×
-                </button>
+                {isDerivedAction(action.id) ? (
+                  <span className="action-card-source" title="From an equipped item; unequip to remove">
+                    Equipped
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="action-card-remove"
+                    onClick={() => onRemoveAction(action.id)}
+                    title={`Delete ${action.name}`}
+                    aria-label={`Delete ${action.name}`}
+                  >
+                    ×
+                  </button>
+                )}
               </div>
 
               {action.description && <p className="action-card-body">{action.description}</p>}

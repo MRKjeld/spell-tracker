@@ -137,6 +137,11 @@ export interface Character {
   modifiers: Modifier[]; // Actions tab: reusable named bonuses
   calculations: Calculation[]; // Actions tab: dice rolls built from modifiers
   actions: CharacterAction[]; // Actions tab: named activities built from calculations
+  // Display order for the Actions tab, by action id. Covers both stored
+  // actions and the ones derived from equipped items (see lib/itemActions),
+  // so the two can be interleaved by dragging. Ids that no longer resolve are
+  // ignored and actions it doesn't mention sort to the end.
+  actionOrder: string[];
   createdAt: string;
   updatedAt: string;
 }

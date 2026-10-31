@@ -538,6 +538,17 @@
   cursor: grabbing;
 }
 
+.action-card-source {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
 .action-card-remove {
   background: none;
   border: none;

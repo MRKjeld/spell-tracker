@@ -13,6 +13,7 @@ import { isTwoHandedWeaponItemId } from '../data/weapons';
 import type { BodySlotId } from '../data/bodySlots';
 import type { BaseArmorCategory } from '../data/baseArmor';
 import { occupiedSlots } from '../lib/equipmentSlots';
+import { deriveItemActions, moveInOrder, orderActions } from '../lib/itemActions';
 import type {
   Calculation,
   Character,
@@ -251,6 +252,7 @@ function backfillDefaults(character: Character): Character {
     modifiers,
     calculations,
     actions: rest.actions ?? [],
+    actionOrder: rest.actionOrder ?? [],
     extraSlotPools: (rest.extraSlotPools ?? []).map((p) => ({ ...p, classId: p.classId ?? primaryClassId })),
     learnedSpells: (rest.learnedSpells ?? []).map((s) => ({ ...s, classId: s.classId ?? s.sourceClassId ?? primaryClassId })),
   };
@@ -298,6 +300,7 @@ export const useCharacterStore = create<CharacterStoreState>()(
           modifiers: [],
           calculations: [],
           actions: [],
+          actionOrder: [],
           learnedSpells: [],
           createdAt: now,
           updatedAt: now,
@@ -891,12 +894,17 @@ export const useCharacterStore = create<CharacterStoreState>()(
         set((state) => {
           const existing = state.characters[charId];
           if (!existing) return state;
-          const actions = [...(existing.actions ?? [])];
-          const from = actions.findIndex((a) => a.id === actionId);
-          if (from === -1 || toIndex < 0 || toIndex >= actions.length || from === toIndex) return state;
-          const [moved] = actions.splice(from, 1);
-          actions.splice(toIndex, 0, moved);
-          const updated = touch({ ...existing, actions });
+          // Actions derived from equipped items sit in the same list as the
+          // stored ones, so the order has to be saved by id rather than by
+          // reordering `actions` itself.
+          const derived = deriveItemActions(existing.items ?? []).actions;
+          const shownIds = orderActions(
+            [...(existing.actions ?? []), ...derived],
+            existing.actionOrder ?? [],
+          ).map((a) => a.id);
+          const actionOrder = moveInOrder(shownIds, actionId, toIndex);
+          if (actionOrder === shownIds) return state;
+          const updated = touch({ ...existing, actionOrder });
           return { characters: { ...state.characters, [charId]: updated } };
         });
       },
