@@ -3,6 +3,8 @@ import { CLASS_LABELS } from '../../data/classes';
 import type { SlotInstance } from '../../lib/slotMath';
 import type { SlotFill } from '../../state/types';
 import { POOL_COLOR_HEX, POOL_COLOR_TEXT } from '../../data/poolColors';
+import { getSpellById } from '../../data/spells';
+import { schoolThemeColor, schoolThemeTextColor } from '../../data/schoolThemes';
 
 interface SlotChipProps {
   instance: SlotInstance;
@@ -23,6 +25,11 @@ export function SlotChip({ instance, fill, tabClassId, onClick }: SlotChipProps)
   const stateClass = fill ? (fill.used ? 'slot-chip-used' : 'slot-chip-filled') : 'slot-chip-empty';
   const poolColor = instance.poolColor ? POOL_COLOR_HEX[instance.poolColor] : undefined;
   const poolTextColor = instance.poolColor ? POOL_COLOR_TEXT[instance.poolColor] : undefined;
+  // A prepared (not yet used) spell takes its school's colour; a pool's own
+  // colour wins when set, and used spells stay greyed.
+  const school = fill && !fill.used ? getSpellById(fill.spellId)?.school : undefined;
+  const schoolColor = school ? schoolThemeColor(school) : undefined;
+  const schoolTextColor = school ? schoolThemeTextColor(school) : undefined;
 
   return (
     <button
@@ -31,7 +38,11 @@ export function SlotChip({ instance, fill, tabClassId, onClick }: SlotChipProps)
       onClick={onClick}
       title={originLabel ?? undefined}
       style={
-        poolColor ? { backgroundColor: poolColor, borderColor: poolColor, color: poolTextColor } : undefined
+        poolColor
+          ? { backgroundColor: poolColor, borderColor: poolColor, color: poolTextColor }
+          : schoolColor
+            ? { backgroundColor: schoolColor, borderColor: schoolColor, color: schoolTextColor }
+            : undefined
       }
     >
       {fill ? (
