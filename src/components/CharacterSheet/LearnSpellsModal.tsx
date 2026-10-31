@@ -144,7 +144,7 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
           const expanded = expandedIds.has(spell.id);
           return (
             <li key={spell.id}>
-              <div className="spell-picker-row">
+              <div className={`spell-picker-row${isSelected ? ' spell-picker-row-selected' : ''}`}>
                 <button
                   type="button"
                   className={`spell-picker-pick${isSelected ? ' spell-picker-pick-selected' : ''}`}
@@ -159,9 +159,10 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
                   type="button"
                   className="spell-picker-toggle"
                   aria-expanded={expanded}
+                  aria-label={`${expanded ? 'Hide' : 'Show'} details for ${spell.name}`}
                   onClick={() => toggleExpanded(spell.id)}
                 >
-                  {expanded ? 'Show less' : 'Show more'}
+                  {expanded ? '−' : '+'}
                 </button>
               </div>
               {expanded && <SpellDetails spell={spell} themed tinted />}

@@ -1303,6 +1303,21 @@
   border-radius: 4px;
 }
 
+/* Learn modal: highlight the whole row (name + expand button), not just the name. */
+.spell-picker-row-selected {
+  background: var(--accent-spell);
+  color: white;
+  border-radius: 4px;
+}
+
+.spell-picker-row-selected .spell-picker-pick.spell-picker-pick-selected {
+  background: none;
+}
+
+.spell-picker-row-selected .spell-picker-toggle {
+  color: white;
+}
+
 .spell-picker-pick-selected .spell-picker-school {
   color: rgba(255, 255, 255, 0.85);
 }
