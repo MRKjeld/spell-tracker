@@ -51,11 +51,13 @@ export function SpellViewModal({
 
   return (
     <Modal title={spellName} onClose={onClose} accentColor={spell ? schoolThemeColor(spell.school) : undefined}>
-      {spell ? (
-        <SpellDetails spell={spell} saveDC={saveDC} casterLevel={classLevel?.level} themed />
-      ) : (
-        <p>Spell details not found.</p>
-      )}
+      <div className="spell-view-scroll">
+        {spell ? (
+          <SpellDetails spell={spell} saveDC={saveDC} casterLevel={classLevel?.level} themed />
+        ) : (
+          <p>Spell details not found.</p>
+        )}
+      </div>
       <div className="spell-view-actions">
         <button type="button" className="button-danger" onClick={onClear}>
           Clear

@@ -1028,7 +1028,16 @@
   padding: 0 4px;
 }
 
+/* The spell block fills the space above the buttons and scrolls on its own,
+   so Clear/Use/Close stay pinned to the bottom right of the modal. */
+.spell-view-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .spell-view-actions {
+  flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
