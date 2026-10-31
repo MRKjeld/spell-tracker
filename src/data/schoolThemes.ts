@@ -26,6 +26,30 @@ export const SCHOOL_THEME_TEXT: Record<string, string> = {
   uni: '#ffffff',
 };
 
+const SCHOOL_NAME_KEYS: Record<string, string> = {
+  abjuration: 'abj',
+  conjuration: 'con',
+  divination: 'div',
+  enchantment: 'enc',
+  evocation: 'evo',
+  illusion: 'ill',
+  necromancy: 'nec',
+  transmutation: 'trs',
+};
+
+// Magic items state their school in free text ("faint transmutation",
+// "moderate illusion and transmutation"). Returns the first school named, or
+// null when there is none (e.g. "no aura (nonmagical)").
+export function auraSchool(aura: string): string | null {
+  const text = aura.toLowerCase();
+  let best: { key: string; index: number } | null = null;
+  for (const [name, key] of Object.entries(SCHOOL_NAME_KEYS)) {
+    const index = text.indexOf(name);
+    if (index !== -1 && (best === null || index < best.index)) best = { key, index };
+  }
+  return best ? best.key : null;
+}
+
 export function schoolThemeColor(school: string): string {
   return SCHOOL_THEME_HEX[school] ?? SCHOOL_THEME_HEX.uni;
 }

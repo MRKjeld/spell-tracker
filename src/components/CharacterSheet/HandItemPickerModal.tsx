@@ -91,7 +91,7 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
           const twoHanded = kind === 'weapon' && isTwoHandedWeapon(item);
           return (
             <li key={key}>
-              <div className="spell-picker-row">
+              <div className={`spell-picker-row${isSelected ? ' spell-picker-row-selected' : ''}`}>
                 <button
                   type="button"
                   className={`spell-picker-pick${isSelected ? ' spell-picker-pick-selected' : ''}`}
@@ -106,9 +106,10 @@ export function HandItemPickerModal({ slot, onPick, onClose }: HandItemPickerMod
                   type="button"
                   className="spell-picker-toggle"
                   aria-expanded={expanded}
+                  aria-label={`${expanded ? 'Hide' : 'Show'} details for ${item.name}`}
                   onClick={() => toggleExpanded(item.id)}
                 >
-                  {expanded ? 'Show less' : 'Show more'}
+                  {expanded ? '−' : '+'}
                 </button>
               </div>
               {expanded ? (

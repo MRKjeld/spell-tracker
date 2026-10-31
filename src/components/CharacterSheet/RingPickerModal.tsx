@@ -73,7 +73,7 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
           const isSelected = selectedId === item.id;
           return (
             <li key={item.id}>
-              <div className="spell-picker-row">
+              <div className={`spell-picker-row${isSelected ? ' spell-picker-row-selected' : ''}`}>
                 <button
                   type="button"
                   className={`spell-picker-pick${isSelected ? ' spell-picker-pick-selected' : ''}`}
@@ -87,9 +87,10 @@ export function RingPickerModal({ slot, onPick, onClose }: RingPickerModalProps)
                   type="button"
                   className="spell-picker-toggle"
                   aria-expanded={expanded}
+                  aria-label={`${expanded ? 'Hide' : 'Show'} details for ${item.name}`}
                   onClick={() => toggleExpanded(item.id)}
                 >
-                  {expanded ? 'Show less' : 'Show more'}
+                  {expanded ? '−' : '+'}
                 </button>
               </div>
               {expanded ? (
