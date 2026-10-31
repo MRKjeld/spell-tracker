@@ -145,7 +145,7 @@ export function SpellPickerModal({
                 </button>
               </div>
               {expanded ? (
-                <SpellDetails spell={spell} />
+                <SpellDetails spell={spell} themed tinted />
               ) : (
                 showAllDescriptions && (
                   <p className="spell-picker-description">{spell.description || 'No description available.'}</p>

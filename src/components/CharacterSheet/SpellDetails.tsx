@@ -16,11 +16,15 @@ export function SpellDetails({
   saveDC,
   casterLevel,
   themed = false,
+  tinted = false,
 }: {
   spell: SpellEntry;
   saveDC?: number;
   casterLevel?: number;
   themed?: boolean;
+  // Also tint the block's background with the school colour, for use inside
+  // un-themed modals (the spell view modal tints its own background instead).
+  tinted?: boolean;
 }) {
   const schoolLine = [
     SCHOOL_LABELS[spell.school] ?? spell.school,
@@ -35,7 +39,14 @@ export function SpellDetails({
   return (
     <div
       className={themed ? 'spell-picker-details spell-details-themed' : 'spell-picker-details'}
-      style={themed ? { borderLeftColor: schoolColor } : undefined}
+      style={
+        themed
+          ? {
+              borderLeftColor: schoolColor,
+              ...(tinted && { background: `color-mix(in srgb, ${schoolColor} 14%, var(--surface))` }),
+            }
+          : undefined
+      }
     >
       <p>
         <strong>School:</strong> <span style={themed ? { color: schoolColor } : undefined}>{schoolLine}</span>

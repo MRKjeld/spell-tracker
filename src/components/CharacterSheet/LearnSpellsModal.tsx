@@ -164,7 +164,7 @@ export function LearnSpellsModal({ classId, learnedSpellIds, onConfirm, onClose 
                   {expanded ? 'Show less' : 'Show more'}
                 </button>
               </div>
-              {expanded && <SpellDetails spell={spell} />}
+              {expanded && <SpellDetails spell={spell} themed tinted />}
             </li>
           );
         })}

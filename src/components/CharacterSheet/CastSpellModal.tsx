@@ -87,7 +87,7 @@ export function CastSpellModal({ classId, learnedSpells, onCast, onClose }: Cast
                   {expanded ? 'Show less' : 'Show more'}
                 </button>
             </div>
-            {expanded && <SpellDetails spell={spell}/>}
+            {expanded && <SpellDetails spell={spell} themed tinted />}
           </li>
           );
         })}
