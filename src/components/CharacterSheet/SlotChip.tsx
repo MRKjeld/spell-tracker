@@ -3,6 +3,8 @@ import { CLASS_LABELS } from '../../data/classes';
 import type { SlotInstance } from '../../lib/slotMath';
 import type { SlotFill } from '../../state/types';
 import { POOL_COLOR_HEX, POOL_COLOR_TEXT } from '../../data/poolColors';
+import { getSpellById } from '../../data/spells';
+import { SchoolBadge } from './SchoolBadge';
 
 interface SlotChipProps {
   instance: SlotInstance;
@@ -23,6 +25,7 @@ export function SlotChip({ instance, fill, tabClassId, onClick }: SlotChipProps)
   const stateClass = fill ? (fill.used ? 'slot-chip-used' : 'slot-chip-filled') : 'slot-chip-empty';
   const poolColor = instance.poolColor ? POOL_COLOR_HEX[instance.poolColor] : undefined;
   const poolTextColor = instance.poolColor ? POOL_COLOR_TEXT[instance.poolColor] : undefined;
+  const school = fill ? getSpellById(fill.spellId)?.school : undefined;
 
   return (
     <button
@@ -36,7 +39,10 @@ export function SlotChip({ instance, fill, tabClassId, onClick }: SlotChipProps)
     >
       {fill ? (
         <>
-          <span className="slot-chip-spell">{fill.spellName}</span>
+          <span className="slot-chip-spell-block">
+            <span className="slot-chip-spell">{fill.spellName}</span>
+            {school && <SchoolBadge school={school} />}
+          </span>
           {filledSourceParts.length > 0 && (
             <span className="slot-chip-source">{filledSourceParts.join(' · ')}</span>
           )}
